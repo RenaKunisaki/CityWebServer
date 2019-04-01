@@ -1,0 +1,64 @@
+html {
+    width: 100%;
+}
+
+body {
+    padding-top: 60px;
+    background: #000;
+    color: #FFF;
+    width: 100%;
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 0;
+    border-bottom: 1px #FFF solid;
+}
+
+.container {
+    width: 100% !important;
+}
+
+.list {
+    border: 1px #FFF solid;
+    max-width: 45%;
+    overflow-y: auto;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 4px;
+}
+
+/* table {
+    border-left: 1px #FFF solid;
+    border-top: 1px #FFF solid;
+} */
+
+td, th {
+    border-right: 1px #FFF solid;
+    border-bottom: 1px #FFF solid;
+}
+
+#clock {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    text-align: right;
+    color: #CCC;
+    font-size: 1.3em;
+}
+
+#chirper .name {
+    font-weight: bold;
+    margin-right: 1em;
+}
+
+#transit .blimp { background-color: #424 }
+#transit .bus   { background-color: #044 }
+#transit .train { background-color: #420 }
+#transit .ferry { background-color: #004 }
+#transit .metro { background-color: #040 }
+
+#transit .stops, #transit .vehicles, #transit .passengers {
+    text-align: right;
+}
