@@ -122,6 +122,9 @@
     <None Include="wwwroot\r\js\main.js" />
     <None Include="wwwroot\r\js\oldmain.js" />
     <None Include="wwwroot\index.html" />
+    <None Include="wwwroot\r\js\budget.js" />
+    <None Include="wwwroot\r\js\jquery.number.min.js" />
+    <None Include="wwwroot\r\js\jquery.number.min.js.map" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

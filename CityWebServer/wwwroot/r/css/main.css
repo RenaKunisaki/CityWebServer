@@ -29,6 +29,16 @@ h2 {
     margin-right: 4px;
 }
 
+.money {
+    text-align: right;
+    font-family: monospace;
+    margin-right: 1em;
+}
+.money:before { content: '₡' }
+.budget .income:before { content: "Income: ₡" }
+.budget .expenses:before { content: "Expenses: ₡" }
+.budget .delta:before { content: "Net Income: ₡" }
+
 /* table {
     border-left: 1px #FFF solid;
     border-top: 1px #FFF solid;

@@ -4,6 +4,7 @@ class App {
         this._isInit        = false;
         this.viewModel      = null;
         this.currentDate    = null;
+        this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
         this.transit        = new Transit(this);
     }
@@ -12,10 +13,12 @@ class App {
         window.setInterval(() => {
             this._refresh();
         }, this.updateInterval);
-
+        
+        $('#budget').append(this.budget.element);
         $('#chirper').append(this.chirper.element);
         $('#transit').append(this.transit.element);
-
+        
+        this.budget.run();
         this.chirper.run();
         this.transit.run();
     }
