@@ -66,12 +66,13 @@ namespace CityWebServer
             foreach (var path in modPaths)
             {
                 var testPath = Path.Combine(path, "wwwroot");
-
-                if (Directory.Exists(testPath))
-                {
+                LogMessage($"Trying path \"{testPath}\"...");
+                if(Directory.Exists(testPath)) {
+                    LogMessage($"Found wwwroot: \"{testPath}\"...");
                     return testPath;
                 }
             }
+            LogMessage($"No wwwroot found!", messageType: PluginManager.MessageType.Error);
             return null;
         }
 
@@ -247,9 +248,17 @@ namespace CityWebServer
             }
 
             var wwwroot = GetWebRoot();
+            if (wwwroot == null) return;
 
             // At this point, we can guarantee that we don't need any game data, so we can safely start a new thread to perform the remaining tasks.
-            ServiceFileRequest(wwwroot, request, response);
+            try {
+                ServiceFileRequest(wwwroot, request, response);
+            }
+            catch(Exception ex) {
+				String body = $"Error handling request {request.RawUrl}: {ex}";
+				IResponseFormatter fmt = new PlainTextResponseFormatter(body, HttpStatusCode.InternalServerError);
+				fmt.WriteContent(response);
+			}
         }
 
         private static void ServiceFileRequest(String wwwroot, HttpListenerRequest request, HttpListenerResponse response)
@@ -467,16 +476,16 @@ namespace CityWebServer
         /// <summary>
         /// Adds a timestamp to the specified message, and appends it to the internal log.
         /// </summary>
-        public static void LogMessage(String message, String label = null, Boolean showInDebugPanel = false)
-        {
+        public static void LogMessage(String message, String label = null,
+        Boolean showInDebugPanel = true,
+        PluginManager.MessageType messageType = PluginManager.MessageType.Message) {
             var dt = DateTime.Now;
             String time = String.Format("{0} {1}", dt.ToShortDateString(), dt.ToShortTimeString());
             String messageWithLabel = String.IsNullOrEmpty(label) ? message : String.Format("{0}: {1}", label, message);
             String line = String.Format("[{0}] {1}{2}", time, messageWithLabel, Environment.NewLine);
             _logLines.Add(line);
-            if (showInDebugPanel)
-            {
-                DebugOutputPanel.AddMessage(PluginManager.MessageType.Message, line);
+            if (showInDebugPanel) {
+                DebugOutputPanel.AddMessage(messageType, line);
             }
         }
 
