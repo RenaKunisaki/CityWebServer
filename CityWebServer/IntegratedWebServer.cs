@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,500 +15,471 @@ using ICities;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace CityWebServer
-{
-    [UsedImplicitly]
-    public class IntegratedWebServer : ThreadingExtensionBase, IWebServer
-    {
-        // Allows an arbitrary number of bindings by appending a number to the end.
-        private const String WebServerHostKey = "webServerHost{0}";
+namespace CityWebServer {
+	[UsedImplicitly]
+	public class IntegratedWebServer: ThreadingExtensionBase, IWebServer {
+		// Allows an arbitrary number of bindings by appending a number to the end.
+		private const String WebServerHostKey = "webServerHost{0}";
 
-        private static List<String> _logLines;
-        private static string _endpoint;
+		private static List<String> _logLines;
+		private static string _endpoint;
 
-        private WebServer _server;
-        private List<IRequestHandler> _requestHandlers;
-        private String _cityName = "CityName";
+		private WebServer _server;
+		private List<IRequestHandler> _requestHandlers;
+		private String _cityName = "CityName";
 
-        // Not required, but prevents a number of spurious entries from making it to the log file.
-        private static readonly List<String> IgnoredAssemblies = new List<String>
-        {
-            "Anonymously Hosted DynamicMethods Assembly",
-            "Assembly-CSharp",
-            "Assembly-CSharp-firstpass",
-            "Assembly-UnityScript-firstpass",
-            "Boo.Lang",
-            "ColossalManaged",
-            "ICSharpCode.SharpZipLib",
-            "ICities",
-            "Mono.Security",
-            "mscorlib",
-            "System",
-            "System.Configuration",
-            "System.Core",
-            "System.Xml",
-            "UnityEngine",
-            "UnityEngine.UI",
-        };
+		protected static String wwwRoot = null;
+		protected static Stream logFile = null;
+		protected static TextWriterTraceListener logListener;
 
-        /// <summary>
-        /// Gets the root endpoint for which the server is configured to service HTTP requests.
-        /// </summary>
-        public static String Endpoint
-        {
-            get { return _endpoint; }
-        }
+		// Not required, but prevents a number of spurious entries from making it to the log file.
+		private static readonly List<String> IgnoredAssemblies = new List<String>
+		{
+			"Anonymously Hosted DynamicMethods Assembly",
+			"Assembly-CSharp",
+			"Assembly-CSharp-firstpass",
+			"Assembly-UnityScript-firstpass",
+			"Boo.Lang",
+			"ColossalManaged",
+			"ICSharpCode.SharpZipLib",
+			"ICities",
+			"Mono.Security",
+			"mscorlib",
+			"System",
+			"System.Configuration",
+			"System.Core",
+			"System.Xml",
+			"UnityEngine",
+			"UnityEngine.UI",
+		};
 
-        /// <summary>
-        /// Gets the full path to the directory where static pages are served from.
-        /// </summary>
-        public static String GetWebRoot()
-        {
-            var modPaths = PluginManager.instance.GetPluginsInfo().Select(obj => obj.modPath);
-            foreach (var path in modPaths)
-            {
-                var testPath = Path.Combine(path, "wwwroot");
-                LogMessage($"Trying path \"{testPath}\"...");
-                if(Directory.Exists(testPath)) {
-                    LogMessage($"Found wwwroot: \"{testPath}\"...");
-                    return testPath;
-                }
-            }
-            LogMessage($"No wwwroot found!", messageType: PluginManager.MessageType.Error);
-            return null;
-        }
+		/// <summary>
+		/// Gets the root endpoint for which the server is configured to service HTTP requests.
+		/// </summary>
+		public static String Endpoint {
+			get { return _endpoint; }
+		}
 
-        /// <summary>
-        /// Gets an array containing all currently registered request handlers.
-        /// </summary>
-        public IRequestHandler[] RequestHandlers
-        {
-            get { return _requestHandlers.ToArray(); }
-        }
+		/// <summary>
+		/// Gets the full path to the directory where static pages are served from.
+		/// </summary>
+		public static String GetWebRoot() {
+			if(wwwRoot != null) return wwwRoot;
+			var modPaths = PluginManager.instance.GetPluginsInfo().Select(obj => obj.modPath);
+			foreach(var path in modPaths) {
+				var testPath = Path.Combine(path, "wwwroot");
+				LogMessage($"Trying path \"{testPath}\"...");
+				if(Directory.Exists(testPath)) {
+					LogMessage($"Found wwwroot: \"{testPath}\"...");
+					wwwRoot = testPath;
+					return testPath;
+				}
+			}
+			LogMessage($"No wwwroot found!", messageType: PluginManager.MessageType.Error);
+			return null;
+		}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IntegratedWebServer"/> class.
-        /// </summary>
-        public IntegratedWebServer()
-        {
-            // For the entire lifetime of this instance, we'll preseve log messages.
-            // After a certain point, it might be worth truncating them, but we'll cross that bridge when we get to it.
-            _logLines = new List<String>();
+		/// <summary>
+		/// Gets an array containing all currently registered request handlers.
+		/// </summary>
+		public IRequestHandler[] RequestHandlers {
+			get { return _requestHandlers.ToArray(); }
+		}
 
-            // We need a place to store all the request handlers that have been registered.
-            _requestHandlers = new List<IRequestHandler>();
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="IntegratedWebServer"/> class.
+		/// </summary>
+		public IntegratedWebServer() {
+			// For the entire lifetime of this instance, we'll preseve log messages.
+			// After a certain point, it might be worth truncating them, but we'll cross that bridge when we get to it.
+			_logLines = new List<String>();
 
-        #region Create
+			// We need a place to store all the request handlers that have been registered.
+			_requestHandlers = new List<IRequestHandler>();
 
-        /// <summary>
-        /// Called by the game after this instance is created.
-        /// </summary>
-        /// <param name="threading">The threading.</param>
-        public override void OnCreated(IThreading threading)
-        {
-            InitializeServer();
+			if(logFile == null) {
+				logFile = File.Create("CSL-WebServer.log");
+				logListener = new TextWriterTraceListener(logFile);
+				Trace.Listeners.Add(logListener);
+			}
+		}
 
-            base.OnCreated(threading);
-        }
+		#region Create
 
-        private void InitializeServer()
-        {
-            if (_server != null)
-            {
-                _server.Stop();
-                _server = null;
-            }
+		/// <summary>
+		/// Called by the game after this instance is created.
+		/// </summary>
+		/// <param name="threading">The threading.</param>
+		public override void OnCreated(IThreading threading) {
+			InitializeServer();
 
-            LogMessage("Initializing Server...");
+			base.OnCreated(threading);
+		}
 
-            List<String> bindings = new List<String>();
+		private void InitializeServer() {
+			if(_server != null) {
+				_server.Stop();
+				_server = null;
+			}
 
-            int currentBinding = 1;
-            String currentBindingKey = String.Format(WebServerHostKey, currentBinding);
-            while (Configuration.HasSetting(currentBindingKey))
-            {
-                bindings.Add(Configuration.GetString(currentBindingKey));
-                currentBinding++;
-                currentBindingKey = String.Format(WebServerHostKey, currentBinding);
-            }
+			LogMessage("Initializing Server...");
 
-            // If there are no bindings in the configuration file, we'll need to initialize those values.
-            if (bindings.Count == 0)
-            {
-                const String defaultBinding = "http://localhost:8080/";
-                bindings.Add(defaultBinding);
+			List<String> bindings = new List<String>();
 
-                // If there aren't any bindings, the value of currentBindingKey will never have made it past 1.
-                // As a result, we can just use that.
-                Configuration.SetString(currentBindingKey, defaultBinding);
-                Configuration.SaveSettings();
-            }
+			int currentBinding = 1;
+			String currentBindingKey = String.Format(WebServerHostKey, currentBinding);
+			while(Configuration.HasSetting(currentBindingKey)) {
+				bindings.Add(Configuration.GetString(currentBindingKey));
+				currentBinding++;
+				currentBindingKey = String.Format(WebServerHostKey, currentBinding);
+			}
 
-            // The endpoint used internally should always be the first binding in the configuration.
-            // There's no need to use multiple bindings for internal references, we only need a single one.
-            _endpoint = bindings.First();
+			// If there are no bindings in the configuration file, we'll need to initialize those values.
+			if(bindings.Count == 0) {
+				const String defaultBinding = "http://localhost:8080/";
+				bindings.Add(defaultBinding);
 
-            WebServer ws = new WebServer(HandleRequest, bindings.ToArray());
-            _server = ws;
-            _server.Run();
-            LogMessage("Server Initialized.");
+				// If there aren't any bindings, the value of currentBindingKey will never have made it past 1.
+				// As a result, we can just use that.
+				Configuration.SetString(currentBindingKey, defaultBinding);
+				Configuration.SaveSettings();
+			}
 
-            _requestHandlers = new List<IRequestHandler>();
+			// The endpoint used internally should always be the first binding in the configuration.
+			// There's no need to use multiple bindings for internal references, we only need a single one.
+			_endpoint = bindings.First();
 
-            try
-            {
-                RegisterHandlers();
-            }
-            catch (Exception ex)
-            {
-                UnityEngine.Debug.LogException(ex);
-            }
-        }
+			WebServer ws = new WebServer(HandleRequest, bindings.ToArray());
+			_server = ws;
+			_server.Run();
+			LogMessage("Server Initialized.");
 
-        #endregion Create
+			_requestHandlers = new List<IRequestHandler>();
 
-        #region Release
+			try {
+				RegisterHandlers();
+			}
+			catch(Exception ex) {
+				UnityEngine.Debug.LogException(ex);
+			}
+		}
 
-        /// <summary>
-        /// Called by the game before this instance is about to be destroyed.
-        /// </summary>
-        public override void OnReleased()
-        {
-            ReleaseServer();
+		#endregion Create
 
-            // TODO: Unregister from events (i.e. ILogAppender.LogMessage)
-            _requestHandlers.Clear();
+		#region Release
 
-            Configuration.SaveSettings();
+		/// <summary>
+		/// Called by the game before this instance is about to be destroyed.
+		/// </summary>
+		public override void OnReleased() {
+			ReleaseServer();
 
-            base.OnReleased();
-        }
+			// TODO: Unregister from events (i.e. ILogAppender.LogMessage)
+			_requestHandlers.Clear();
 
-        private void ReleaseServer()
-        {
-            LogMessage("Checking for existing server...");
-            if (_server != null)
-            {
-                LogMessage("Server found; disposing...");
-                _server.Stop();
-                _server = null;
-                LogMessage("Server Disposed.");
-            }
-        }
+			Configuration.SaveSettings();
 
-        #endregion Release
+			base.OnReleased();
+		}
 
-        /// <summary>;
-        /// Handles the specified request.
-        /// </summary>
-        /// <remarks>
-        /// Defers execution to an appropriate request handler, except for requests to the reserved endpoints: <c>~/</c> and <c>~/Log</c>.<br />
-        /// Returns a default error message if an appropriate request handler can not be found.
-        /// </remarks>
-        private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
-        {
-            LogMessage($"{request.HttpMethod} {request.RawUrl}");
+		private void ReleaseServer() {
+			LogMessage("Checking for existing server...");
+			if(_server != null) {
+				LogMessage("Server found; disposing...");
+				_server.Stop();
+				_server = null;
+				LogMessage("Server Disposed.");
+			}
+		}
 
-            var simulationManager = Singleton<SimulationManager>.instance;
-            _cityName = simulationManager.m_metaData.m_CityName;
+		#endregion Release
 
-            // There are two reserved endpoints: "/" and "/Log".
-            // These take precedence over all other request handlers.
-            if (ServiceRoot(request, response))
-            {
-				LogMessage("Served by ServiceRoot.");
-                return;
-            }
+		/// <summary>;
+		/// Handles the specified request.
+		/// </summary>
+		/// <remarks>
+		/// Defers execution to an appropriate request handler, except for requests to the reserved endpoints: <c>~/</c> and <c>~/Log</c>.<br />
+		/// Returns a default error message if an appropriate request handler can not be found.
+		/// </remarks>
+		private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response) {
+			//LogMessage($"{request.HttpMethod} {request.RawUrl}");
 
-            if (ServiceLog(request, response))
-            {
-				LogMessage("Served by ServiceLog.");
+			var simulationManager = Singleton<SimulationManager>.instance;
+			_cityName = simulationManager.m_metaData.m_CityName;
+
+			// There are two reserved endpoints: "/" and "/Log".
+			// These take precedence over all other request handlers.
+			if(ServiceRoot(request, response)) {
+				//LogMessage("Served by ServiceRoot.");
 				return;
-            }
+			}
+
+			if(ServiceLog(request, response)) {
+				//LogMessage("Served by ServiceLog.");
+				return;
+			}
 
 			// Get the request handler associated with the current request.
-			LogMessage("Looking for handlers...");
+			//LogMessage("Looking for handlers...");
 			var handler = _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
-            if (handler != null)
-            {
-				LogMessage($"Using handler: {handler.Name}");
-                try
-                {
-                    IResponseFormatter responseFormatterWriter = handler.Handle(request);
-                    responseFormatterWriter.WriteContent(response);
+			if(handler != null) {
+				//LogMessage($"Using handler: {handler.Name}");
+				try {
+					IResponseFormatter responseFormatterWriter = handler.Handle(request);
+					responseFormatterWriter.WriteContent(response);
 
-                    return;
-                }
-                catch (Exception ex)
-                {
+					return;
+				}
+				catch(Exception ex) {
 					LogMessage($"Error in handler {handler.Name} for {request.RawUrl}: {ex}");
-                    String errorBody = String.Format("<h1>An error has occurred!</h1><pre>{0}</pre>", ex);
-                    var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Error", _requestHandlers, errorBody);
-                    var template = TemplateHelper.PopulateTemplate("index", tokens);
+					String errorBody = String.Format("<h1>An error has occurred!</h1><pre>{0}</pre>", ex);
+					var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Error", _requestHandlers, errorBody);
+					var template = TemplateHelper.PopulateTemplate("index", tokens);
 
-                    IResponseFormatter errorResponseFormatter = new HtmlResponseFormatter(template);
-                    errorResponseFormatter.WriteContent(response);
+					IResponseFormatter errorResponseFormatter = new HtmlResponseFormatter(template);
+					errorResponseFormatter.WriteContent(response);
 
-                    return;
-                }
-            }
+					return;
+				}
+			}
 
-			LogMessage("No handler found");
-            var wwwroot = GetWebRoot();
-            if (wwwroot == null) return;
+			//LogMessage("No handler found");
+			var wwwroot = GetWebRoot();
+			if(wwwroot == null) {
+				LogMessage($"No wwwroot found for {request.RawUrl}");
+				return;
+			}
 
-            // At this point, we can guarantee that we don't need any game data, so we can safely start a new thread to perform the remaining tasks.
-            try {
-                ServiceFileRequest(wwwroot, request, response);
-            }
-            catch(Exception ex) {
+			// At this point, we can guarantee that we don't need any game data, so we can safely start a new thread to perform the remaining tasks.
+			try {
+				ServiceFileRequest(wwwroot, request, response);
+			}
+			catch(Exception ex) {
 				String body = $"Error handling request {request.RawUrl}: {ex}";
 				IResponseFormatter fmt = new PlainTextResponseFormatter(body, HttpStatusCode.InternalServerError);
 				fmt.WriteContent(response);
 			}
-        }
+		}
 
-        private static void ServiceFileRequest(String wwwroot, HttpListenerRequest request, HttpListenerResponse response)
-        {
-            var relativePath = request.Url.AbsolutePath.Substring(1);
-            relativePath = relativePath.Replace("/", Path.DirectorySeparatorChar.ToString());
-            var absolutePath = Path.Combine(wwwroot, relativePath);
+		private static void ServiceFileRequest(String wwwroot, HttpListenerRequest request, HttpListenerResponse response) {
+			var relativePath = request.Url.AbsolutePath.Substring(1);
+			relativePath = relativePath.Replace("/", Path.DirectorySeparatorChar.ToString());
+			var absolutePath = Path.Combine(wwwroot, relativePath);
+			LogMessage($"Sending file: {absolutePath}");
 
-            if (File.Exists(absolutePath))
-            {
-                var extension = Path.GetExtension(absolutePath);
-                response.ContentType = Apache.GetMime(extension);
-                response.StatusCode = 200; // HTTP 200 - SUCCESS
+			if(File.Exists(absolutePath)) {
+				try {
+					var extension = Path.GetExtension(absolutePath);
+					response.ContentType = Apache.GetMime(extension);
+					response.StatusCode = 200; // HTTP 200 - SUCCESS
 
-                // Open file, read bytes into buffer and write them to the output stream.
-                using (FileStream fileReader = File.OpenRead(absolutePath))
-                {
-                    byte[] buffer = new byte[4096];
-                    int read;
-                    while ((read = fileReader.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        response.OutputStream.Write(buffer, 0, read);
-                    }
-                }
-            }
-            else
-            {
-                String body = String.Format("No resource is available at the specified filepath: {0}", absolutePath);
+					// Open file, read bytes into buffer and write them to the output stream.
+					using(FileStream fileReader = File.OpenRead(absolutePath)) {
+						byte[] buffer = new byte[4096];
+						int read;
+						while((read = fileReader.Read(buffer, 0, buffer.Length)) > 0) {
+							response.OutputStream.Write(buffer, 0, read);
+						}
+					}
+					LogMessage($"Sent file OK: {relativePath}");
+				}
+				catch(Exception ex) {
+					LogMessage($"Error sending file {absolutePath}: {ex}");
+					String body = $"Error sending file {absolutePath}: {ex}";
+					IResponseFormatter fmt = new PlainTextResponseFormatter(body, HttpStatusCode.InternalServerError);
+					fmt.WriteContent(response);
+				}
+			}
+			else {
+				LogMessage($"Not found: {relativePath}");
+				String body = String.Format("No resource is available at the specified filepath: {0}", absolutePath);
+				IResponseFormatter notFoundResponseFormatter = new PlainTextResponseFormatter(body, HttpStatusCode.NotFound);
+				notFoundResponseFormatter.WriteContent(response);
+			}
+		}
 
-                IResponseFormatter notFoundResponseFormatter = new PlainTextResponseFormatter(body, HttpStatusCode.NotFound);
-                notFoundResponseFormatter.WriteContent(response);
-            }
-        }
+		/// <summary>
+		/// Searches all the assemblies in the current AppDomain for class definitions that implement the <see cref="IRequestHandler"/> interface.  Those classes are instantiated and registered as request handlers.
+		/// </summary>
+		private void RegisterHandlers() {
+			IEnumerable<Type> handlers = FindHandlersInLoadedAssemblies();
+			RegisterHandlers(handlers);
+		}
 
-        /// <summary>
-        /// Searches all the assemblies in the current AppDomain for class definitions that implement the <see cref="IRequestHandler"/> interface.  Those classes are instantiated and registered as request handlers.
-        /// </summary>
-        private void RegisterHandlers()
-        {
-            IEnumerable<Type> handlers = FindHandlersInLoadedAssemblies();
-            RegisterHandlers(handlers);
-        }
+		private void RegisterHandlers(IEnumerable<Type> handlers) {
+			if(handlers == null) { return; }
 
-        private void RegisterHandlers(IEnumerable<Type> handlers)
-        {
-            if (handlers == null) { return; }
+			if(_requestHandlers == null) {
+				_requestHandlers = new List<IRequestHandler>();
+			}
 
-            if (_requestHandlers == null)
-            {
-                _requestHandlers = new List<IRequestHandler>();
-            }
+			foreach(var handler in handlers) {
+				// Only register handlers that we don't already have an instance of.
+				if(_requestHandlers.Any(h => h.GetType() == handler)) {
+					continue;
+				}
 
-            foreach (var handler in handlers)
-            {
-                // Only register handlers that we don't already have an instance of.
-                if (_requestHandlers.Any(h => h.GetType() == handler))
-                {
-                    continue;
-                }
+				IRequestHandler handlerInstance = null;
+				Boolean exists = false;
 
-                IRequestHandler handlerInstance = null;
-                Boolean exists = false;
+				try {
+					if(typeof(RequestHandlerBase).IsAssignableFrom(handler)) {
+						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler, this);
+					}
+					else {
+						handlerInstance = (IRequestHandler)Activator.CreateInstance(handler);
+					}
 
-                try
-                {
-                    if (typeof(RequestHandlerBase).IsAssignableFrom(handler))
-                    {
-                        handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler, this);
-                    }
-                    else
-                    {
-                        handlerInstance = (IRequestHandler)Activator.CreateInstance(handler);
-                    }
+					if(handlerInstance == null) {
+						LogMessage(String.Format("Request Handler ({0}) could not be instantiated!", handler.Name));
+						continue;
+					}
 
-                    if (handlerInstance == null)
-                    {
-                        LogMessage(String.Format("Request Handler ({0}) could not be instantiated!", handler.Name));
-                        continue;
-                    }
+					// Duplicates handlers seem to pass the check above, so now we filter them based on their identifier values, which should work.
+					exists = _requestHandlers.Any(obj => obj.HandlerID == handlerInstance.HandlerID);
+				}
+				catch(Exception ex) {
+					LogMessage(ex.ToString());
+				}
 
-                    // Duplicates handlers seem to pass the check above, so now we filter them based on their identifier values, which should work.
-                    exists = _requestHandlers.Any(obj => obj.HandlerID == handlerInstance.HandlerID);
-                }
-                catch (Exception ex)
-                {
-                    LogMessage(ex.ToString());
-                }
+				if(exists) {
+					// TODO: Allow duplicate registrations to occur; previous registration is removed and replaced with a new one?
+					LogMessage(String.Format("Supressing duplicate handler registration for '{0}'", handler.Name));
+				}
+				else {
+					_requestHandlers.Add(handlerInstance);
+					if(handlerInstance is ILogAppender) {
+						var logAppender = (handlerInstance as ILogAppender);
+						logAppender.LogMessage += RequestHandlerLogAppender_OnLogMessage;
+					}
 
-                if (exists)
-                {
-                    // TODO: Allow duplicate registrations to occur; previous registration is removed and replaced with a new one?
-                    LogMessage(String.Format("Supressing duplicate handler registration for '{0}'", handler.Name));
-                }
-                else
-                {
-                    _requestHandlers.Add(handlerInstance);
-                    if (handlerInstance is ILogAppender)
-                    {
-                        var logAppender = (handlerInstance as ILogAppender);
-                        logAppender.LogMessage += RequestHandlerLogAppender_OnLogMessage;
-                    }
+					LogMessage(String.Format("Added Request Handler: {0}", handler.FullName));
+				}
+			}
+		}
 
-                    LogMessage(String.Format("Added Request Handler: {0}", handler.FullName));
-                }
-            }
-        }
+		private void RequestHandlerLogAppender_OnLogMessage(object sender, LogAppenderEventArgs logAppenderEventArgs) {
+			var senderTypeName = sender.GetType().Name;
+			LogMessage(logAppenderEventArgs.LogLine, senderTypeName, false);
+		}
 
-        private void RequestHandlerLogAppender_OnLogMessage(object sender, LogAppenderEventArgs logAppenderEventArgs)
-        {
-            var senderTypeName = sender.GetType().Name;
-            LogMessage(logAppenderEventArgs.LogLine, senderTypeName, false);
-        }
+		/// <summary>
+		/// Searches all the assemblies in the current AppDomain, and returns a collection of those that implement the <see cref="IRequestHandler"/> interface.
+		/// </summary>
+		private static IEnumerable<Type> FindHandlersInLoadedAssemblies() {
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        /// <summary>
-        /// Searches all the assemblies in the current AppDomain, and returns a collection of those that implement the <see cref="IRequestHandler"/> interface.
-        /// </summary>
-        private static IEnumerable<Type> FindHandlersInLoadedAssemblies()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			foreach(var assembly in assemblies) {
+				var handlers = FetchHandlers(assembly);
+				foreach(var handler in handlers) {
+					yield return handler;
+				}
+			}
+		}
 
-            foreach (var assembly in assemblies)
-            {
-                var handlers = FetchHandlers(assembly);
-                foreach (var handler in handlers)
-                {
-                    yield return handler;
-                }
-            }
-        }
+		private static IEnumerable<Type> FetchHandlers(Assembly assembly) {
+			var assemblyName = assembly.GetName().Name;
 
-        private static IEnumerable<Type> FetchHandlers(Assembly assembly)
-        {
-            var assemblyName = assembly.GetName().Name;
+			// Skip any assemblies that we don't anticipate finding anything in.
+			if(IgnoredAssemblies.Contains(assemblyName)) { yield break; }
 
-            // Skip any assemblies that we don't anticipate finding anything in.
-            if (IgnoredAssemblies.Contains(assemblyName)) { yield break; }
+			Type[] types = new Type[0];
+			try {
+				types = assembly.GetTypes();
+			}
+			catch { }
 
-            Type[] types = new Type[0];
-            try
-            {
-                types = assembly.GetTypes();
-            }
-            catch { }
+			foreach(var type in types) {
+				Boolean isValid = false;
+				try {
+					isValid = typeof(IRequestHandler).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract;
+				}
+				catch { }
 
-            foreach (var type in types)
-            {
-                Boolean isValid = false;
-                try
-                {
-                    isValid = typeof(IRequestHandler).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract;
-                }
-                catch { }
+				if(isValid) {
+					yield return type;
+				}
+			}
+		}
 
-                if (isValid)
-                {
-                    yield return type;
-                }
-            }
-        }
+		#region Reserved Endpoint Handlers
 
-        #region Reserved Endpoint Handlers
+		/// <summary>
+		/// Services requests to <c>~/</c>
+		/// </summary>
+		private Boolean ServiceRoot(HttpListenerRequest request, HttpListenerResponse response) {
+			if(request.Url.AbsolutePath.ToLower() == "/") {
+				List<String> links = new List<String>();
+				foreach(var requestHandler in this._requestHandlers.OrderBy(obj => obj.Priority)) {
+					links.Add(String.Format("<li><a href='{1}'>{0}</a> by {2} (Priority: {3})</li>", requestHandler.Name, requestHandler.MainPath, requestHandler.Author, requestHandler.Priority));
+				}
 
-        /// <summary>
-        /// Services requests to <c>~/</c>
-        /// </summary>
-        private Boolean ServiceRoot(HttpListenerRequest request, HttpListenerResponse response)
-        {
-            if (request.Url.AbsolutePath.ToLower() == "/")
-            {
-                List<String> links = new List<String>();
-                foreach (var requestHandler in this._requestHandlers.OrderBy(obj => obj.Priority))
-                {
-                    links.Add(String.Format("<li><a href='{1}'>{0}</a> by {2} (Priority: {3})</li>", requestHandler.Name, requestHandler.MainPath, requestHandler.Author, requestHandler.Priority));
-                }
+				String body = String.Format("<h1>Cities: Skylines - Integrated Web Server</h1><ul>{0}</ul>", String.Join("", links.ToArray()));
+				var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Home", _requestHandlers, body);
+				var template = TemplateHelper.PopulateTemplate("index", tokens);
 
-                String body = String.Format("<h1>Cities: Skylines - Integrated Web Server</h1><ul>{0}</ul>", String.Join("", links.ToArray()));
-                var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Home", _requestHandlers, body);
-                var template = TemplateHelper.PopulateTemplate("index", tokens);
+				IResponseFormatter htmlResponseFormatter = new HtmlResponseFormatter(template);
+				htmlResponseFormatter.WriteContent(response);
 
-                IResponseFormatter htmlResponseFormatter = new HtmlResponseFormatter(template);
-                htmlResponseFormatter.WriteContent(response);
+				return true;
+			}
 
-                return true;
-            }
+			return false;
+		}
 
-            return false;
-        }
+		/// <summary>
+		/// Services requests to <c>~/Log</c>
+		/// </summary>
+		private Boolean ServiceLog(HttpListenerRequest request, HttpListenerResponse response) {
+			if(request.Url.AbsolutePath.ToLower() == "/log") {
+				{
+					String body = String.Format("<h1>Server Log</h1><pre>{0}</pre>", String.Join("", _logLines.ToArray()));
+					var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Log", _requestHandlers, body);
+					var template = TemplateHelper.PopulateTemplate("index", tokens);
 
-        /// <summary>
-        /// Services requests to <c>~/Log</c>
-        /// </summary>
-        private Boolean ServiceLog(HttpListenerRequest request, HttpListenerResponse response)
-        {
-            if (request.Url.AbsolutePath.ToLower() == "/log")
-            {
-                {
-                    String body = String.Format("<h1>Server Log</h1><pre>{0}</pre>", String.Join("", _logLines.ToArray()));
-                    var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Log", _requestHandlers, body);
-                    var template = TemplateHelper.PopulateTemplate("index", tokens);
+					IResponseFormatter htmlResponseFormatter = new HtmlResponseFormatter(template);
+					htmlResponseFormatter.WriteContent(response);
 
-                    IResponseFormatter htmlResponseFormatter = new HtmlResponseFormatter(template);
-                    htmlResponseFormatter.WriteContent(response);
+					return true;
+				}
+			}
 
-                    return true;
-                }
-            }
+			return false;
+		}
 
-            return false;
-        }
+		#endregion Reserved Endpoint Handlers
 
-        #endregion Reserved Endpoint Handlers
+		#region Logging
 
-        #region Logging
-
-        /// <summary>
-        /// Adds a timestamp to the specified message, and appends it to the internal log.
-        /// </summary>
-        public static void LogMessage(String message, String label = null,
-        Boolean showInDebugPanel = false,
-        PluginManager.MessageType messageType = PluginManager.MessageType.Message) {
-            var dt = DateTime.Now;
-            String time = String.Format("{0} {1}", dt.ToShortDateString(), dt.ToShortTimeString());
-            String messageWithLabel = String.IsNullOrEmpty(label) ? message : String.Format("{0}: {1}", label, message);
-            String line = String.Format("[{0}] {1}{2}", time, messageWithLabel, Environment.NewLine);
-            _logLines.Add(line);
+		/// <summary>
+		/// Adds a timestamp to the specified message, and appends it to the internal log.
+		/// </summary>
+		public static void LogMessage(String message, String label = null,
+		Boolean showInDebugPanel = false,
+		PluginManager.MessageType messageType = PluginManager.MessageType.Message) {
+			var dt = DateTime.Now;
+			String time = String.Format("{0} {1}", dt.ToShortDateString(), dt.ToShortTimeString());
+			String messageWithLabel = String.IsNullOrEmpty(label) ? message : String.Format("{0}: {1}", label, message);
+			String line = String.Format("[{0}] {1}{2}", time, messageWithLabel, Environment.NewLine);
+			_logLines.Add(line);
 			line = "[WebServer] " + line;
-			Debug.Log(line);
+			UnityEngine.Debug.Log(line);
 			Console.WriteLine(line);
-			File.AppendAllText("CSL-WebServer.log", line);
-			if (showInDebugPanel) {
-                DebugOutputPanel.AddMessage(messageType, line);
-            }
-        }
+			Trace.Write(line);
+			Trace.Flush();
+			if(showInDebugPanel) {
+				//DANGEROUS! Can crash game if called from wrong thread.
+				DebugOutputPanel.AddMessage(messageType, line);
+			}
+		}
 
-        /// <summary>
-        /// Writes the value of <paramref name="args"/>.<see cref="LogAppenderEventArgs.LogLine"/> to the internal log.
-        /// </summary>
-        private void ServerOnLogMessage(object sender, LogAppenderEventArgs args)
-        {
-            LogMessage(args.LogLine);
-        }
+		/// <summary>
+		/// Writes the value of <paramref name="args"/>.<see cref="LogAppenderEventArgs.LogLine"/> to the internal log.
+		/// </summary>
+		private void ServerOnLogMessage(object sender, LogAppenderEventArgs args) {
+			LogMessage(args.LogLine);
+		}
 
-        #endregion Logging
-    }
+		#endregion Logging
+	}
 }
