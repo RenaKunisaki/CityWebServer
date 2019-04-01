@@ -105,7 +105,7 @@ namespace CityWebServer.RequestHandlers
             VehicleManager vehicleManager = Singleton<VehicleManager>.instance;
             foreach (Vehicle vehicle in vehicleManager.m_vehicles.m_buffer)
             {
-                if (vehicle.m_flags != Vehicle.Flags.None)
+                if (vehicle.m_flags != 0)
                 {
                     var districtID = (int)districtManager.GetDistrict(vehicle.GetLastFramePosition());
                     if (districtVehicles.ContainsKey(districtID))

@@ -27,7 +27,7 @@ namespace CityWebServer.RequestHandlers
                 var len = vehicleManager.m_vehicles.m_buffer.Length;
                 for (ushort i = 0; i < len; i++)
                 {
-                    if (vehicleManager.m_vehicles.m_buffer[i].m_flags == Vehicle.Flags.None) { continue; }
+                    if (vehicleManager.m_vehicles.m_buffer[i].m_flags == 0) { continue; }
 
                     vehicleIds.Add(i);
                 }
@@ -39,7 +39,7 @@ namespace CityWebServer.RequestHandlers
 
             foreach (var vehicle in vehicleManager.m_vehicles.m_buffer)
             {
-                if (vehicle.m_flags == Vehicle.Flags.None) { continue; }
+                if (vehicle.m_flags == 0) { continue; }
 
                 if ((vehicle.m_flags & Vehicle.Flags.Spawned) == Vehicle.Flags.Spawned && (vehicle.m_flags & Vehicle.Flags.Created) == Vehicle.Flags.Created)
                 {
