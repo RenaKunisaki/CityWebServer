@@ -55,9 +55,9 @@ class Transit {
 
                 row.append(
                     $('<td class="name">').text(route.Name),
-                    $('<td class="stops">').text(route.StopCount),
-                    $('<td class="vehicles">').text(route.VehicleCount),
-                    $('<td class="passengers">').text(numPassengers),
+                    $('<td class="stops">').number(route.StopCount),
+                    $('<td class="vehicles">').number(route.VehicleCount),
+                    $('<td class="passengers">').number(numPassengers),
                 );
             }
 
@@ -67,9 +67,9 @@ class Transit {
                     $('<tr class="total">').append(
                         $('<td class="name">').text(
                             `${total.type} (${total.routes})`),
-                        $('<td class="stops">').text(total.stops),
-                        $('<td class="vehicles">').text(total.vehicles),
-                        $('<td class="passengers">').text(total.passengers),
+                        $('<td class="stops">').number(total.stops),
+                        $('<td class="vehicles">').number(total.vehicles),
+                        $('<td class="passengers">').number(total.passengers),
                     )
                 );
             }
