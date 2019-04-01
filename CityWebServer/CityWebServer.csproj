@@ -121,6 +121,7 @@
     <None Include="wwwroot\r\js\knockout.mapping-latest.js" />
     <None Include="wwwroot\r\js\main.js" />
     <None Include="wwwroot\r\js\oldmain.js" />
+    <None Include="wwwroot\index.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

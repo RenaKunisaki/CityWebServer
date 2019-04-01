@@ -12,6 +12,7 @@ using ColossalFramework;
 using ColossalFramework.Plugins;
 using ICities;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace CityWebServer
 {
@@ -206,7 +207,7 @@ namespace CityWebServer
         /// </remarks>
         private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
         {
-            LogMessage(String.Format("{0} {1}", request.HttpMethod, request.RawUrl));
+            LogMessage($"{request.HttpMethod} {request.RawUrl}");
 
             var simulationManager = Singleton<SimulationManager>.instance;
             _cityName = simulationManager.m_metaData.m_CityName;
@@ -215,18 +216,22 @@ namespace CityWebServer
             // These take precedence over all other request handlers.
             if (ServiceRoot(request, response))
             {
+				LogMessage("Served by ServiceRoot.");
                 return;
             }
 
             if (ServiceLog(request, response))
             {
-                return;
+				LogMessage("Served by ServiceLog.");
+				return;
             }
 
-            // Get the request handler associated with the current request.
-            var handler = _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
+			// Get the request handler associated with the current request.
+			LogMessage("Looking for handlers...");
+			var handler = _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
             if (handler != null)
             {
+				LogMessage($"Using handler: {handler.Name}");
                 try
                 {
                     IResponseFormatter responseFormatterWriter = handler.Handle(request);
@@ -236,6 +241,7 @@ namespace CityWebServer
                 }
                 catch (Exception ex)
                 {
+					LogMessage($"Error in handler {handler.Name} for {request.RawUrl}: {ex}");
                     String errorBody = String.Format("<h1>An error has occurred!</h1><pre>{0}</pre>", ex);
                     var tokens = TemplateHelper.GetTokenReplacements(_cityName, "Error", _requestHandlers, errorBody);
                     var template = TemplateHelper.PopulateTemplate("index", tokens);
@@ -247,6 +253,7 @@ namespace CityWebServer
                 }
             }
 
+			LogMessage("No handler found");
             var wwwroot = GetWebRoot();
             if (wwwroot == null) return;
 
@@ -477,14 +484,18 @@ namespace CityWebServer
         /// Adds a timestamp to the specified message, and appends it to the internal log.
         /// </summary>
         public static void LogMessage(String message, String label = null,
-        Boolean showInDebugPanel = true,
+        Boolean showInDebugPanel = false,
         PluginManager.MessageType messageType = PluginManager.MessageType.Message) {
             var dt = DateTime.Now;
             String time = String.Format("{0} {1}", dt.ToShortDateString(), dt.ToShortTimeString());
             String messageWithLabel = String.IsNullOrEmpty(label) ? message : String.Format("{0}: {1}", label, message);
             String line = String.Format("[{0}] {1}{2}", time, messageWithLabel, Environment.NewLine);
             _logLines.Add(line);
-            if (showInDebugPanel) {
+			line = "[WebServer] " + line;
+			Debug.Log(line);
+			Console.WriteLine(line);
+			File.AppendAllText("CSL-WebServer.log", line);
+			if (showInDebugPanel) {
                 DebugOutputPanel.AddMessage(messageType, line);
             }
         }
