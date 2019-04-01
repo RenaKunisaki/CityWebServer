@@ -22,6 +22,7 @@ class App {
 
     _refresh() {
         $.getJSON('/CityInfo', (data) => {
+            console.log("Got response", data);
             if(!this._isInit) {
                 this.viewModel = ko.mapping.fromJS(data);
                 ko.applyBindings(this.viewModel);
