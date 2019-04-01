@@ -7,12 +7,12 @@ namespace CityWebServer
     {
         public String Name
         {
-            get { return "Integrated Web Server"; }
+            get { return "Integrated Web Server V2"; }
         }
 
         public String Description
         {
-            get { return "Host a web-server allowing you to communicate with the game via a web-browser."; }
+            get { return "Access live game data in a web browser."; }
         }
     }
 }
