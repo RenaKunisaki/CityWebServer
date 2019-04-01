@@ -4,6 +4,8 @@ namespace CityWebServer.Models {
 	public class BudgetInfo {
 		public long income;
 		public long expenses;
+		public long cash;
+		public int numLoans;
 		public TaxRate[] taxRates;
 	}
 

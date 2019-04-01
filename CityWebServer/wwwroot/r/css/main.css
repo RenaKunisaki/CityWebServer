@@ -29,15 +29,18 @@ h2 {
     margin-right: 4px;
 }
 
-.money {
+.money { /* any money amount */
     text-align: right;
     font-family: monospace;
-    margin-right: 1em;
 }
 .money:before { content: '₡' }
-.budget .income:before { content: "Income: ₡" }
-.budget .expenses:before { content: "Expenses: ₡" }
-.budget .delta:before { content: "Net Income: ₡" }
+.budget .income:before { content: " (₡" }
+.budget .expenses:before { content: " - ₡" }
+.budget .expenses:after { content: ")" }
+.budget .delta:before { content: " ~ ₡" }
+.budget .cash:before { content: "₡" }
+.budget .numLoans:before { content: "; Loans: " }
+.budget .cash { color: #0F0 }
 
 /* table {
     border-left: 1px #FFF solid;

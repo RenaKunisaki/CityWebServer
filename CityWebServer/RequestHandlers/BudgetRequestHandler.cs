@@ -20,6 +20,8 @@ namespace CityWebServer.RequestHandlers {
 
 			economyManager.GetIncomeAndExpenses(new ItemClass(),
 				out budget.income, out budget.expenses);
+			budget.cash = economyManager.LastCashAmount;
+			budget.numLoans = economyManager.CountLoans();
 
 			List<TaxRate> taxRates = new List<TaxRate>();
 			taxRates.Add(new TaxRate {
