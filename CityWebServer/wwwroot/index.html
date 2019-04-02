@@ -45,6 +45,46 @@
                 Balance: <span id="current-cash" class="money cash"></span>
                 Net Income: <span id="net-income" class="money net"></span>
             </div>
+            <div class="taxes">
+                <h2>Tax Rates:</h2>
+                <table>
+                    <tr>
+                        <th>Group</th>
+                        <th>Low</th>
+                        <th>High</th>
+                    </tr>
+                    <tr>
+                        <td>Residential</td>
+                        <td id="tax-ResidentialLow"></td>
+                        <td id="tax-ResidentialHigh"></td>
+                    </tr>
+                    <tr>
+                        <td>Commercial</td>
+                        <td id="tax-CommercialLow"></td>
+                        <td id="tax-CommercialHigh"></td>
+                    </tr>
+                    <tr>
+                        <td>Industry/Office</td>
+                        <td id="tax-Industrial"></td>
+                        <td id="tax-Office"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="loans">
+                <h2>Loans:</h2>
+                <table id="loans">
+                    <tr>
+                        <th>Bank</th>
+                        <th>Paymt Left</th>
+                        <th>Time Left</th>
+                        <th>Interest</th>
+                        <th>Cost/Week</th>
+                    </tr>
+                    <tr id="loan0"></tr>
+                    <tr id="loan1"></tr>
+                    <tr id="loan2"></tr>
+                </table>
+            </div>
         </div>
 
         <div id="transit" class="list box">

@@ -30,15 +30,7 @@ function shuffle(a) {
             layout: {
                 padding: { left: 0, right: 0, bottom: 0, top: 0 },
             },
-            legend: {
-                /* position: 'right',
-                labels: {
-                    boxWidth: 20,
-                    fontColor: '#FFF',
-                    padding:  0,
-                }, */
-                display: false,
-            },
+            legend: { display: false },
             tooltips: {
                 callbacks: {
                     label: (item, data) => {
@@ -153,6 +145,27 @@ function shuffle(a) {
 
             $('#current-cash').number(data.CurrentCash / 100)
                 .toggleClass('negative', data.CurrentCash <= 0);
+
+            const taxes = Object.entries(data.Economy.taxRates);
+            for(const [name, rate] of taxes) {
+                $(`#tax-${name}`).text(rate+'%');
+            }
+
+            for(let i=0; i < data.loans.length; i++) {
+                const loan = data.loans[i];
+                $(`#loan${i}`).empty().append(
+                    $('<td>').text('XXX'), //Bank
+                    $('<td class="money">').number(loan.m_amountLeft),
+                    $('<td class="number">').text('XXX'), //time left
+                    $('<td class="number">').text('XXX'), //interest
+                    $('<td class="money">').text('XXX'), //weekly cost
+                );
+            }
+            if(data.loans.length == 0) {
+                $('#loan0').empty().append(
+                    $('<td colspan="5">No active loans</td>')
+                );
+            }
 
             this._updateCharts(data);
         });

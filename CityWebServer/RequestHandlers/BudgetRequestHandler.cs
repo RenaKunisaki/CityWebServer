@@ -169,6 +169,7 @@ namespace CityWebServer.RequestHandlers {
 				//XXX what is LoanInfo?
 				//EconomyManager.LoanInfo[] loanInfo;
 				//economyManager.GetLoanInfo(i, out loanInfo);
+				//XXX what the heck is this data, it's all wrong
 				economyManager.GetLoan(i, out EconomyManager.Loan loan);
 				loans.Add(loan);
 			}

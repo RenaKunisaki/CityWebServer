@@ -39,6 +39,11 @@ body {
     border-bottom: 1px #FFF solid;
 }
 
+.box h2 {
+    font-size: 1.1em;
+    margin: 0;
+}
+
 .list {
     border: 1px #FFF solid;
     max-width: 45%;
@@ -53,15 +58,6 @@ body {
 }
 .money:before { content: '₡' }
 .money.negative { color: #F00 !important }
-#budget .cash { color: #0F0 }
-#budget .stats {
-    font-size: 1.2em;
-}
-
-/* table {
-    border-left: 1px #FFF solid;
-    border-top: 1px #FFF solid;
-} */
 
 td, th {
     border-right: 1px #FFF solid;
@@ -106,6 +102,23 @@ td, th {
 
 #budget .chart .money {
     text-align: center;
+}
+
+#budget .cash { color: #0F0 }
+#budget .stats {
+    font-size: 1.2em;
+}
+
+#budget .taxes, #budget .loans {
+    display: inline-block;
+    padding-right: 0.25em;
+    border-right: 1px #FFF solid;
+    border-top: 1px #FFF solid;
+}
+
+#budget .taxes table, #budget .loans table {
+    border-left: 1px #FFF solid;
+    border-top: 1px #FFF solid;
 }
 
 #clock {
