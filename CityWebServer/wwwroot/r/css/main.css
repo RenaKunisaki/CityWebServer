@@ -74,11 +74,33 @@ td, th {
     text-align: center;
 }
 
+.legend {
+    float: right;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    font-size: 0.8em;
+}
+
+.legend li { margin: 0 }
+
+.legend .legend-box {
+    width:  1em;
+    height: 1em;
+    display: inline-block;
+}
+
+#budget { position: relative }
+#budget .legend {
+    position: absolute;
+    top:   2em;
+    right: 0;
+}
+
 #budget .chart {
     display: inline-block;
-    width: 200px;
+    width: 100%;
     margin: 0;
-    border: 1px #F00 dotted;
     vertical-align: top;
 }
 

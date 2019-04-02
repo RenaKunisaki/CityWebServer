@@ -9,6 +9,7 @@ class Chirper {
     run() {
         window.setInterval(() => {this._refresh()}, this.updateInterval);
         console.log("Chirper online.")
+        this._refresh();
     }
 
     _refresh() {
@@ -25,7 +26,7 @@ class Chirper {
     }
 
     _onNewMessage(msg) {
-        console.log("Chirp!", msg);
+        //console.log("Chirp!", msg);
         this.element.prepend(
             $('<li class="chirp">').append(
                 $('<span class="name">').text(msg.SenderName),

@@ -183,7 +183,7 @@ namespace CityWebServer.RequestHandlers {
 						economyManager.GetIncomeAndExpenses(
 							group.Service, group.SubService, (ItemClass.Level)i,
 							out long income, out long expense);
-						incomeExpenses[group.Name] = new IncomeExpense {
+						incomeExpenses[$"{group.Name}_Lv{i}"] = new IncomeExpense {
 							Income  = income,
 							Expense = expense,
 							Level   = i,

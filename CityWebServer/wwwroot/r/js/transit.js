@@ -14,6 +14,7 @@ class Transit {
     run() {
         window.setInterval(() => {this._refresh()}, this.updateInterval);
         console.log("Transit online.")
+        this._refresh();
     }
 
     _refresh() {
