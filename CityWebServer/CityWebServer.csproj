@@ -100,7 +100,6 @@
     <None Include="wwwroot\r\css\main.css" />
     <None Include="wwwroot\r\js\bootstrap.min.js" />
     <None Include="wwwroot\r\js\chirper.js" />
-    <None Include="wwwroot\r\js\highcharts.js" />
     <None Include="wwwroot\r\js\jquery-2.1.3.min.js" />
     <None Include="wwwroot\r\js\knockout-3.3.0.js" />
     <None Include="wwwroot\r\js\knockout.mapping-latest.js" />
@@ -110,6 +109,7 @@
     <None Include="wwwroot\r\js\budget.js" />
     <None Include="wwwroot\r\js\jquery.number.min.js" />
     <None Include="wwwroot\r\js\jquery.number.min.js.map" />
+    <None Include="wwwroot\r\js\Chart.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
