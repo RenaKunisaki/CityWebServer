@@ -20,13 +20,18 @@ namespace CityWebServer.RequestHandlers
         public override IResponseFormatter Handle(HttpListenerRequest request)
         {
             var transportManager = Singleton<TransportManager>.instance;
+			LogMessage("got transportManager");
+
+			//somewhere in here we're getting a null reference
+			//if the game hasn't finished loading yet
 
             var lines = transportManager.m_lines.m_buffer;
             List<PublicTransportLine> lineModels = new List<PublicTransportLine>();
 
             foreach (var line in lines)
             {
-                if (line.m_flags == TransportLine.Flags.None) { continue; }
+				LogMessage($"Transport: looking at line {line}");
+				if (line.m_flags == TransportLine.Flags.None) { continue; }
 
                 var passengers = line.m_passengers;
                 List<PopulationGroup> passengerGroups = new List<PopulationGroup>
@@ -54,9 +59,14 @@ namespace CityWebServer.RequestHandlers
                 lineModels.Add(lineModel);
             }
 
-            lineModels = lineModels.OrderBy(obj => obj.Name).ToList();
+			LogMessage("Transport: ordering");
+			lineModels = lineModels.OrderBy(obj => obj.Name).ToList();
 
             return JsonResponse(lineModels);
         }
-    }
+
+		private new void LogMessage(string msg) {
+			IntegratedWebServer.LogMessage(msg);
+		}
+	}
 }
