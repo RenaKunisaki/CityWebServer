@@ -30,15 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\Assemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="ColossalManaged">
-      <HintPath>..\Assemblies\ColossalManaged.dll</HintPath>
-    </Reference>
-    <Reference Include="ICities">
-      <HintPath>..\Assemblies\ICities.dll</HintPath>
-    </Reference>
     <Reference Include="JsonFx">
       <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net35\JsonFx.dll</HintPath>
     </Reference>
@@ -53,26 +44,20 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\Assemblies\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\Assemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="ICities">
-      <HintPath>..\..\..\..\steam\.steam\steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\opt\steam\.local\share\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="ColossalManaged">
-      <HintPath>..\..\..\..\steam\.steam\steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
+      <HintPath>..\..\..\..\..\opt\steam\.local\share\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
+    </Reference>
+    <Reference Include="ICities">
+      <HintPath>..\..\..\..\..\opt\steam\.local\share\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\steam\.steam\steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\opt\steam\.local\share\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\steam\.steam\steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\steam\.steam\steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\opt\steam\.local\share\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -134,13 +119,11 @@ xcopy /Y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addo
 xcopy /Y "$(TargetDir)CityWebServer.Extensibility.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)\*.*"
 xcopy /Y "$(TargetDir)Jsonfx.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)\*.*"
 xcopy /Y /E "$(TargetDir)wwwroot\*.*" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)\wwwroot\*.*"</PostBuildEvent>
-    <PostBuildEvent Condition="'$(OS)' != 'Windows_NT' ">mkdir -p "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
-rm "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/$(TargetFileName)"
-cp -r "$(TargetPath)" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
-cp -r "$(TargetDir)CityWebServer.Extensibility.dll" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/"
-cp -r "$(TargetDir)JsonFx.dll" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/"
-rm -r "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/wwwroot"
-cp -r "$(ProjectDir)/wwwroot" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"</PostBuildEvent>
+    <PostBuildEvent Condition="'$(OS)' != 'Windows_NT' ">mkdir -p "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
+rm "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/$(TargetFileName)"
+cp -r "$(TargetPath)" "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
+cp -r "$(TargetDir)CityWebServer.Extensibility.dll" "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/"
+cp -r "$(TargetDir)JsonFx.dll" "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

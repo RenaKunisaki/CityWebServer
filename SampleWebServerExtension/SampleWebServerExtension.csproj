@@ -72,10 +72,10 @@
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)\$(TargetFileName)"
 xcopy /Y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)"
 xcopy /Y "$(TargetDir)CityWebServer.Extensibility.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)_$(ProjectName)\*.*"</PostBuildEvent>
-    <PostBuildEvent Condition="'$(OS)' != 'Windows_NT' ">mkdir -p "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
-rm "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/$(TargetFileName)"
-cp -r "$(TargetPath)" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
-cp -r "$(TargetDir)CityWebServer.Extensibility.dll" "/home/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/"</PostBuildEvent>
+    <PostBuildEvent Condition="'$(OS)' != 'Windows_NT' ">mkdir -p "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
+rm "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/$(TargetFileName)"
+cp -r "$(TargetPath)" "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)"
+cp -r "$(TargetDir)CityWebServer.Extensibility.dll" "/opt/steam/.local/share/Steam/steamapps/common/Cities_Skylines/Files/Mods/$(SolutionName)_$(ProjectName)/"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
