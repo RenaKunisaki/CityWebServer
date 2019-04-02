@@ -3,21 +3,40 @@ html {
 }
 
 body {
-    padding-top: 60px;
+    padding-top: 2em;
     background: #000;
     color: #FFF;
     width: 100%;
 }
 
-h2 {
-    text-align: center;
-    font-size: 1.2em;
-    margin: 0;
+#navbar {
+    position: absolute;
+    top:   0;
+    left:  0;
+    right: 0;
+    padding-left: 0.25em;
+    min-height: 1.3em;
+    background: linear-gradient(to bottom,
+        #002D63 0%,
+        #004D83 100%
+    );
     border-bottom: 1px #FFF solid;
+    font-size: 1.3em;
 }
 
 .container {
     width: 100% !important;
+}
+
+.box h1 {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 0;
+    background: linear-gradient(to bottom,
+        #002D63 0%,
+        #004D83 100%
+    );
+    border-bottom: 1px #FFF solid;
 }
 
 .list {
@@ -30,17 +49,14 @@ h2 {
 }
 
 .money { /* any money amount */
-    text-align: right;
     font-family: monospace;
 }
 .money:before { content: '₡' }
-.budget .income:before { content: " (₡" }
-.budget .expenses:before { content: " - ₡" }
-.budget .expenses:after { content: ")" }
-.budget .delta:before { content: " ~ ₡" }
-.budget .cash:before { content: "₡" }
-.budget .numLoans:before { content: "; Loans: " }
-.budget .cash { color: #0F0 }
+.money.negative { color: #F00 !important }
+#budget .cash { color: #0F0 }
+#budget .stats {
+    font-size: 1.2em;
+}
 
 /* table {
     border-left: 1px #FFF solid;
@@ -52,13 +68,30 @@ td, th {
     border-bottom: 1px #FFF solid;
 }
 
+.chart h2 {
+    font-size: 1.1em;
+    margin: 0;
+    text-align: center;
+}
+
+#budget .chart {
+    display: inline-block;
+    width: 200px;
+    margin: 0;
+    border: 1px #F00 dotted;
+    vertical-align: top;
+}
+
+#budget .chart .money {
+    text-align: center;
+}
+
 #clock {
     position: absolute;
-    top: 0.5em;
-    right: 0.5em;
+    top: 0;
+    right: 0.25em;
     text-align: right;
     color: #CCC;
-    font-size: 1.3em;
 }
 
 #chirper .name {

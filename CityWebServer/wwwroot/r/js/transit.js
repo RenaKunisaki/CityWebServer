@@ -53,12 +53,12 @@ class Transit {
                 totals[cls].vehicles   += route.VehicleCount;
                 totals[cls].passengers += numPassengers;
 
-                row.append(
+                /* row.append(
                     $('<td class="name">').text(route.Name),
                     $('<td class="stops">').number(route.StopCount),
                     $('<td class="vehicles">').number(route.VehicleCount),
                     $('<td class="passengers">').number(numPassengers),
-                );
+                ); */
             }
 
             for(const cls in totals) {

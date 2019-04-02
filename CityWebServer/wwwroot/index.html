@@ -5,15 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Cities: Skylines - Test</title>
-    <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
+    <title data-bind="text: Name"></title>
     <link href='/r/css/main.css' rel='stylesheet'>
     <script src='/r/js/jquery-2.1.3.min.js'></script>
     <script src='/r/js/jquery.number.min.js'></script>
     <script src='/r/js/bootstrap.min.js'></script>
     <script src='/r/js/knockout-3.3.0.js'></script>
     <script src='/r/js/knockout.mapping-latest.js'></script>
-    <script src="/r/js/highcharts.js"></script>
+    <script src='/r/js/Chart.min.js'></script>
     <script src="/r/js/budget.js"></script>
     <script src="/r/js/chirper.js"></script>
     <script src="/r/js/transit.js"></script>
@@ -21,28 +20,37 @@
 </head>
 <body>
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/"><span data-bind="text: Name"></span></a>
-                <div id="budget"></div>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/Log">Log</a></li>
-                    <!-- TODO: Dynamically populate this with links to other handlers.  -->
-                </ul>
-            </div>
-            <div id="clock" data-bind="text: Time"></div>
-        </div>
+    <nav id="navbar">
+        <div id="name" data-bind="text: Name"></div>
+        <div id="clock" data-bind="text: friendlyDate"></div>
     </nav>
     <div class="container">
-        <div id="chirper" class="list">
-            <h2>Chirper Messages</h2>
+        <div id="chirper" class="list box">
+            <h1>Chirper Messages</h1>
         </div>
-        <div id="transit" class="list">
-            <h2>Transit Overview</h2>
+
+        <div id="budget" class="list box">
+            <h1>Budget Overview</h1>
+            <div id="budget-summary"></div>
+            <div class="chart" id="income-chart">
+                <h2>Income</h2>
+                <div class="money total"></div>
+                <canvas></canvas>
+            </div>
+            <div class="chart" id="expense-chart">
+                <h2>Expenses</h2>
+                <div class="money total"></div>
+                <canvas></canvas>
+            </div>
+            <div class="stats">
+                Balance: <span id="current-cash" class="money cash"></span>
+                Net Income: <span id="net-income" class="money net"></span>
+                Active Loans: <span id="num-loans" class="number"></span>
+            </div>
+        </div>
+
+        <div id="transit" class="list box">
+            <h1>Transit Overview</h1>
         </div>
     </div>
 </body>
