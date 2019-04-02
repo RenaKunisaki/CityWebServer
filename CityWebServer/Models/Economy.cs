@@ -1,23 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CityWebServer.Models {
 	public class BudgetInfo {
-		public long income;
-		public long expenses;
-		public long cash;
-		public int numLoans;
-		public TaxRate[] taxRates;
+		public long TotalIncome;
+		public long TotalExpenses;
+		public long CurrentCash;
+		public EconomyManager.Loan[] loans;
+		public Economy Economy;
+	}
+
+	public class IncomeExpenseGroup {
+		public String Name;
+		public ItemClass.Service Service;
+		public ItemClass.SubService SubService = ItemClass.SubService.None;
+		public int Levels = 0;
+	}
+
+	public class TaxRateGroup {
+		public String Name;
+		public ItemClass.Service Service;
+		public ItemClass.SubService SubService = ItemClass.SubService.None;
 	}
 
 	public class Economy {
-		public IncomeExpense[] IncomesAndExpenses { get; set; }
-
-		public TaxRate[] TaxRates { get; set; }
+		public Dictionary<String, IncomeExpense> IncomesAndExpenses;
+		public Dictionary<String, int> taxRates;
 	}
 
 	public class TaxRate {
-		public String GroupName { get; set; }
-
 		public int Rate { get; set; }
 
 		// Tax Rate: Low-Density Residential
@@ -29,11 +40,9 @@ namespace CityWebServer.Models {
 	}
 
 	public class IncomeExpense {
-		public String Group { get; set; }
-
-		public String SubGroup { get; set; }
-
-		public Double Amount { get; set; }
+		public long Income;
+		public long Expense;
+		public int Level;
 
 		// Tax Income: Low-Density Residential
 		// Tax Income: High-Density Residential
