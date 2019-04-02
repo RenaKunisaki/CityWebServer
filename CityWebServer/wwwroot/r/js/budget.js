@@ -18,6 +18,14 @@ function shuffle(a) {
         this.app = app;
         this.updateInterval = 5000; //msec
         this._isInit = false;
+
+        //for some reason the in-game bank names
+        //just return BankA, BankB, BankC. XXX fix this.
+        this.bankNames = [
+            "Silver Sunset Bank",
+            "Global Credit Inc",
+            "Pyramid Capital",
+        ];
     }
 
     _init(data) {
@@ -154,16 +162,18 @@ function shuffle(a) {
             for(let i=0; i < data.loans.length; i++) {
                 const loan = data.loans[i];
                 $(`#loan${i}`).empty().append(
-                    $('<td>').text('XXX'), //Bank
-                    $('<td class="money">').number(loan.m_amountLeft),
+                    //$('<td>').text(loan.BankName),
+                    $('<td>').text(this.bankNames[i]),
+                    $('<td class="money">').number(loan.PaymentLeft / 100),
                     $('<td class="number">').text('XXX'), //time left
-                    $('<td class="number">').text('XXX'), //interest
+                    $('<td class="number">').text(
+                        (loan.InterestRate / 100).toFixed(0) + '%'),
                     $('<td class="money">').text('XXX'), //weekly cost
-                );
-            }
-            if(data.loans.length == 0) {
-                $('#loan0').empty().append(
-                    $('<td colspan="5">No active loans</td>')
+
+                    //Length: number of weeks of repayment total
+                    //No idea how to get number of weeks left or start date,
+                    //or cost per week
+                    //Should be 408 and 442.31
                 );
             }
 

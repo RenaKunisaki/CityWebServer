@@ -6,7 +6,7 @@ namespace CityWebServer.Models {
 		public long TotalIncome;
 		public long TotalExpenses;
 		public long CurrentCash;
-		public EconomyManager.Loan[] loans;
+		public Loan[] loans;
 		public Economy Economy;
 	}
 
@@ -21,6 +21,15 @@ namespace CityWebServer.Models {
 		public String Name;
 		public ItemClass.Service Service;
 		public ItemClass.SubService SubService = ItemClass.SubService.None;
+	}
+
+	public class Loan {
+		public String BankName;
+		public long Amount;
+		public long PaymentLeft;
+		public int InterestRate;
+		public long InterestPaid;
+		public long Length;
 	}
 
 	public class Economy {

@@ -163,15 +163,25 @@ namespace CityWebServer.RequestHandlers {
 			budget.CurrentCash = economyManager.LastCashAmount;
 
 			//Get loan info
-			List<EconomyManager.Loan> loans = new List<EconomyManager.Loan>(
-				EconomyManager.MAX_LOANS);
-			for(int i = 0; i < economyManager.CountLoans(); i++) {
-				//XXX what is LoanInfo?
-				//EconomyManager.LoanInfo[] loanInfo;
-				//economyManager.GetLoanInfo(i, out loanInfo);
-				//XXX what the heck is this data, it's all wrong
+			List<Loan> loans = new List<Loan>(EconomyManager.MAX_LOANS);
+			//for(int i = 0; i < economyManager.CountLoans(); i++) {
+			for(int i = 0; i < EconomyManager.MAX_LOANS; i++) {
 				economyManager.GetLoan(i, out EconomyManager.Loan loan);
-				loans.Add(loan);
+				loans.Add(new Loan {
+					//economyManager.GetLoanExpenses()  - useful?
+					//economyManager.GetPolicyExpenses()
+					//LocaleFormatter
+					//bank names aren't the ones shown in-game,
+					//they're just BankA, BankB, BankC. WTF?
+					BankName = economyManager.GetBankName(i),
+					Amount = loan.m_amountTaken,
+					PaymentLeft = loan.m_amountLeft,
+					InterestRate = loan.m_interestRate,
+					InterestPaid = loan.m_interestPaid,
+					Length = loan.m_length,
+					//XXX how to get weekly cost, weeks left,
+					//correct bank name?
+				});
 			}
 			budget.loans = loans.ToArray();
 
