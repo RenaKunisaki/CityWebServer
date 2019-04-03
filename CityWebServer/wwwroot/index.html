@@ -39,11 +39,7 @@
         </div></div>
 
         <div id="budget" class="list box"><div class="wrapper">
-            <h1>Budget Overview</h1>
-            <div class="stats">
-                Balance: <span id="current-cash" class="money cash"></span>
-                Net Income: <span id="net-income" class="money net"></span>/wk
-            </div>
+            <h1>Budget: <span id="current-cash" class="money cash"></span> (<span id="net-income" class="money net"></span>/wk)</h1>
             <div class="charts">
                 <div class="chart" id="income-chart">
                     <h2>Weekly Income: <span class="money total"></span></h2>
@@ -63,8 +59,8 @@
                 <table>
                     <tr>
                         <th>Tax Rate %</th>
-                        <th>Low</th>
-                        <th>High</th>
+                        <th title="Low Density">Low</th>
+                        <th title="High Density">High</th>
                     </tr>
                     <tr>
                         <td>Residential</td>
@@ -87,10 +83,10 @@
                 <table id="loans">
                     <tr>
                         <th>Loans</th>
-                        <th>Paymt Left ₡</th>
-                        <th>Time Left</th>
-                        <th>Intrst</th>
-                        <th>₡/Week</th>
+                        <th title="Amount left to repay">₡ Left</th>
+                        <th title="Time until paid">Time Left</th>
+                        <th title="Interest rate">Intrst</th>
+                        <th title="Weekly payment">₡/Week</th>
                     </tr>
                     <tr id="loan0"></tr>
                     <tr id="loan1"></tr>

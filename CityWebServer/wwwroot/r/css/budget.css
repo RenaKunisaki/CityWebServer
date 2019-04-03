@@ -5,7 +5,7 @@
 .money.negative { color: #F00 !important }
 
 #budget {
-    max-width: 40em;
+    max-width: 36em;
 }
 
 #budget-legend {
@@ -13,7 +13,6 @@
     float: right;
     vertical-align: top;
     border-left: 1px #FFF solid;
-    margin-top: -1.5em; /* allow to overlap summary */
 }
 
 #budget-legend .income { display: none }
@@ -26,8 +25,9 @@
 
 #budget .chart {
     display: inline-block;
-    width: 100%;
+    width: 130%;
     margin: 0;
+    margin-left: -15%;
     vertical-align: top;
 }
 

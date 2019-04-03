@@ -26,7 +26,6 @@ body {
     border: 1px #FFF solid;
     overflow-y: auto;
     vertical-align: top;
-    padding: 4px;
     max-height: calc(100vh - 4em);
     max-width: 30%;
     margin: 0.25em;

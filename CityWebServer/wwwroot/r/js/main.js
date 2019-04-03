@@ -83,8 +83,12 @@ class App {
             console.log("CityInfo:", data);
             this.data = data;
             this.currentDate = new Date(this.data.Time);
-            document.title = this.data.Name;
             this._updateClock(data);
+
+            document.title = this.data.Name;
+            $('#city-name').attr('title',
+                `Map: ${data.mapName}\n` +
+                `Climate: ${data.environment}`);
 
             if(!this._isInit) {
                 this.viewModel = ko.mapping.fromJS(this.data);

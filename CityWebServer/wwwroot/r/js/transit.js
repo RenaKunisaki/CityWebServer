@@ -4,10 +4,10 @@ class Transit {
         this.updateInterval = 10000; //msec
         this.element = $('<table class="transit">');
         this.header = $('<tr class="header">').append(
-            $('<th>').text("Route"),
-            $('<th>').text("Stops"),
-            $('<th>').text("Vhcls"),
-            $('<th>').text("Riders"),
+            $('<th>').text("Route") .attr('title', "Route Name"),
+            $('<th>').text("Stops") .attr('title', "Number of stops"),
+            $('<th>').text("Vhcls") .attr('title', "Number of vehicles"),
+            $('<th>').text("Riders").attr('title', "Number of passengers"),
         );
     }
 
