@@ -27,7 +27,7 @@
     float: right;
     vertical-align: top;
     border-left: 1px #FFF solid;
-    border-top:  1px #FFF solid;
+    /* border-top:  1px #FFF solid; */
 }
 
 #budget-legend .income { display: none }
@@ -67,8 +67,6 @@
 #budget .taxes, #budget .loans {
     display: inline-block;
     padding-right: 0.25em;
-    border-right: 1px #FFF solid;
-    border-top: 1px #FFF solid;
 }
 
 #budget .taxes table, #budget .loans table {

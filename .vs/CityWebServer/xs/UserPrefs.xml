@@ -1,7 +1,7 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/Models/Economy.cs">
     <Files>
-      <File FileName="CityWebServer/Models/Economy.cs" Line="33" Column="28" />
+      <File FileName="CityWebServer/Models/Economy.cs" Line="23" Column="22" />
       <File FileName="CityWebServer/IntegratedWebServer.cs" Line="465" Column="33" />
       <File FileName="CityWebServer/RequestHandlers/BuildingRequestHandler.cs" Line="24" Column="6" />
       <File FileName="CityWebServer/RequestHandlers/CityInfoRequestHandler.cs" Line="24" Column="14" />
