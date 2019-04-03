@@ -1,0 +1,22 @@
+#navbar {
+    position: absolute;
+    top:   0;
+    left:  0;
+    right: 0;
+    padding-left: 0.25em;
+    min-height: 1.3em;
+    background: linear-gradient(to bottom,
+        #002D63 0%,
+        #004D83 100%
+    );
+    border-bottom: 1px #FFF solid;
+    font-size: 1.3em;
+}
+
+#clock {
+    position: absolute;
+    top: 0;
+    right: 0.25em;
+    text-align: right;
+    color: #CCC;
+}

@@ -1,0 +1,9 @@
+#transit .blimp { background-color: #424 }
+#transit .bus   { background-color: #044 }
+#transit .train { background-color: #420 }
+#transit .ferry { background-color: #004 }
+#transit .metro { background-color: #040 }
+
+#transit .stops, #transit .vehicles, #transit .passengers {
+    text-align: right;
+}

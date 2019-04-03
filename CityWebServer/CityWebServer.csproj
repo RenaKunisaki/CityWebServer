@@ -110,6 +110,10 @@
     <None Include="wwwroot\r\js\jquery.number.min.js" />
     <None Include="wwwroot\r\js\jquery.number.min.js.map" />
     <None Include="wwwroot\r\js\Chart.min.js" />
+    <None Include="wwwroot\r\css\budget.css" />
+    <None Include="wwwroot\r\css\chirp.css" />
+    <None Include="wwwroot\r\css\navbar.css" />
+    <None Include="wwwroot\r\css\transit.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
