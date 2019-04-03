@@ -4,19 +4,6 @@
 .money:before { content: '₡' }
 .money.negative { color: #F00 !important }
 
-.legend {
-    float: right;
-    margin: 0;
-    padding: 0;
-    font-size: 0.8em;
-}
-
-.legend .legend-box {
-    width:  1em;
-    height: 1em;
-    display: inline-block;
-}
-
 #budget {
     max-width: 40em;
 }

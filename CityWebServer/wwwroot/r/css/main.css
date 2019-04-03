@@ -65,5 +65,15 @@ td.money:before { content: '' }
     text-align: center;
 }
 
-#population-table th { text-align: left; }
-#population-table td { text-align: right;}
+.legend {
+    float: right;
+    margin: 0;
+    padding: 0;
+    font-size: 0.8em;
+}
+
+.legend-box {
+    width:  1em;
+    height: 1em;
+    display: inline-block;
+}

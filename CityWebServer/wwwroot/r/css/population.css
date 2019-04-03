@@ -1,0 +1,21 @@
+#population-table th { text-align: left; }
+#population-table td { text-align: right;}
+
+#population-table {
+    width: 50%;
+}
+
+#population {
+    width: 20em;
+    overflow: visible;
+}
+
+#population .canvas {
+    /* stupid hack to line chart up nicely
+     * without being surrounded by empty space
+     */
+    position: absolute;
+    right: -20%;
+    top:    1.5em;
+    width:  80%;
+}

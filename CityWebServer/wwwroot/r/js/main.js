@@ -6,6 +6,7 @@ class App {
         this.currentDate    = null;
         this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
+        this.population     = new Population(this);
         this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
@@ -24,6 +25,7 @@ class App {
 
         this.budget.run();
         this.chirper.run();
+        //this.population.run();
         this.transit.run();
 
         $('#main').masonry({
@@ -38,6 +40,7 @@ class App {
         setTimeout(() => {
             $('#main').masonry('layout');
         }, 500);
+        this._refresh();
     }
 
     makeNameColor(name) {
@@ -61,14 +64,18 @@ class App {
         return `hsl(${hue}, ${sat}%, ${light}%)`;
     }
 
-    _updatePopulation(data) {
-        let rows = [];
-        let pop = 0;
-        for(let item of data.GlobalDistrict.PopulationData) {
-            pop += item.Amount;
-            $(`#population-table-${item.Name}`).number(item.Amount);
-        }
-        $('#navbar-population').number(pop);
+    _updateClock(data) {
+        //build displayed date string
+        let year   = this.currentDate.getFullYear();
+        let month  = this.monthNames[this.currentDate.getMonth()-1];
+        let day    = String(this.currentDate.getDay()).padStart(2, '0');
+        let hour   = String(this.currentDate.getHours()).padStart(2, '0');
+        let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
+        let second = String(this.currentDate.getSeconds()).padStart(2, '0');
+        let night  = data.isNight ? '☽' : '☀';
+
+        this.data.friendlyDate =
+            `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
     }
 
     _refresh() {
@@ -77,18 +84,7 @@ class App {
             this.data = data;
             this.currentDate = new Date(this.data.Time);
             document.title = this.data.Name;
-
-            //build displayed date string
-            let year   = this.currentDate.getFullYear();
-            let month  = this.monthNames[this.currentDate.getMonth()-1];
-            let day    = String(this.currentDate.getDay()).padStart(2, '0');
-            let hour   = String(this.currentDate.getHours()).padStart(2, '0');
-            let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
-            let second = String(this.currentDate.getSeconds()).padStart(2, '0');
-            let night  = data.isNight ? '☽' : '☀';
-
-            this.data.friendlyDate =
-                `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
+            this._updateClock(data);
 
             if(!this._isInit) {
                 this.viewModel = ko.mapping.fromJS(this.data);
@@ -99,7 +95,7 @@ class App {
                 return;
             }
 
-            this._updatePopulation(data);
+            this.population.update(data);
             ko.mapping.fromJS(this.data, this.viewModel);
             $('#main').masonry('layout');
         });

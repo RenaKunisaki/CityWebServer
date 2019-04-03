@@ -90,7 +90,7 @@
                 $('<td>').append(
                     $('<div class="legend-box">')
                         .css('background-color', color),
-                        $('<span class="label">').text(name),
+                    $('<span class="label">').text(name),
                 ),
                 cellIncome, cellCost, cellNet,
             );

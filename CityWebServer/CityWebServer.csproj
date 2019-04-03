@@ -116,6 +116,8 @@
     <None Include="wwwroot\r\css\transit.css" />
     <None Include="wwwroot\r\js\highcharts.js" />
     <None Include="wwwroot\r\js\masonry.pkgd.min.js" />
+    <None Include="wwwroot\r\css\population.css" />
+    <None Include="wwwroot\r\js\population.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
