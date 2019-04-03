@@ -31,25 +31,30 @@
 
         <div id="budget" class="list box">
             <h1>Budget Overview</h1>
-            <div id="budget-summary"></div>
-            <div class="chart" id="income-chart">
-                <h2>Weekly Income: <span class="money total"></span></h2>
-                <canvas></canvas>
-            </div>
-            <div class="chart" id="expense-chart">
-                <h2>Weekly Expenses: <span class="money total"></span></h2>
-                <canvas></canvas>
+            <div class="charts">
+                <div class="chart" id="income-chart">
+                    <h2>Weekly Income: <span class="money total"></span></h2>
+                    <div class="canvas">
+                        <canvas></canvas>
+                    </div>
+                </div>
+                <div class="chart" id="expense-chart">
+                    <h2>Weekly Expenses: <span class="money total"></span></h2>
+                    <div class="canvas">
+                        <canvas></canvas>
+                    </div>
+                </div>
             </div>
             <div id="budget-legend"></div>
             <div class="stats">
-                Balance: <span id="current-cash" class="money cash"></span>
-                Net Income: <span id="net-income" class="money net"></span>
+                <div>Balance: <span id="current-cash" class="money cash"></span></div>
+                <div>
+                    Net Income: <span id="net-income" class="money net"></span></div>
             </div>
             <div class="taxes">
-                <h2>Tax Rates:</h2>
                 <table>
                     <tr>
-                        <th>Group</th>
+                        <th>Tax Rates</th>
                         <th>Low</th>
                         <th>High</th>
                     </tr>
@@ -71,14 +76,13 @@
                 </table>
             </div>
             <div class="loans">
-                <h2>Loans:</h2>
                 <table id="loans">
                     <tr>
-                        <th>Bank</th>
+                        <th>Loans</th>
                         <th>Paymt Left</th>
                         <th>Time Left</th>
-                        <th>Interest</th>
-                        <th>Cost/Week</th>
+                        <th>Intrst</th>
+                        <th>₡/Week</th>
                     </tr>
                     <tr id="loan0"></tr>
                     <tr id="loan1"></tr>

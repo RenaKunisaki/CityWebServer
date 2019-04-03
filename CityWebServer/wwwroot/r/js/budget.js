@@ -1,18 +1,3 @@
-/**
- * Shuffles array in place.
- * @param {Array} a items An array containing the items.
- */
-function shuffle(a) {
-    var j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-    }
-    return a;
-}
-
 ﻿class Budget {
     constructor(app) {
         this.app = app;
@@ -32,8 +17,29 @@ function shuffle(a) {
         this._makeCharts(data);
     }
 
+    _makeNameColor(name) {
+        if(name.startsWith('ResidentialLow'))  return '#80FF00';
+        if(name.startsWith('ResidentialHigh')) return '#40C000';
+        if(name.startsWith('CommercialLow'))   return '#0080FF';
+        if(name.startsWith('CommercialHigh'))  return '#0040C0';
+        if(name.startsWith('Industrial'))      return '#FF8000';
+        if(name.startsWith('Office'))          return '#00C0C0';
+        let hue = 0;
+        for(let i=0; i<name.length; i++) {
+            hue += name.charCodeAt(i);
+        }
+        hue %= 360;
+        return `hsl(${hue}, 100%, 50%)`;
+    }
+
     _makeCharts(data) {
-        const legend = $('<ul class="legend">');
+        const legend = $('<table class="legend">').append(
+            $('<tr>').append(
+                $('<th>').text("Source"),
+                $('<th>').text("Income"),
+                $('<th>').text("Cost"),
+            ),
+        );
         const options = {
             layout: {
                 padding: { left: 0, right: 0, bottom: 0, top: 0 },
@@ -61,17 +67,22 @@ function shuffle(a) {
         const items = Object.entries(data.Economy.IncomesAndExpenses);
         for(const [name, item] of items) {
             labels.push(name);
-            const hue = (incomeData.length / items.length) * 360;
-            bgColors.push(`hsl(${hue}, 100%, 50%)`);
+            const color = this._makeNameColor(name);
+            bgColors.push(color);
             incomeData.push(item.Income);
             expenseData.push(item.Expense);
-        }
-        shuffle(bgColors);
 
-        for(let i=0; i<items.length; i++) {
-            legend.append($('<li>').append(
-                $('<div class="legend-box">').css('background-color', bgColors[i]),
-                $('<span class="label">').text(items[i][0]),
+            const cellIncome = $(`<td id="income-${name}" class="money income">`);
+            const cellCost = $(`<td id="cost-${name}" class="money expense">`);
+            cellIncome.number(item.Income);
+            cellCost.number(item.Expense);
+            legend.append($('<tr>').append(
+                $('<td>').append(
+                    $('<div class="legend-box">')
+                        .css('background-color', color),
+                        $('<span class="label">').text(name),
+                ),
+                cellIncome, cellCost,
             ));
         }
 
@@ -118,6 +129,8 @@ function shuffle(a) {
             //XXX why are these dollars, not cents?
             incomeData.push(item.Income);
             expenseData.push(item.Expense);
+            $(`#income-${name}`).number(item.Income);
+            $(`#cost-${name}`).number(item.Expense);
         }
 
         this.chartIncome.data.datasets[0].data = incomeData;

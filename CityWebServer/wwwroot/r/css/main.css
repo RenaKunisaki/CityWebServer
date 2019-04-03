@@ -1,5 +1,7 @@
 html {
     width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -46,7 +48,7 @@ body {
 
 .list {
     border: 1px #FFF solid;
-    max-width: 45%;
+    max-width: 49%;
     overflow-y: auto;
     display: inline-block;
     vertical-align: top;
@@ -64,6 +66,10 @@ td, th {
     border-bottom: 1px #FFF solid;
 }
 
+td.money {
+    text-align: right;
+}
+
 .chart h2 {
     font-size: 1.1em;
     margin: 0;
@@ -74,11 +80,8 @@ td, th {
     float: right;
     margin: 0;
     padding: 0;
-    list-style-type: none;
     font-size: 0.8em;
 }
-
-.legend li { margin: 0 }
 
 .legend .legend-box {
     width:  1em;
@@ -87,10 +90,16 @@ td, th {
 }
 
 #budget { position: relative }
-#budget .legend {
-    position: absolute;
-    top:   2em;
-    right: 0;
+#budget-legend {
+    display: inline-block;
+    float: right;
+    vertical-align: top;
+    border-left: 1px #FFF solid;
+    border-top:  1px #FFF solid;
+}
+
+#budget .legend td, #budget .legend th {
+    padding: 0;
 }
 
 #budget .chart {
@@ -102,6 +111,17 @@ td, th {
 
 #budget .chart .money {
     text-align: center;
+}
+
+#budget .charts {
+    display: inline-block;
+    vertical-align: top;
+    width: 300px;
+    margin: 0;
+    padding: 0;
+    /* hack to make up for the excessive side padding */
+    margin-right: -5em;
+    margin-left: -2em;
 }
 
 #budget .cash { color: #0F0 }
