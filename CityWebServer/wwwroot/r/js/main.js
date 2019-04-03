@@ -67,8 +67,8 @@ class App {
     _updateClock(data) {
         //build displayed date string
         let year   = this.currentDate.getFullYear();
-        let month  = this.monthNames[this.currentDate.getMonth()-1];
-        let day    = String(this.currentDate.getDay()).padStart(2, '0');
+        let month  = this.monthNames[this.currentDate.getMonth()];
+        let day    = String(this.currentDate.getDate()).padStart(2, '0');
         let hour   = String(this.currentDate.getHours()).padStart(2, '0');
         let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
         let second = String(this.currentDate.getSeconds()).padStart(2, '0');
