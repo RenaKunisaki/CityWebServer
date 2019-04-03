@@ -6,8 +6,8 @@ class Transit {
         this.header = $('<tr class="header">').append(
             $('<th>').text("Route"),
             $('<th>').text("Stops"),
-            $('<th>').text("Vehicles"),
-            $('<th>').text("Passengers"),
+            $('<th>').text("Vhcls"),
+            $('<th>').text("Riders"),
         );
     }
 
@@ -24,7 +24,7 @@ class Transit {
 
             for(const route of data) {
                 const row = $('<tr>');
-                rows.push(row);
+                //rows.push(row);
 
                 const name = route.Name;
                 let cls = '';

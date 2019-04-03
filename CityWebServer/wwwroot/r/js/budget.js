@@ -17,25 +17,21 @@
         this._makeCharts(data);
     }
 
-    _makeNameColor(name) {
+    makeNameColor(name) {
+        //Try to match game colors
         if(name.startsWith('Residential_Low'))  return '#80FF00';
         if(name.startsWith('Residential_High')) return '#40C000';
         if(name.startsWith('Commercial_Low'))   return '#0080FF';
         if(name.startsWith('Commercial_High'))  return '#0040C0';
         if(name.startsWith('Industrial'))       return '#FF8000';
         if(name.startsWith('Office'))           return '#00C0C0';
-        let hue = 0;
-        for(let i=0; i<name.length; i++) {
-            hue += (name.charCodeAt(i) ^ 0xE2);
-        }
-        hue %= 360;
-        return `hsl(${hue}, 100%, 50%)`;
+        return this.app.makeNameColor(name);
     }
 
     _makeCharts(data) {
         const legend = $('<table class="legend">').append(
             $('<tr>').append(
-                $('<th class="name">').text("Source"),
+                $('<th class="name">').text("Service"),
                 $('<th class="income">').text("Income ₡"),
                 $('<th class="expense">').text("Cost ₡"),
                 $('<th class="net">').text("Net ₡"),
@@ -77,7 +73,7 @@
 
         for(const [name, item] of items) {
             labels.push(name);
-            const color = this._makeNameColor(name);
+            const color = this.makeNameColor(name);
             bgColors.push(color);
             incomeData.push(item.Income);
             expenseData.push(item.Expense);
@@ -115,7 +111,7 @@
                 datasets: [{
                     backgroundColor: bgColors,
                     hoverBackgroundColor: bgColors,
-                    borderWidth: 1,
+                    borderWidth: 0,
                     borderColor: '#000',
                     data: incomeData,
                 }],
@@ -131,7 +127,7 @@
                 datasets: [{
                     backgroundColor: bgColors,
                     hoverBackgroundColor: bgColors,
-                    borderWidth: 1,
+                    borderWidth: 0,
                     borderColor: '#000',
                     data: expenseData,
                 }],

@@ -18,8 +18,7 @@
 }
 
 #budget {
-    position: relative;
-    flex-basis: 400px;
+    max-width: 40em;
 }
 
 #budget-legend {
@@ -27,7 +26,7 @@
     float: right;
     vertical-align: top;
     border-left: 1px #FFF solid;
-    /* border-top:  1px #FFF solid; */
+    border-top:  1px #FFF solid;
 }
 
 #budget-legend .income { display: none }
@@ -52,7 +51,7 @@
 #budget .charts {
     display: inline-block;
     vertical-align: top;
-    width: 300px;
+    width: 80%;
     margin: 0;
     padding: 0;
     /* hack to make up for the excessive side padding */

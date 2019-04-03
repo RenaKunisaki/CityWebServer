@@ -1,3 +1,8 @@
+#chirper {
+    /* max-width: 30em; */
+    max-height: 50%;
+}
+
 #chirper .name {
     font-weight: bold;
     margin-right: 1em;

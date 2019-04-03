@@ -8,137 +8,115 @@ using CityWebServer.Models;
 using ColossalFramework;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers
-{
-    [UsedImplicitly]
-    public class CityInfoRequestHandler : RequestHandlerBase
-    {
-        public CityInfoRequestHandler(IWebServer server)
-            : base(server, new Guid("eeada0d0-f1d2-43b0-9595-2a6a4d917631"), "City Info", "Rychard", 100, "/CityInfo")
-        {
-        }
+namespace CityWebServer.RequestHandlers {
+	[UsedImplicitly]
+	public class CityInfoRequestHandler: RequestHandlerBase {
+		public CityInfoRequestHandler(IWebServer server)
+			: base(server, new Guid("eeada0d0-f1d2-43b0-9595-2a6a4d917631"), "City Info", "Rychard", 100, "/CityInfo") {
+		}
 
-        public override IResponseFormatter Handle(HttpListenerRequest request)
-        {
-            if (request.QueryString.HasKey("showList"))
-            {
-                return HandleDistrictList();
-            }
+		public override IResponseFormatter Handle(HttpListenerRequest request) {
+			if(request.QueryString.HasKey("showList")) {
+				return HandleDistrictList();
+			}
+			return HandleDistrict(request);
+		}
 
-            return HandleDistrict(request);
-        }
+		private IResponseFormatter HandleDistrictList() {
+			var districtIDs = DistrictInfo.GetDistricts().ToArray();
+			return JsonResponse(districtIDs);
+		}
 
-        private IResponseFormatter HandleDistrictList()
-        {
-            var districtIDs = DistrictInfo.GetDistricts().ToArray();
+		private IResponseFormatter HandleDistrict(HttpListenerRequest request) {
+			var districtIDs = GetDistrictsFromRequest(request);
 
-            return JsonResponse(districtIDs);
-        }
+			DistrictInfo globalDistrictInfo = null;
+			List<DistrictInfo> districtInfoList = new List<DistrictInfo>();
 
-        private IResponseFormatter HandleDistrict(HttpListenerRequest request)
-        {
-            var districtIDs = GetDistrictsFromRequest(request);
+			var buildings = GetBuildingBreakdownByDistrict();
+			var vehicles = GetVehicleBreakdownByDistrict();
 
-            DistrictInfo globalDistrictInfo = null;
-            List<DistrictInfo> districtInfoList = new List<DistrictInfo>();
+			foreach(var districtID in districtIDs) {
+				var districtInfo = DistrictInfo.GetDistrictInfo(districtID);
+				if(districtID == 0) {
+					districtInfo.TotalBuildingCount = buildings.Sum(obj => obj.Value);
+					districtInfo.TotalVehicleCount = vehicles.Sum(obj => obj.Value);
+					globalDistrictInfo = districtInfo;
+				}
+				else {
+					districtInfo.TotalBuildingCount = buildings.Where(obj => obj.Key == districtID).Sum(obj => obj.Value);
+					districtInfo.TotalVehicleCount = vehicles.Where(obj => obj.Key == districtID).Sum(obj => obj.Value);
+					districtInfoList.Add(districtInfo);
+				}
+			}
 
-            var buildings = GetBuildingBreakdownByDistrict();
-            var vehicles = GetVehicleBreakdownByDistrict();
+			var simulationManager = Singleton<SimulationManager>.instance;
+			var cityInfo = new CityInfo {
+				Name = simulationManager.m_metaData.m_CityName,
+				mapName = simulationManager.m_metaData.m_MapName,
+				environment = simulationManager.m_metaData.m_environment,
+				Time = simulationManager.m_currentGameTime,
+				GlobalDistrict = globalDistrictInfo,
+				Districts = districtInfoList.ToArray(),
+				isNight = simulationManager.m_isNightTime,
+				simSpeed = simulationManager.SelectedSimulationSpeed,
+				isPaused = simulationManager.SimulationPaused,
+			};
 
-            foreach (var districtID in districtIDs)
-            {
-                var districtInfo = DistrictInfo.GetDistrictInfo(districtID);
-                if (districtID == 0)
-                {
-                    districtInfo.TotalBuildingCount = buildings.Sum(obj => obj.Value);
-                    districtInfo.TotalVehicleCount = vehicles.Sum(obj => obj.Value);
-                    globalDistrictInfo = districtInfo;
-                }
-                else
-                {
-                    districtInfo.TotalBuildingCount = buildings.Where(obj => obj.Key == districtID).Sum(obj => obj.Value);
-                    districtInfo.TotalVehicleCount = vehicles.Where(obj => obj.Key == districtID).Sum(obj => obj.Value);
-                    districtInfoList.Add(districtInfo);
-                }
-            }
+			return JsonResponse(cityInfo);
+		}
 
-            var simulationManager = Singleton<SimulationManager>.instance;
+		private Dictionary<int, int> GetBuildingBreakdownByDistrict() {
+			var districtManager = Singleton<DistrictManager>.instance;
 
-            var cityInfo = new CityInfo
-            {
-                Name = simulationManager.m_metaData.m_CityName,
-                Time = simulationManager.m_currentGameTime.Date,
-                GlobalDistrict = globalDistrictInfo,
-                Districts = districtInfoList.ToArray(),
-            };
+			Dictionary<int, int> districtBuildings = new Dictionary<int, int>();
+			BuildingManager instance = Singleton<BuildingManager>.instance;
+			foreach(Building building in instance.m_buildings.m_buffer) {
+				if(building.m_flags == Building.Flags.None) { continue; }
+				var districtID = (int)districtManager.GetDistrict(building.m_position);
+				if(districtBuildings.ContainsKey(districtID)) {
+					districtBuildings[districtID]++;
+				}
+				else {
+					districtBuildings.Add(districtID, 1);
+				}
+			}
+			return districtBuildings;
+		}
 
-            return JsonResponse(cityInfo);
-        }
+		private Dictionary<int, int> GetVehicleBreakdownByDistrict() {
+			var districtManager = Singleton<DistrictManager>.instance;
 
-        private Dictionary<int, int> GetBuildingBreakdownByDistrict()
-        {
-            var districtManager = Singleton<DistrictManager>.instance;
+			Dictionary<int, int> districtVehicles = new Dictionary<int, int>();
+			VehicleManager vehicleManager = Singleton<VehicleManager>.instance;
+			foreach(Vehicle vehicle in vehicleManager.m_vehicles.m_buffer) {
+				if(vehicle.m_flags != 0) {
+					var districtID = (int)districtManager.GetDistrict(vehicle.GetLastFramePosition());
+					if(districtVehicles.ContainsKey(districtID)) {
+						districtVehicles[districtID]++;
+					}
+					else {
+						districtVehicles.Add(districtID, 1);
+					}
+				}
+			}
+			return districtVehicles;
+		}
 
-            Dictionary<int, int> districtBuildings = new Dictionary<int, int>();
-            BuildingManager instance = Singleton<BuildingManager>.instance;
-            foreach (Building building in instance.m_buildings.m_buffer)
-            {
-                if (building.m_flags == Building.Flags.None) { continue; }
-                var districtID = (int)districtManager.GetDistrict(building.m_position);
-                if (districtBuildings.ContainsKey(districtID))
-                {
-                    districtBuildings[districtID]++;
-                }
-                else
-                {
-                    districtBuildings.Add(districtID, 1);
-                }
-            }
-            return districtBuildings;
-        }
-
-        private Dictionary<int, int> GetVehicleBreakdownByDistrict()
-        {
-            var districtManager = Singleton<DistrictManager>.instance;
-
-            Dictionary<int, int> districtVehicles = new Dictionary<int, int>();
-            VehicleManager vehicleManager = Singleton<VehicleManager>.instance;
-            foreach (Vehicle vehicle in vehicleManager.m_vehicles.m_buffer)
-            {
-                if (vehicle.m_flags != 0)
-                {
-                    var districtID = (int)districtManager.GetDistrict(vehicle.GetLastFramePosition());
-                    if (districtVehicles.ContainsKey(districtID))
-                    {
-                        districtVehicles[districtID]++;
-                    }
-                    else
-                    {
-                        districtVehicles.Add(districtID, 1);
-                    }
-                }
-            }
-            return districtVehicles;
-        }
-
-        private IEnumerable<int> GetDistrictsFromRequest(HttpListenerRequest request)
-        {
-            IEnumerable<int> districtIDs;
-            if (request.QueryString.HasKey("districtID"))
-            {
-                List<int> districtIDList = new List<int>();
-                var districtID = request.QueryString.GetInteger("districtID");
-                if (districtID.HasValue)
-                {
-                    districtIDList.Add(districtID.Value);
-                }
-                districtIDs = districtIDList;
-            }
-            else
-            {
-                districtIDs = DistrictInfo.GetDistricts();
-            }
-            return districtIDs;
-        }
-    }
+		private IEnumerable<int> GetDistrictsFromRequest(HttpListenerRequest request) {
+			IEnumerable<int> districtIDs;
+			if(request.QueryString.HasKey("districtID")) {
+				List<int> districtIDList = new List<int>();
+				var districtID = request.QueryString.GetInteger("districtID");
+				if(districtID.HasValue) {
+					districtIDList.Add(districtID.Value);
+				}
+				districtIDs = districtIDList;
+			}
+			else {
+				districtIDs = DistrictInfo.GetDistricts();
+			}
+			return districtIDs;
+		}
+	}
 }

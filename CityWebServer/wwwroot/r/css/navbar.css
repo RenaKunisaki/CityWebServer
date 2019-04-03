@@ -13,6 +13,13 @@
     font-size: 1.3em;
 }
 
+#city-name {
+    margin-right: 0.5em;
+    font-weight: bold;
+}
+
+#navbar-population::before { content: '👥' }
+
 #clock {
     position: absolute;
     top: 0;

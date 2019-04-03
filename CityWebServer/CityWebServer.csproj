@@ -114,6 +114,8 @@
     <None Include="wwwroot\r\css\chirp.css" />
     <None Include="wwwroot\r\css\navbar.css" />
     <None Include="wwwroot\r\css\transit.css" />
+    <None Include="wwwroot\r\js\highcharts.js" />
+    <None Include="wwwroot\r\js\masonry.pkgd.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -16,20 +16,24 @@ body {
 .container {
     width: 100%;
     height: calc(100% - 2em);
-    display: flex;
-    flex-wrap: wrap;
+}
+
+.grid-sizer {
+    width: 33%;
 }
 
 .box {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 25%;
     border: 1px #FFF solid;
     overflow-y: auto;
     vertical-align: top;
-    margin-right: 0.5em;
     padding: 4px;
-    max-height: 100%;
+    max-height: calc(100vh - 4em);
+    max-width: 30%;
+    margin: 0.25em;
+}
+
+.box .wrapper {
+    position: relative;
 }
 
 .box h1 {
@@ -60,3 +64,6 @@ td.money:before { content: '' }
     margin: 0;
     text-align: center;
 }
+
+#population-table th { text-align: left; }
+#population-table td { text-align: right;}

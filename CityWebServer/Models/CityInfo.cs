@@ -4,12 +4,14 @@ namespace CityWebServer.Models
 {
     public class CityInfo
     {
-        public String Name { get; set; }
-
-        public DateTime Time { get; set; }
-
-        public DistrictInfo GlobalDistrict { get; set; }
-
-        public DistrictInfo[] Districts { get; set; }
+		public String Name;
+		public String mapName;
+		public String environment;
+		public DateTime Time;
+		public DistrictInfo GlobalDistrict;
+		public DistrictInfo[] Districts;
+		public Boolean isNight;
+		public int simSpeed;
+		public Boolean isPaused;
     }
 }
