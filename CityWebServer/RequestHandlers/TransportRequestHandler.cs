@@ -3,67 +3,81 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using CityWebServer.Extensibility;
+using CityWebServer.Extensibility.Responses;
 using CityWebServer.Models;
 using ColossalFramework;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers
-{
-    [UsedImplicitly]
-    public class TransportRequestHandler : RequestHandlerBase
-    {
-        public TransportRequestHandler(IWebServer server)
-            : base(server, new Guid("89c8ef27-fc8c-4fe8-9793-1f6432feb179"), "Transport", "Rychard", 100, "/Transport")
-        {
-        }
+namespace CityWebServer.RequestHandlers {
+	[UsedImplicitly]
+	public class TransportRequestHandler: RequestHandlerBase {
+		public TransportRequestHandler(IWebServer server)
+			: base(server, new Guid("89c8ef27-fc8c-4fe8-9793-1f6432feb179"), "Transport", "Rychard", 100, "/Transport") {
+		}
 
-        public override IResponseFormatter Handle(HttpListenerRequest request)
-        {
-            var transportManager = Singleton<TransportManager>.instance;
-			LogMessage("got transportManager");
+		public override IResponseFormatter Handle(HttpListenerRequest request) {
+			var transportManager = Singleton<TransportManager>.instance;
+			if(transportManager == null) {
+				return new PlainTextResponseFormatter("",
+					HttpStatusCode.ServiceUnavailable);
+			}
+			//LogMessage("got transportManager");
 
 			//somewhere in here we're getting a null reference
 			//if the game hasn't finished loading yet
 
-            var lines = transportManager.m_lines.m_buffer;
-            List<PublicTransportLine> lineModels = new List<PublicTransportLine>();
+			TransportLine[] lines;
+			List<PublicTransportLine> lineModels;
+			try {
+				lines = transportManager.m_lines.m_buffer;
+				lineModels = new List<PublicTransportLine>();
+			}
+			catch(Exception ex) {
+				LogMessage($"Error getting transport lines buffer: {ex}");
+				return new PlainTextResponseFormatter("",
+					HttpStatusCode.InternalServerError);
+			}
 
-            foreach (var line in lines)
-            {
-				LogMessage($"Transport: looking at line {line}");
-				if (line.m_flags == TransportLine.Flags.None) { continue; }
+			foreach(var line in lines) {
+				try {
+					if(line.m_flags == TransportLine.Flags.None) { continue; }
 
-                var passengers = line.m_passengers;
-                List<PopulationGroup> passengerGroups = new List<PopulationGroup>
-                {
-                    new PopulationGroup("Child", (int) passengers.m_childPassengers.m_finalCount),
-                    new PopulationGroup("Teen", (int) passengers.m_teenPassengers.m_finalCount),
-                    new PopulationGroup("Young Adult", (int) passengers.m_youngPassengers.m_finalCount),
-                    new PopulationGroup("Adult", (int) passengers.m_adultPassengers.m_finalCount),
-                    new PopulationGroup("Senior", (int) passengers.m_seniorPassengers.m_finalCount),
-                    new PopulationGroup("Tourist", (int) passengers.m_touristPassengers.m_finalCount),
-                    new PopulationGroup("Resident", (int) passengers.m_residentPassengers.m_finalCount),
-                    new PopulationGroup("Car-Owning", (int) passengers.m_carOwningPassengers.m_finalCount)
-                };
+					var passengers = line.m_passengers;
+					List<PopulationGroup> passengerGroups = new List<PopulationGroup> {
+						new PopulationGroup("Child", (int) passengers.m_childPassengers.m_finalCount),
+						new PopulationGroup("Teen", (int) passengers.m_teenPassengers.m_finalCount),
+						new PopulationGroup("Young Adult", (int) passengers.m_youngPassengers.m_finalCount),
+						new PopulationGroup("Adult", (int) passengers.m_adultPassengers.m_finalCount),
+						new PopulationGroup("Senior", (int) passengers.m_seniorPassengers.m_finalCount),
+						new PopulationGroup("Tourist", (int) passengers.m_touristPassengers.m_finalCount),
+						new PopulationGroup("Resident", (int) passengers.m_residentPassengers.m_finalCount),
+						new PopulationGroup("Car-Owning", (int) passengers.m_carOwningPassengers.m_finalCount)
+					};
 
-                var stops = line.CountStops(0); // The parameter is never used.
-                var vehicles = line.CountVehicles(0); // The parameter is never used.
+					var stops = line.CountStops(0); // The parameter is never used.
+					var vehicles = line.CountVehicles(0); // The parameter is never used.
 
-                var lineModel = new PublicTransportLine
-                {
-                    Name = String.Format("{0} {1}", line.Info.name, (int)line.m_lineNumber),
-                    StopCount = stops,
-                    VehicleCount = vehicles,
-                    Passengers = passengerGroups.ToArray(),
-                };
-                lineModels.Add(lineModel);
-            }
+					var lineModel = new PublicTransportLine {
+						Name = String.Format("{0} {1}", line.Info.name, (int)line.m_lineNumber),
+						StopCount = stops,
+						VehicleCount = vehicles,
+						Passengers = passengerGroups.ToArray(),
+					};
+					lineModels.Add(lineModel);
+				}
+				catch(System.NullReferenceException) {
+					//Game isn't loaded yet.
+					//XXX pinpoint where this error happens.
+					return new PlainTextResponseFormatter("",
+						HttpStatusCode.ServiceUnavailable);
+				}
+			}
 
-			LogMessage("Transport: ordering");
+			//LogMessage("Transport: ordering");
 			lineModels = lineModels.OrderBy(obj => obj.Name).ToList();
 
-            return JsonResponse(lineModels);
-        }
+			return JsonResponse(lineModels);
+		}
 
 		private new void LogMessage(string msg) {
 			IntegratedWebServer.LogMessage(msg);
