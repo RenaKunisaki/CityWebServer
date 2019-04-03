@@ -29,7 +29,9 @@ class Chirper {
         //console.log("Chirp!", msg);
         this.element.prepend(
             $('<li class="chirp">').append(
-                $('<span class="name">').text(msg.SenderName),
+                $('<span class="name">').text(msg.SenderName).css(
+                    'color', this.app.makeNameColor(msg.SenderName)
+                ),
                 $('<span class="text">').text(msg.Text),
             )
         );

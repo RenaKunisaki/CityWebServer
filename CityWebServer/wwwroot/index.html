@@ -29,7 +29,7 @@
     <!-- Fixed navbar -->
     <nav id="navbar">
         <span id="city-name" data-bind="text: Name"></span>
-        <span id="navbar-population"></span>
+        <span id="navbar-population" class="population number"></span>
         <div id="clock" data-bind="text: friendlyDate"></div>
     </nav>
     <div class="container" id="main">
@@ -100,7 +100,7 @@
         </div></div>
 
         <div id="population" class="list box"><div class="wrapper">
-            <h1>Population Overview</h1>
+            <h1>Population: <span class="population number"></span></h1>
             <div class="body">
                 <div class="canvas">
                     <canvas></canvas>

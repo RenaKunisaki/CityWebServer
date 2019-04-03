@@ -1,6 +1,13 @@
 class Population {
     constructor(app) {
         this.app = app;
+        this.colors = {
+            Children:   "#0040FF",
+            Teen:       "#00FF00",
+            YoungAdult: "#FF4040",
+            Adult:      "#FFC000",
+            Senior:     "#800080",
+        };
         this._makeCharts();
     }
 
@@ -14,11 +21,11 @@ class Population {
             },
             legend: { display: false },
         };
-        const labels   = ["Children", "Teen", "YoungAdult", "Adult", "Senior"];
+        const labels = ["Children", "Teen", "YoungAdult", "Adult", "Senior"];
         const bgColors = [];
 
         for(const name of labels) {
-            const color = this.app.makeNameColor(name);
+            const color = this.colors[name];
             bgColors.push(color);
 
             const td  = $('<td>');
@@ -43,7 +50,7 @@ class Population {
                 datasets: [{
                     backgroundColor: bgColors,
                     hoverBackgroundColor: bgColors,
-                    borderWidth: 0,
+                    borderWidth: 1,
                     borderColor: '#000',
                     data: [],
                 }],
@@ -58,7 +65,7 @@ class Population {
             this.rows[item.Name].number(item.Amount);
             dataSet.push(item.Amount);
         }
-        $('#navbar-population').number(data.GlobalDistrict.TotalPopulationCount);
+        $('.population.number').number(data.GlobalDistrict.TotalPopulationCount);
         this.chart.data.datasets[0].data = dataSet;
         this.chart.update();
     }

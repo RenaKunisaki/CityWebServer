@@ -11,6 +11,28 @@
             "Global Credit Inc",
             "Pyramid Capital",
         ];
+
+        this.groups = {
+            Residential:     {color:'#80FF00'},
+            Commercial:      {color:'#0080FF'},
+            Industrial:      {color:'#FF8000'},
+            Office:          {color:'#00C0C0'},
+            Transit:         {},
+            Parks:           {},
+            Roads:           {},
+            Electricity:     {},
+            Water:           {},
+            Garbage:         {},
+            UniqueBuildings: {},
+            Health:          {},
+            Education:       {},
+            Police:          {},
+            Fire:            {},
+            Disaster:        {},
+            LoanPayments:    {},
+            Policies:        {},
+            Unknown:         {color: '#FF0000'},
+        };
     }
 
     _init(data) {
@@ -60,45 +82,60 @@
         const incomeData  = [];
         const expenseData = [];
 
+        data.groups = {};
+
         const items = Object.entries(data.economy.incomesAndExpenses);
         let totalIncome=0, totalExpense=0;
         for(const [name, item] of items) {
             totalIncome += item.Income;
             totalExpense += item.Expense;
         }
+        //Add a row for any discrepancies if totals don't match up
         items.push(["Unknown", {
             Income:  data.totalIncome   - totalIncome,
             Expense: data.totalExpenses - totalExpense,
         }]);
 
         for(const [name, item] of items) {
+            let groupName = name.substring(0, name.indexOf('_'));
+            if(groupName == '') groupName = name;
+            let group = this.groups[groupName];
+            if(data.groups[groupName] == undefined) {
+                group.income  = item.Income;
+                group.expense = item.Expense;
+                data.groups[groupName] = group;
+            }
+            else {
+                group.income  += item.Income;
+                group.expense += item.Expense;
+            }
+        }
+
+        for(const [name, group] of Object.entries(data.groups)) {
             labels.push(name);
-            const color = this.makeNameColor(name);
-            bgColors.push(color);
-            incomeData.push(item.Income);
-            expenseData.push(item.Expense);
+            if(group.color == undefined) group.color = this.makeNameColor(name);
+            bgColors.push(group.color);
 
             const cellIncome = $(`<td id="income-${name}" class="money income">`);
             const cellCost = $(`<td id="cost-${name}" class="money expense">`);
             const cellNet = $(`<td id="net-${name}" class="money net">`);
-            cellIncome.number(item.Income / 100);
-            cellCost.number(item.Expense / 100);
-            cellNet.number((item.Income - item.Expense) / 100);
-            cellNet.toggleClass('negative', item.Income < item.Expense);
+            cellIncome.number(group.income / 100);
+            cellCost.number(group.expense / 100);
+            cellNet.number((group.income - group.expense) / 100);
+            cellNet.toggleClass('negative', group.income < group.expense);
 
             let row = $(`<tr id="legend-row-${name}">`).append(
                 $('<td>').append(
                     $('<div class="legend-box">')
-                        .css('background-color', color),
+                        .css('background-color', group.color),
                     $('<span class="label">').text(name),
                 ),
                 cellIncome, cellCost, cellNet,
             );
-            if(item.Income == 0 && item.Expense == 0) {
+            if(group.income == 0 && group.expense == 0) {
                 row.addClass('zero');
             }
             legend.append(row);
-
         }
 
 
@@ -139,16 +176,32 @@
     _updateCharts(data) {
         const incomeData  = [];
         const expenseData = [];
+        data.groups = {};
         for(const [name, item] of Object.entries(data.economy.incomesAndExpenses)) {
             //XXX are we sure these will always be in the same order?
-            incomeData.push(item.Income);
-            expenseData.push(item.Expense);
-            $(`#income-${name}`).number(item.Income / 100);
-            $(`#cost-${name}`).number(item.Expense / 100);
-            $(`#net-${name}`).number((item.Income - item.Expense) / 100)
-                .toggleClass('negative', item.Income < item.Expense);
+            let groupName = name.substring(0, name.indexOf('_'));
+            if(groupName == '') groupName = name;
+            let group = this.groups[groupName];
+            if(data.groups[groupName] == undefined) {
+                group.income  = item.Income;
+                group.expense = item.Expense;
+                data.groups[groupName] = group;
+            }
+            else {
+                group.income  += item.Income;
+                group.expense += item.Expense;
+            }
+        }
+
+        for(const [name, group] of Object.entries(data.groups)) {
+            incomeData.push(group.income);
+            expenseData.push(group.expense);
+            $(`#income-${name}`).number(group.income / 100);
+            $(`#cost-${name}`).number(group.expense / 100);
+            $(`#net-${name}`).number((group.income - group.expense) / 100)
+                .toggleClass('negative', group.income < group.expense);
             $(`#legend-row-${name}`).toggleClass('zero',
-                (item.Income == 0 && item.Expense == 0));
+                (group.income == 0 && group.expense == 0));
         }
 
         this.chartIncome.data.datasets[0].data = incomeData;

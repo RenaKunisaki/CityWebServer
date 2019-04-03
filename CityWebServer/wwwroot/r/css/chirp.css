@@ -3,9 +3,14 @@
     max-height: 50%;
 }
 
+#chirper ul {
+    margin: 0;
+}
+
 #chirper .name {
     font-weight: bold;
     margin-right: 1em;
+    text-shadow: 1px 1px 0px #000;
 }
 
 .chirp {
