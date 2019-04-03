@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace CityWebServer.Models {
 	public class BudgetInfo {
+		//The dict that gets sent as reply for a `/Budget` request.
 		public long totalIncome;
 		public long totalExpenses;
 		public long currentCash;
@@ -11,6 +12,7 @@ namespace CityWebServer.Models {
 	}
 
 	public class IncomeExpenseGroup {
+		//Defines groups of incomes and expenses.
 		public String Name;
 		public ItemClass.Service Service;
 		public ItemClass.SubService SubService = ItemClass.SubService.None;
@@ -18,12 +20,21 @@ namespace CityWebServer.Models {
 	}
 
 	public class TaxRateGroup {
+		//Defines groups of tax rates.
+		public String Name;
+		public ItemClass.Service Service;
+		public ItemClass.SubService SubService = ItemClass.SubService.None;
+	}
+
+	public class BudgetGroup {
+		//Defines groups of budget rate settings.
 		public String Name;
 		public ItemClass.Service Service;
 		public ItemClass.SubService SubService = ItemClass.SubService.None;
 	}
 
 	public class Loan {
+		//Response data about loans.
 		public String BankName;
 		public long Amount;
 		public long PaymentLeft;
@@ -35,6 +46,7 @@ namespace CityWebServer.Models {
 	public class Economy {
 		public Dictionary<String, IncomeExpense> incomesAndExpenses;
 		public Dictionary<String, int> taxRates;
+		public Dictionary<String, int> budgetRates;
 	}
 
 	public class TaxRate {

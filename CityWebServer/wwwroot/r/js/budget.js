@@ -64,8 +64,17 @@
         const incomeData  = [];
         const expenseData = [];
 
-        //XXX color by some hash of the name so it's consistent
         const items = Object.entries(data.economy.incomesAndExpenses);
+        let totalIncome=0, totalExpense=0;
+        for(const [name, item] of items) {
+            totalIncome += item.Income;
+            totalExpense += item.Expense;
+        }
+        items.push(["Unknown", {
+            Income:  data.totalIncome   - totalIncome,
+            Expense: data.totalExpenses - totalExpense,
+        }]);
+
         for(const [name, item] of items) {
             labels.push(name);
             const color = this._makeNameColor(name);
@@ -76,9 +85,9 @@
             const cellIncome = $(`<td id="income-${name}" class="money income">`);
             const cellCost = $(`<td id="cost-${name}" class="money expense">`);
             const cellNet = $(`<td id="net-${name}" class="money net">`);
-            cellIncome.number(item.Income);
-            cellCost.number(item.Expense);
-            cellNet.number(item.Income - item.Expense);
+            cellIncome.number(item.Income / 100);
+            cellCost.number(item.Expense / 100);
+            cellNet.number((item.Income - item.Expense) / 100);
             cellNet.toggleClass('negative', item.Income < item.Expense);
             legend.append($('<tr>').append(
                 $('<td>').append(
@@ -88,6 +97,7 @@
                 ),
                 cellIncome, cellCost, cellNet,
             ));
+
         }
 
 
@@ -130,12 +140,11 @@
         const expenseData = [];
         for(const [name, item] of Object.entries(data.economy.incomesAndExpenses)) {
             //XXX are we sure these will always be in the same order?
-            //XXX why are these dollars, not cents?
             incomeData.push(item.Income);
             expenseData.push(item.Expense);
-            $(`#income-${name}`).number(item.Income);
-            $(`#cost-${name}`).number(item.Expense);
-            $(`#net-${name}`).number(item.Income - item.Expense)
+            $(`#income-${name}`).number(item.Income / 100);
+            $(`#cost-${name}`).number(item.Expense / 100);
+            $(`#net-${name}`).number((item.Income - item.Expense) / 100)
                 .toggleClass('negative', item.Income < item.Expense);
         }
 

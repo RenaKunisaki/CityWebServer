@@ -47,6 +47,7 @@ namespace CityWebServer.RequestHandlers {
 					Levels     = 3,
 				},
 				new IncomeExpenseGroup {
+					//"Organic and Local Produce"
 					Name       = "Commercial_Eco",
 					Service    = ItemClass.Service.Commercial,
 					SubService = ItemClass.SubService.CommercialEco,
@@ -64,7 +65,6 @@ namespace CityWebServer.RequestHandlers {
 					SubService = ItemClass.SubService.CommercialTourist,
 					Levels     = 3,
 				},
-				//XXX "Organic and Local Produce"
 				new IncomeExpenseGroup {
 					Name       = "Industrial_Generic",
 					Service    = ItemClass.Service.Industrial,
@@ -95,6 +95,14 @@ namespace CityWebServer.RequestHandlers {
 					SubService = ItemClass.SubService.IndustrialForestry,
 					Levels     = 3,
 				},
+				//Areas zoned as Industrial are counted differently
+				//from the specific industries above (including Generic).
+				new IncomeExpenseGroup {
+					Name       = "Industrial_Zoned",
+					Service    = ItemClass.Service.PlayerIndustry,
+					Levels     = 0,
+				},
+
 				new IncomeExpenseGroup {
 					Name       = "Office_Generic",
 					Service    = ItemClass.Service.Office,
@@ -172,14 +180,16 @@ namespace CityWebServer.RequestHandlers {
 					//Income is from tolls
 				},
 				//XXX Small/Large Vehicle tolls
-				new IncomeExpenseGroup {
-					Name       = "Citizens", //XXX what is this?
+
+				//These are grand totals, don't include them.
+				/* new IncomeExpenseGroup {
+					Name       = "Citizens",
 					Service    = ItemClass.Service.Citizen,
 				},
 				new IncomeExpenseGroup {
 					Name       = "Tourists",
 					Service    = ItemClass.Service.Tourism,
-				},
+				}, */
 				//XXX specific tourist types
 
 				//Upkeep expenses
@@ -198,7 +208,7 @@ namespace CityWebServer.RequestHandlers {
 				},
 				new IncomeExpenseGroup {
 					Name       = "UniqueBuildings",
-					Service    = ItemClass.Service.Monument, //XXX verify
+					Service    = ItemClass.Service.Monument,
 				},
 				new IncomeExpenseGroup {
 					Name       = "Health",
@@ -220,15 +230,21 @@ namespace CityWebServer.RequestHandlers {
 					Name       = "Disaster",
 					Service    = ItemClass.Service.Disaster,
 				},
-				new IncomeExpenseGroup {
+
+				//These always return 0, so probably there aren't any
+				//incomes or expenses associated with them.
+				/* new IncomeExpenseGroup {
 					Name       = "Natural", //natural resources?
 					Service    = ItemClass.Service.Natural,
 				},
 				new IncomeExpenseGroup {
 					Name       = "Vehicles", //city service vehicles?
 					Service    = ItemClass.Service.Vehicles,
-				},
-				//Policy and Loan expenses are handled differently
+				}, */
+
+				//Policy and Loan expenses are handled differently,
+				//as they're not consider services.
+				//Loan payments are a lump sum, so not weekly income.
 			}
 		);
 
@@ -265,6 +281,110 @@ namespace CityWebServer.RequestHandlers {
 			}
 		);
 
+		public static readonly IList<BudgetGroup> budgetGroups = new System.Collections.ObjectModel.ReadOnlyCollection<BudgetGroup>(
+			new List<BudgetGroup> {
+				new BudgetGroup {
+					Name    = "Electricity",
+					Service = ItemClass.Service.Electricity,
+				},
+				new BudgetGroup {
+					Name    = "Water",
+					Service = ItemClass.Service.Water,
+				},
+				new BudgetGroup {
+					Name    = "Garbage",
+					Service = ItemClass.Service.Garbage,
+				},
+				new BudgetGroup {
+					Name    = "Health",
+					Service = ItemClass.Service.HealthCare,
+				},
+				new BudgetGroup {
+					Name    = "Fire",
+					Service = ItemClass.Service.FireDepartment,
+				},
+				new BudgetGroup {
+					Name    = "Police",
+					Service = ItemClass.Service.PoliceDepartment,
+				},
+				new BudgetGroup {
+					Name    = "Education",
+					Service = ItemClass.Service.Education,
+				},
+				new BudgetGroup {
+					Name    = "Parks",
+					Service = ItemClass.Service.Beautification,
+				},
+				new BudgetGroup {
+					Name    = "UniqueBuildings",
+					Service = ItemClass.Service.Monument,
+				},
+				new BudgetGroup {
+					Name    = "Industry",
+					Service = ItemClass.Service.PlayerIndustry,
+				},
+				new BudgetGroup {
+					Name    = "Roads",
+					Service = ItemClass.Service.Road,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Bus",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportBus,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Tram",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTram,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Metro",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportMetro,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Train",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTrain,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Ship",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportShip,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Plane",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportPlane,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Monorail",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportMonorail,
+				},
+				new BudgetGroup {
+					Name       = "Transit_CableCar",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportCableCar,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Post",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportPost,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Taxi",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTaxi,
+				},
+				new BudgetGroup {
+					Name       = "Transit_Tours",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTours,
+				},
+			}
+		);
+
 		public BudgetRequestHandler(IWebServer server)
 			: base(server, new Guid("87205a0d-1b53-47bd-91fa-9cddf0a3bd9e"),
 				"Budget", "Rychard", 100, "/Budget") {
@@ -278,6 +398,7 @@ namespace CityWebServer.RequestHandlers {
 			budget.economy     = new Economy {
 				incomesAndExpenses = this.GetIncomesAndExpenses(economyManager),
 				taxRates           = this.GetTaxRates(economyManager),
+				budgetRates        = this.GetBudgetRates(economyManager),
 			};
 
 			//LogMessage("Sending response.");
@@ -309,6 +430,8 @@ namespace CityWebServer.RequestHandlers {
 					Length       = loan.m_length,
 					//XXX how to get weekly cost, weeks left,
 					//correct bank name?
+					//do we just have to compute them? but we don't know
+					//when the loan was taken.
 				});
 			}
 			return loans;
@@ -344,6 +467,7 @@ namespace CityWebServer.RequestHandlers {
 				}
 			}
 
+			//These aren't considered services
 			incomeExpenses["LoanPayments"] = new IncomeExpense {
 				Income = 0,
 				Expense = economyManager.GetLoanExpenses(),
@@ -368,6 +492,17 @@ namespace CityWebServer.RequestHandlers {
 					group.Service, group.SubService, ItemClass.Level.None);
 			}
 			return taxRates;
+		}
+
+		public Dictionary<String, int> GetBudgetRates(EconomyManager economyManager) {
+			Dictionary<String, int> budgetRates = new Dictionary<string, int>();
+			foreach(BudgetGroup group in budgetGroups) {
+				budgetRates[$"{group.Name}_Day"] =
+					economyManager.GetBudget(group.Service, group.SubService, false);
+				budgetRates[$"{group.Name}_Night"] =
+					economyManager.GetBudget(group.Service, group.SubService, true);
+			}
+			return budgetRates;
 		}
 
 		private new void LogMessage(string msg) {
