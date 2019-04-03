@@ -17,7 +17,11 @@
     display: inline-block;
 }
 
-#budget { position: relative }
+#budget {
+    position: relative;
+    flex-basis: 400px;
+}
+
 #budget-legend {
     display: inline-block;
     float: right;

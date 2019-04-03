@@ -1,5 +1,6 @@
 html {
     width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
 }
@@ -8,11 +9,21 @@ body {
     padding-top: 2em;
     background: #000;
     color: #FFF;
-    width: 100%;
+    /* width: 100%;
+    height: 100%; */
 }
 
 .container {
-    width: 100% !important;
+    width: 100%;
+    height: calc(100% - 2em);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.box {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 25%;
 }
 
 .box h1 {
@@ -33,9 +44,9 @@ body {
 
 .list {
     border: 1px #FFF solid;
-    max-width: 49%;
+    /* max-width: 49%; */
     overflow-y: auto;
-    display: inline-block;
+    /* display: inline-block; */
     vertical-align: top;
     margin-right: 4px;
 }
