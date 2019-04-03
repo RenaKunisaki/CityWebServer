@@ -18,12 +18,12 @@
     }
 
     _makeNameColor(name) {
-        if(name.startsWith('ResidentialLow'))  return '#80FF00';
-        if(name.startsWith('ResidentialHigh')) return '#40C000';
-        if(name.startsWith('CommercialLow'))   return '#0080FF';
-        if(name.startsWith('CommercialHigh'))  return '#0040C0';
-        if(name.startsWith('Industrial'))      return '#FF8000';
-        if(name.startsWith('Office'))          return '#00C0C0';
+        if(name.startsWith('Residential_Low'))  return '#80FF00';
+        if(name.startsWith('Residential_High')) return '#40C000';
+        if(name.startsWith('Commercial_Low'))   return '#0080FF';
+        if(name.startsWith('Commercial_High'))  return '#0040C0';
+        if(name.startsWith('Industrial'))       return '#FF8000';
+        if(name.startsWith('Office'))           return '#00C0C0';
         let hue = 0;
         for(let i=0; i<name.length; i++) {
             hue += (name.charCodeAt(i) ^ 0xE2);

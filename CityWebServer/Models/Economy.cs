@@ -6,8 +6,6 @@ namespace CityWebServer.Models {
 		public long totalIncome;
 		public long totalExpenses;
 		public long currentCash;
-		public long loanExpenses;
-		public long policyExpenses;
 		public Loan[] loans;
 		public Economy economy;
 	}

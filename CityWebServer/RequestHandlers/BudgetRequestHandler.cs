@@ -11,50 +11,160 @@ namespace CityWebServer.RequestHandlers {
 			new List<IncomeExpenseGroup> {
 				//Tax income from zones
 				new IncomeExpenseGroup {
-					Name       = "ResidentialLow",
+					Name       = "Residential_Low",
 					Service    = ItemClass.Service.Residential,
 					SubService = ItemClass.SubService.ResidentialLow,
 					Levels     = 5,
 				},
 				new IncomeExpenseGroup {
-					Name       = "ResidentialHigh",
+					Name       = "Residential_High",
 					Service    = ItemClass.Service.Residential,
 					SubService = ItemClass.SubService.ResidentialHigh,
 					Levels     = 5,
 				},
 				new IncomeExpenseGroup {
-					Name       = "CommercialLow",
+					Name       = "Residential_LowEco",
+					Service    = ItemClass.Service.Residential,
+					SubService = ItemClass.SubService.ResidentialLowEco,
+					Levels     = 5,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Residential_HighEco",
+					Service    = ItemClass.Service.Residential,
+					SubService = ItemClass.SubService.ResidentialHighEco,
+					Levels     = 5,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Commercial_Low",
 					Service    = ItemClass.Service.Commercial,
 					SubService = ItemClass.SubService.CommercialLow,
 					Levels     = 3,
 				},
 				new IncomeExpenseGroup {
-					Name       = "CommercialHigh",
+					Name       = "Commercial_High",
 					Service    = ItemClass.Service.Commercial,
 					SubService = ItemClass.SubService.CommercialHigh,
 					Levels     = 3,
 				},
-				//XXX Leisure, Tourism, Organic and Local Produce
 				new IncomeExpenseGroup {
-					Name       = "Industrial",
+					Name       = "Commercial_Eco",
+					Service    = ItemClass.Service.Commercial,
+					SubService = ItemClass.SubService.CommercialEco,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Commercial_Leisure",
+					Service    = ItemClass.Service.Commercial,
+					SubService = ItemClass.SubService.CommercialLeisure,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Commercial_Tourist",
+					Service    = ItemClass.Service.Commercial,
+					SubService = ItemClass.SubService.CommercialTourist,
+					Levels     = 3,
+				},
+				//XXX "Organic and Local Produce"
+				new IncomeExpenseGroup {
+					Name       = "Industrial_Generic",
 					Service    = ItemClass.Service.Industrial,
+					SubService = ItemClass.SubService.IndustrialGeneric,
 					Levels     = 3,
 				},
-				//XXX specific industries
 				new IncomeExpenseGroup {
-					Name       = "Transit",
-					Service    = ItemClass.Service.PublicTransport,
+					Name       = "Industrial_Oil",
+					Service    = ItemClass.Service.Industrial,
+					SubService = ItemClass.SubService.IndustrialOil,
+					Levels     = 3,
 				},
-				//XXX specific transit types
 				new IncomeExpenseGroup {
-					Name       = "Office",
+					Name       = "Industrial_Ore",
+					Service    = ItemClass.Service.Industrial,
+					SubService = ItemClass.SubService.IndustrialOre,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Industrial_Farming",
+					Service    = ItemClass.Service.Industrial,
+					SubService = ItemClass.SubService.IndustrialFarming,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Industrial_Forestry",
+					Service    = ItemClass.Service.Industrial,
+					SubService = ItemClass.SubService.IndustrialForestry,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Office_Generic",
 					Service    = ItemClass.Service.Office,
+					SubService = ItemClass.SubService.OfficeGeneric,
 					Levels     = 3,
 				},
-				//XXX IT Cluster
+				new IncomeExpenseGroup {
+					Name       = "Office_Hightech",
+					Service    = ItemClass.Service.Office,
+					SubService = ItemClass.SubService.OfficeHightech,
+					Levels     = 3,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Bus",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportBus,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Post",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportPost,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Ship",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportShip,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Taxi",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTaxi,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Tram",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTram,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Metro",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportMetro,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Plane",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportPlane,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Tours",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTours,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Train",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportTrain,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_CableCar",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportCableCar,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Transit_Monorail",
+					Service    = ItemClass.Service.PublicTransport,
+					SubService = ItemClass.SubService.PublicTransportMonorail,
+				},
 				new IncomeExpenseGroup {
 					Name       = "Parks",
-					Service    = ItemClass.Service.Beautification, //XXX verify
+					Service    = ItemClass.Service.Beautification,
 				},
 				new IncomeExpenseGroup {
 					Name       = "Roads",
@@ -106,10 +216,19 @@ namespace CityWebServer.RequestHandlers {
 					Name       = "Fire",
 					Service    = ItemClass.Service.FireDepartment,
 				},
-				/* new IncomeExpenseGroup {
-					Name       = "Policies",
-					Service    = ItemClass.Service.???, //XXX
-				}, */
+				new IncomeExpenseGroup {
+					Name       = "Disaster",
+					Service    = ItemClass.Service.Disaster,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Natural", //natural resources?
+					Service    = ItemClass.Service.Natural,
+				},
+				new IncomeExpenseGroup {
+					Name       = "Vehicles", //city service vehicles?
+					Service    = ItemClass.Service.Vehicles,
+				},
+				//Policy and Loan expenses are handled differently
 			}
 		);
 
@@ -170,8 +289,6 @@ namespace CityWebServer.RequestHandlers {
 			economyManager.GetIncomeAndExpenses(new ItemClass(),
 				out budget.totalIncome, out budget.totalExpenses);
 			budget.currentCash    = economyManager.LastCashAmount;
-			budget.loanExpenses   = economyManager.GetLoanExpenses();
-			budget.policyExpenses = economyManager.GetPolicyExpenses();
 			return budget;
 		}
 
@@ -205,7 +322,7 @@ namespace CityWebServer.RequestHandlers {
 				if(group.Levels > 0) {
 					for(int i = 1; i <= group.Levels; i++) {
 						economyManager.GetIncomeAndExpenses(
-							group.Service, group.SubService, (ItemClass.Level)i,
+							group.Service, group.SubService, (ItemClass.Level)(i-1),
 							out long income, out long expense);
 						incomeExpenses[$"{group.Name}_Lv{i}"] = new IncomeExpense {
 							Income = income,
@@ -226,6 +343,18 @@ namespace CityWebServer.RequestHandlers {
 					};
 				}
 			}
+
+			incomeExpenses["LoanPayments"] = new IncomeExpense {
+				Income = 0,
+				Expense = economyManager.GetLoanExpenses(),
+				Level = 0,
+			};
+			incomeExpenses["Policies"] = new IncomeExpense {
+				Income = 0,
+				Expense = economyManager.GetPolicyExpenses(),
+				Level = 0,
+			};
+
 			return incomeExpenses;
 		}
 
