@@ -154,50 +154,63 @@ namespace CityWebServer.RequestHandlers {
 		public override IResponseFormatter Handle(HttpListenerRequest request) {
 			// TODO: Expand upon this to expose substantially more information.
 			var economyManager = Singleton<EconomyManager>.instance;
+			BudgetInfo budget  = this.GetOverview(economyManager);
+			budget.loans       = this.GetLoans(economyManager).ToArray();
+			budget.economy     = new Economy {
+				incomesAndExpenses = this.GetIncomesAndExpenses(economyManager),
+				taxRates           = this.GetTaxRates(economyManager),
+			};
+
+			//LogMessage("Sending response.");
+			return JsonResponse(budget);
+		}
+
+		public BudgetInfo GetOverview(EconomyManager economyManager) {
 			BudgetInfo budget = new BudgetInfo();
-			//LogMessage("Getting budget info.");
-
-			//Get overview
 			economyManager.GetIncomeAndExpenses(new ItemClass(),
-				out budget.TotalIncome, out budget.TotalExpenses);
-			budget.CurrentCash = economyManager.LastCashAmount;
+				out budget.totalIncome, out budget.totalExpenses);
+			budget.currentCash    = economyManager.LastCashAmount;
+			budget.loanExpenses   = economyManager.GetLoanExpenses();
+			budget.policyExpenses = economyManager.GetPolicyExpenses();
+			return budget;
+		}
 
-			//Get loan info
+		public List<Loan> GetLoans(EconomyManager economyManager) {
 			List<Loan> loans = new List<Loan>(EconomyManager.MAX_LOANS);
 			//for(int i = 0; i < economyManager.CountLoans(); i++) {
 			for(int i = 0; i < EconomyManager.MAX_LOANS; i++) {
 				economyManager.GetLoan(i, out EconomyManager.Loan loan);
 				loans.Add(new Loan {
-					//economyManager.GetLoanExpenses()  - useful?
-					//economyManager.GetPolicyExpenses()
-					//LocaleFormatter
 					//bank names aren't the ones shown in-game,
 					//they're just BankA, BankB, BankC. WTF?
-					BankName = economyManager.GetBankName(i),
-					Amount = loan.m_amountTaken,
-					PaymentLeft = loan.m_amountLeft,
+					//can LocaleFormatter give us the names?
+					BankName     = economyManager.GetBankName(i),
+					Amount       = loan.m_amountTaken,
+					PaymentLeft  = loan.m_amountLeft,
 					InterestRate = loan.m_interestRate,
 					InterestPaid = loan.m_interestPaid,
-					Length = loan.m_length,
+					Length       = loan.m_length,
 					//XXX how to get weekly cost, weeks left,
 					//correct bank name?
 				});
 			}
-			budget.loans = loans.ToArray();
+			return loans;
+		}
 
+		public Dictionary<String, IncomeExpense> GetIncomesAndExpenses(EconomyManager economyManager) {
 			//Get income/expenses for each group
 			//LogMessage("Getting Income/Expense info.");
 			Dictionary<String, IncomeExpense> incomeExpenses = new Dictionary<String, IncomeExpense>();
 			foreach(IncomeExpenseGroup group in expenseGroups) {
 				if(group.Levels > 0) {
-					for(int i=1; i<=group.Levels; i++) {
+					for(int i = 1; i <= group.Levels; i++) {
 						economyManager.GetIncomeAndExpenses(
 							group.Service, group.SubService, (ItemClass.Level)i,
 							out long income, out long expense);
 						incomeExpenses[$"{group.Name}_Lv{i}"] = new IncomeExpense {
-							Income  = income,
+							Income = income,
 							Expense = expense,
-							Level   = i,
+							Level = i,
 						};
 					}
 				}
@@ -207,13 +220,16 @@ namespace CityWebServer.RequestHandlers {
 						ItemClass.Level.None,
 						out long income, out long expense);
 					incomeExpenses[group.Name] = new IncomeExpense {
-						Income  = income,
+						Income = income,
 						Expense = expense,
-						Level   = 0,
+						Level = 0,
 					};
 				}
 			}
+			return incomeExpenses;
+		}
 
+		public Dictionary<String, int> GetTaxRates(EconomyManager economyManager) {
 			//Get tax rates for each group
 			//LogMessage("Getting tax info.");
 			Dictionary<String, int> taxRates = new Dictionary<string, int>();
@@ -222,15 +238,7 @@ namespace CityWebServer.RequestHandlers {
 				taxRates[group.Name] = economyManager.GetTaxRate(
 					group.Service, group.SubService, ItemClass.Level.None);
 			}
-
-			//LogMessage("Setting up response.");
-			budget.Economy = new Economy {
-				IncomesAndExpenses = incomeExpenses,
-				taxRates = taxRates,
-			};
-
-			//LogMessage("Sending response.");
-			return JsonResponse(budget);
+			return taxRates;
 		}
 
 		private new void LogMessage(string msg) {

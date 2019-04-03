@@ -70,6 +70,8 @@ td.money {
     text-align: right;
 }
 
+td.money:before { content: '' }
+
 .chart h2 {
     font-size: 1.1em;
     margin: 0;
@@ -97,6 +99,9 @@ td.money {
     border-left: 1px #FFF solid;
     border-top:  1px #FFF solid;
 }
+
+#budget-legend .income { display: none }
+#budget-legend .expense { display: none }
 
 #budget .legend td, #budget .legend th {
     padding: 0;

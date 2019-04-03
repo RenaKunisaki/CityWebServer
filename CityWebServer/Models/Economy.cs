@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace CityWebServer.Models {
 	public class BudgetInfo {
-		public long TotalIncome;
-		public long TotalExpenses;
-		public long CurrentCash;
+		public long totalIncome;
+		public long totalExpenses;
+		public long currentCash;
+		public long loanExpenses;
+		public long policyExpenses;
 		public Loan[] loans;
-		public Economy Economy;
+		public Economy economy;
 	}
 
 	public class IncomeExpenseGroup {
@@ -33,7 +35,7 @@ namespace CityWebServer.Models {
 	}
 
 	public class Economy {
-		public Dictionary<String, IncomeExpense> IncomesAndExpenses;
+		public Dictionary<String, IncomeExpense> incomesAndExpenses;
 		public Dictionary<String, int> taxRates;
 	}
 

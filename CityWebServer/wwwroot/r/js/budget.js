@@ -26,7 +26,7 @@
         if(name.startsWith('Office'))          return '#00C0C0';
         let hue = 0;
         for(let i=0; i<name.length; i++) {
-            hue += name.charCodeAt(i);
+            hue += (name.charCodeAt(i) ^ 0xE2);
         }
         hue %= 360;
         return `hsl(${hue}, 100%, 50%)`;
@@ -35,9 +35,10 @@
     _makeCharts(data) {
         const legend = $('<table class="legend">').append(
             $('<tr>').append(
-                $('<th>').text("Source"),
-                $('<th>').text("Income"),
-                $('<th>').text("Cost"),
+                $('<th class="name">').text("Source"),
+                $('<th class="income">').text("Income ₡"),
+                $('<th class="expense">').text("Cost ₡"),
+                $('<th class="net">').text("Net ₡"),
             ),
         );
         const options = {
@@ -64,7 +65,7 @@
         const expenseData = [];
 
         //XXX color by some hash of the name so it's consistent
-        const items = Object.entries(data.Economy.IncomesAndExpenses);
+        const items = Object.entries(data.economy.incomesAndExpenses);
         for(const [name, item] of items) {
             labels.push(name);
             const color = this._makeNameColor(name);
@@ -74,15 +75,18 @@
 
             const cellIncome = $(`<td id="income-${name}" class="money income">`);
             const cellCost = $(`<td id="cost-${name}" class="money expense">`);
+            const cellNet = $(`<td id="net-${name}" class="money net">`);
             cellIncome.number(item.Income);
             cellCost.number(item.Expense);
+            cellNet.number(item.Income - item.Expense);
+            cellNet.toggleClass('negative', item.Income < item.Expense);
             legend.append($('<tr>').append(
                 $('<td>').append(
                     $('<div class="legend-box">')
                         .css('background-color', color),
                         $('<span class="label">').text(name),
                 ),
-                cellIncome, cellCost,
+                cellIncome, cellCost, cellNet,
             ));
         }
 
@@ -124,13 +128,15 @@
     _updateCharts(data) {
         const incomeData  = [];
         const expenseData = [];
-        for(const [name, item] of Object.entries(data.Economy.IncomesAndExpenses)) {
+        for(const [name, item] of Object.entries(data.economy.incomesAndExpenses)) {
             //XXX are we sure these will always be in the same order?
             //XXX why are these dollars, not cents?
             incomeData.push(item.Income);
             expenseData.push(item.Expense);
             $(`#income-${name}`).number(item.Income);
             $(`#cost-${name}`).number(item.Expense);
+            $(`#net-${name}`).number(item.Income - item.Expense)
+                .toggleClass('negative', item.Income < item.Expense);
         }
 
         this.chartIncome.data.datasets[0].data = incomeData;
@@ -153,23 +159,23 @@
                 this._isInit = true;
             }
 
-            const net = data.TotalIncome - data.TotalExpenses;
+            const net = data.totalIncome - data.totalExpenses;
 
-            $('#income-chart .total').number(data.TotalIncome / 100)
-                .toggleClass('negative', data.TotalIncome <= 0);
+            $('#income-chart .total').number(data.totalIncome / 100)
+                .toggleClass('negative', data.totalIncome <= 0);
 
-            $('#expense-chart .total').number(data.TotalExpenses / 100)
-                .toggleClass('negative', data.TotalExpenses <= 0);
+            $('#expense-chart .total').number(data.totalExpenses / 100)
+                .toggleClass('negative', data.totalExpenses <= 0);
 
             $('#net-income').number(net / 100)
                 .toggleClass('negative', net <= 0);
 
-            $('#current-cash').number(data.CurrentCash / 100)
-                .toggleClass('negative', data.CurrentCash <= 0);
+            $('#current-cash').number(data.currentCash / 100)
+                .toggleClass('negative', data.currentCash <= 0);
 
-            const taxes = Object.entries(data.Economy.taxRates);
+            const taxes = Object.entries(data.economy.taxRates);
             for(const [name, rate] of taxes) {
-                $(`#tax-${name}`).text(rate+'%');
+                $(`#tax-${name}`).number(rate);
             }
 
             for(let i=0; i < data.loans.length; i++) {
