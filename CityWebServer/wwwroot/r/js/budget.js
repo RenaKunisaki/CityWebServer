@@ -89,14 +89,19 @@
             cellCost.number(item.Expense / 100);
             cellNet.number((item.Income - item.Expense) / 100);
             cellNet.toggleClass('negative', item.Income < item.Expense);
-            legend.append($('<tr>').append(
+
+            let row = $(`<tr id="legend-row-${name}">`).append(
                 $('<td>').append(
                     $('<div class="legend-box">')
                         .css('background-color', color),
                         $('<span class="label">').text(name),
                 ),
                 cellIncome, cellCost, cellNet,
-            ));
+            );
+            if(item.Income == 0 && item.Expense == 0) {
+                row.addClass('zero');
+            }
+            legend.append(row);
 
         }
 
@@ -146,6 +151,8 @@
             $(`#cost-${name}`).number(item.Expense / 100);
             $(`#net-${name}`).number((item.Income - item.Expense) / 100)
                 .toggleClass('negative', item.Income < item.Expense);
+            $(`#legend-row-${name}`).toggleClass('zero',
+                (item.Income == 0 && item.Expense == 0));
         }
 
         this.chartIncome.data.datasets[0].data = incomeData;
@@ -162,7 +169,7 @@
 
     _refresh() {
         $.getJSON('/Budget', (data) => {
-            console.log("Budget data:", data);
+            //console.log("Budget data:", data);
             if(!this._isInit) {
                 this._init(data);
                 this._isInit = true;
