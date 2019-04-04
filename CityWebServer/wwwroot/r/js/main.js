@@ -2,7 +2,6 @@
  *  - Everything under Watch It!
  *  - Average land value
  *  - City attractiveness
- *  - Problem notification icons
  *  - Disaster logs
  *  - Game limits
  *  - Localized text
@@ -53,6 +52,8 @@ class App {
             $('#main').masonry('layout');
         }, 500);
         this._refresh();
+
+        $.getJSON('/Limits', (data) => { this.limits = data });
     }
 
     makeNameColor(name) {

@@ -89,6 +89,7 @@
     <Compile Include="WebsiteButton.cs" />
     <Compile Include="RequestHandlers\NotificationRequestHandler.cs" />
     <Compile Include="Models\Notification.cs" />
+    <Compile Include="RequestHandlers\LimitsRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">
