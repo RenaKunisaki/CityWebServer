@@ -9,7 +9,10 @@ namespace CityWebServer.RequestHandlers
     [UsedImplicitly]
     public class MessageRequestHandler : RequestHandlerBase
     {
-        private readonly ChirpRetriever _chirpRetriever;
+		/** Handles `/Messages`.
+		 *  Returns recent Chirper messages.
+		 */
+		private readonly ChirpRetriever _chirpRetriever;
 
         public MessageRequestHandler(IWebServer server)
             : base(server, new Guid("b4efeced-1dbb-435a-8999-9f8adaa5036e"), "Chirper Messages", "Rychard", 100, "/Messages")

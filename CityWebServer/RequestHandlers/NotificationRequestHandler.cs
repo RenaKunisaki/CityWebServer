@@ -9,6 +9,9 @@ using ColossalFramework;
 
 namespace CityWebServer.RequestHandlers {
 	public class NotificationRequestHandler: RequestHandlerBase {
+		/** Handles `/Notifications`.
+		 *  Returns list of active problem notifications.
+		 */
 
 		private static Dictionary<Notification.Problem, String> problemFlags =
 		new Dictionary<Notification.Problem, String>() {

@@ -11,6 +11,9 @@ using JetBrains.Annotations;
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
 	public class TransportRequestHandler: RequestHandlerBase {
+		/** Handles `/Transport`.
+		 *  Returns information about public transit.
+		 */
 		public TransportRequestHandler(IWebServer server)
 			: base(server, new Guid("89c8ef27-fc8c-4fe8-9793-1f6432feb179"), "Transport", "Rychard", 100, "/Transport") {
 		}

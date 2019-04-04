@@ -9,7 +9,9 @@ using ColossalFramework;
 
 namespace CityWebServer.RequestHandlers {
 	public class LimitsRequestHandler: RequestHandlerBase {
-	
+		/** Handles `/Limits`.
+		 *  Returns a number of constants defining game limits.
+		 */
 		public LimitsRequestHandler(IWebServer server)
 			: base(server, new Guid("23377b43-a94a-4aaa-8bd2-a37ecfc14888"),
 				"Limits", "Rena", 100, "/Limits") {

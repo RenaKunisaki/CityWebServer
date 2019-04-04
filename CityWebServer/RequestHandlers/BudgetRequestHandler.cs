@@ -8,6 +8,10 @@ using UnityEngine;
 
 namespace CityWebServer.RequestHandlers {
 	public class BudgetRequestHandler: RequestHandlerBase {
+		/** Handles `/Budget`.
+		 *  Returns information about the incomes and expenses of various things
+		 *  and the current budget balance. 
+		 */
 		public static readonly IList<IncomeExpenseGroup> expenseGroups = new System.Collections.ObjectModel.ReadOnlyCollection<IncomeExpenseGroup>(
 			new List<IncomeExpenseGroup> {
 				//Tax income from zones
