@@ -52,6 +52,7 @@
     <Compile Include="ResponseFormatters\PlainTextResponseFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestfulRequestHandlerBase.cs" />
+    <Compile Include="ResponseFormatters\BinaryResponseFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

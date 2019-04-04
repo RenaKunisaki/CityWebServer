@@ -111,5 +111,12 @@ namespace CityWebServer.Extensibility
         {
             return new PlainTextResponseFormatter(content, statusCode);
         }
-    }
+
+		/// <summary>
+		/// Returns a response in binary format.
+		/// </summary>
+		protected IResponseFormatter BinaryResponse(byte[] content, HttpStatusCode statusCode = HttpStatusCode.OK) {
+			return new BinaryResponseFormatter(content, statusCode);
+		}
+	}
 }

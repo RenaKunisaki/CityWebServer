@@ -90,6 +90,8 @@
     <Compile Include="RequestHandlers\NotificationRequestHandler.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="RequestHandlers\LimitsRequestHandler.cs" />
+    <Compile Include="RequestHandlers\InstancesRequestHandler.cs" />
+    <Compile Include="RequestHandlers\HeightMapRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">
@@ -192,6 +194,9 @@
     <None Include="wwwroot\r\img\problems\WaterCritical.png" />
     <None Include="wwwroot\r\img\problems\WaterNotConnected.png" />
     <None Include="wwwroot\r\js\problems.js" />
+    <None Include="wwwroot\r\css\limits.css" />
+    <None Include="wwwroot\r\img\problems\Sewage.png" />
+    <None Include="wwwroot\r\js\limits.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,32 +1,30 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
     <Files>
-      <File FileName="CityWebServer/Models/Economy.cs" Line="41" Column="27" />
-      <File FileName="CityWebServer/IntegratedWebServer.cs" Line="375" Column="27" />
-      <File FileName="CityWebServer/RequestHandlers/BuildingRequestHandler.cs" Line="21" Column="1" />
-      <File FileName="CityWebServer/RequestHandlers/CityInfoRequestHandler.cs" Line="25" Column="37" />
-      <File FileName="CityWebServer/RequestHandlers/MessageRequestHandler.cs" Line="18" Column="36" />
-      <File FileName="CityWebServer/RequestHandlers/VehicleRequestHandler.cs" Line="18" Column="1" />
-      <File FileName="CityWebServer/Models/ChirperMessage.cs" Line="12" Column="6" />
-      <File FileName="CityWebServer/RequestHandlers/NotificationRequestHandler.cs" Line="74" Column="41" />
-      <File FileName="CityWebServer/RequestHandlers/LimitsRequestHandler.cs" Line="16" Column="4" />
-      <File FileName="CityWebServer Status" />
-      <File FileName="CityWebServer/RequestHandlers/TransportRequestHandler.cs" Line="19" Column="13" NotebookId="1" />
-      <File FileName="CityWebServer/Models/CityInfo.cs" Line="7" Column="3" NotebookId="1" />
+      <File FileName="CityWebServer/Models/CityInfo.cs" Line="17" Column="2" />
+      <File FileName="CityWebServer/RequestHandlers/InstancesRequestHandler.cs" Line="16" Column="6" />
+      <File FileName="CityWebServer/WebServer.cs" Line="26" Column="14" />
+      <File FileName="CityWebServer/IntegratedWebServer.cs" Line="19" Column="18" />
+      <File FileName="CityWebServer/RequestHandlers/HeightMapRequestHandler.cs" Line="24" Column="3" NotebookId="1" />
+      <File FileName="CityWebServer.Extensibility/RequestHandlerBase.cs" Line="119" Column="21" NotebookId="1" />
+      <File FileName="CityWebServer.Extensibility/ResponseFormatters/PlainTextResponseFormatter.cs" Line="11" Column="3" NotebookId="1" />
+      <File FileName="CityWebServer.Extensibility/ResponseFormatters/BinaryResponseFormatter.cs" Line="17" Column="25" NotebookId="1" />
+      <File FileName="CityWebServer Status" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CityWebServer" expanded="True">
             <Node name="CityWebServer" expanded="True">
+              <Node name="Helpers" expanded="True" />
               <Node name="Models" expanded="True" />
               <Node name="Properties" expanded="True" />
-              <Node name="RequestHandlers" expanded="True" />
-              <Node name="wwwroot" expanded="True" selected="True">
-                <Node name="r" expanded="True">
-                  <Node name="js" expanded="True" />
-                </Node>
+              <Node name="RequestHandlers" expanded="True">
+                <Node name="HeightMapRequestHandler.cs" selected="True" />
               </Node>
+            </Node>
+            <Node name="CityWebServer.Extensibility" expanded="True">
+              <Node name="ResponseFormatters" expanded="True" />
             </Node>
             <Node name="SampleWebServerExtension" expanded="True">
               <Node name="Properties" expanded="True" />
