@@ -17,6 +17,7 @@ class App {
         this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
         this.population     = new Population(this);
+        this.problems       = new Problems(this);
         this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
@@ -36,6 +37,7 @@ class App {
         this.budget.run();
         this.chirper.run();
         //this.population.run();
+        this.problems.run();
         this.transit.run();
 
         $('#main').masonry({
@@ -92,7 +94,7 @@ class App {
     _refresh() {
         $.getJSON('/CityInfo', (data) => {
             //console.log("CityInfo:", data);
-            $('#navbar-error').text("");
+            $('#navbar-error').hide();
             this.data = data;
             this.currentDate = new Date(this.data.Time);
             this._updateClock(data);
@@ -115,7 +117,7 @@ class App {
             ko.mapping.fromJS(this.data, this.viewModel);
             $('#main').masonry('layout');
         }).fail(() => {
-            $('#navbar-error').text("Not connected to game");
+            $('#navbar-error').text("Not connected to game").show();
         });
     }
 }

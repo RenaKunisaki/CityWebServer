@@ -4,6 +4,7 @@ using System.Net;
 using CityWebServer.Extensibility;
 using CityWebServer.Models;
 using ColossalFramework;
+using UnityEngine;
 
 namespace CityWebServer.RequestHandlers {
 	public class BudgetRequestHandler: RequestHandlerBase {
@@ -391,7 +392,6 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		public override IResponseFormatter Handle(HttpListenerRequest request) {
-			// TODO: Expand upon this to expose substantially more information.
 			var economyManager = Singleton<EconomyManager>.instance;
 			BudgetInfo budget  = this.GetOverview(economyManager);
 			budget.loans       = this.GetLoans(economyManager).ToArray();
@@ -407,9 +407,10 @@ namespace CityWebServer.RequestHandlers {
 
 		public BudgetInfo GetOverview(EconomyManager economyManager) {
 			BudgetInfo budget = new BudgetInfo();
-			economyManager.GetIncomeAndExpenses(new ItemClass(),
+			economyManager.GetIncomeAndExpenses(
+				(ItemClass)ScriptableObject.CreateInstance("ItemClass"),
 				out budget.totalIncome, out budget.totalExpenses);
-			budget.currentCash    = economyManager.LastCashAmount;
+			budget.currentCash = economyManager.LastCashAmount;
 			return budget;
 		}
 

@@ -1,0 +1,26 @@
+.problem-icon {
+    width: 48px;
+    height: calc(48px + 0.5em);
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    margin-right: 0.5em;
+    margin-bottom: 1em;
+}
+
+.problem-icon.zero {
+    /* opacity: 0.5; */
+    display: none;
+}
+
+.problem-label {
+    margin-top: calc(48px - 0.5em);
+    text-align: center;
+    font-weight: bold;
+    text-shadow: /* outline */
+         2px  2px 2px #000,
+        -2px  2px 2px #000,
+        -2px -2px 2px #000,
+         2px -2px 2px #000;
+}

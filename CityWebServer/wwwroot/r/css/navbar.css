@@ -22,6 +22,9 @@
 
 #navbar-error {
     color: #F00;
+    border: 1px #800 solid;
+    padding: 2px;
+    background: #400;
 }
 
 #clock {
