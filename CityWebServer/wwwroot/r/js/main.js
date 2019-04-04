@@ -1,3 +1,13 @@
+/** TODO:
+ *  - Everything under Watch It!
+ *  - Average land value
+ *  - City attractiveness
+ *  - Problem notification icons
+ *  - Disaster logs
+ *  - Game limits
+ *  - Localized text
+ */
+
 class App {
     constructor() {
         this.updateInterval = 2000; //msec
@@ -76,11 +86,13 @@ class App {
 
         this.data.friendlyDate =
             `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
+        $('#clock').toggleClass('game-paused', data.isPaused)
     }
 
     _refresh() {
         $.getJSON('/CityInfo', (data) => {
-            console.log("CityInfo:", data);
+            //console.log("CityInfo:", data);
+            $('#navbar-error').text("");
             this.data = data;
             this.currentDate = new Date(this.data.Time);
             this._updateClock(data);
@@ -102,6 +114,8 @@ class App {
             this.population.update(data);
             ko.mapping.fromJS(this.data, this.viewModel);
             $('#main').masonry('layout');
+        }).fail(() => {
+            $('#navbar-error').text("Not connected to game");
         });
     }
 }

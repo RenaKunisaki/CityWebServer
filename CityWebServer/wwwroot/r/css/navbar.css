@@ -20,10 +20,18 @@
 
 #navbar-population::before { content: '👥' }
 
+#navbar-error {
+    color: #F00;
+}
+
 #clock {
     position: absolute;
     top: 0;
     right: 0.25em;
     text-align: right;
     color: #CCC;
+}
+
+#clock.game-paused {
+    color: #FF4;
 }
