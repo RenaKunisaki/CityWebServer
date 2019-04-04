@@ -15,6 +15,7 @@ class App {
         this.currentDate    = null;
         this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
+        this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
         this.transit        = new Transit(this);
@@ -35,6 +36,7 @@ class App {
 
         this.budget.run();
         this.chirper.run();
+        this.limits.run();
         //this.population.run();
         this.problems.run();
         this.transit.run();
@@ -52,8 +54,6 @@ class App {
             $('#main').masonry('layout');
         }, 500);
         this._refresh();
-
-        $.getJSON('/Limits', (data) => { this.limits = data });
     }
 
     makeNameColor(name) {
