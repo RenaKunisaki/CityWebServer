@@ -34,14 +34,14 @@ class HeightMap {
                 //let pixel = (bytes[offset+1] << 8) | bytes[offset];
                 let pixel = bytes[offset+1];
                 offset += 2;
-                let dest = ((y*resolution)+x)*4;
+                //Y flip image
+                let dest = (((resolution-y)*resolution)+x)*4;
                 image.data[dest  ] = 0; //red
                 image.data[dest+1] = pixel; //green
                 image.data[dest+2] = 0; //blue
                 image.data[dest+3] = 255; //alpha
             }
         }
-        ctx.scale(-1, 1); //map is flipped
         ctx.putImageData(image, 0, 0);
         this.image = image;
         this.ctx   = ctx;
@@ -54,7 +54,7 @@ class HeightMap {
         for(let y=0; y<tileSize; y++) {
             for(let x=0; x<tileSize; x++) {
                 let offs = (((y+ypos)*this.image.width)+x+xpos)*4;
-                this.image.data[offs] = locked ? 32 : 0; //change red
+                this.image.data[offs] = locked ? 64 : 0; //change red
             }
         }
     }
@@ -64,17 +64,22 @@ class HeightMap {
         let numTiles = cityInfo.isTileUnlocked.length;
         let gridSize = Math.sqrt(numTiles);
         let tileSize = Math.floor(this.resolution / gridSize);
+        //console.log("grid size", gridSize, "tile size", tileSize);
         //this.ctx.fillStyle = 'red';  //'rgba(255, 0, 0, 0.25)';
         let tile = 0;
         for(let y=0; y<gridSize; y++) {
+            //let msg = '';
             for(let x=0; x<gridSize; x++) {
-                this._showTileLocked(x, y, tileSize,
+                //msg += cityInfo.isTileUnlocked[tile] ? 'O ' : 'X ';
+                this._showTileLocked(x, gridSize-(y+1), tileSize,
                     !cityInfo.isTileUnlocked[tile]);
                 //lol too fucking easy
                 //this.ctx.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
                 tile++;
             }
+            //console.log(msg);
         }
         this.ctx.putImageData(this.image, 0, 0);
+
     }
 }

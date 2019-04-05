@@ -1,15 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
     <Files>
-      <File FileName="CityWebServer/Models/CityInfo.cs" Line="17" Column="2" />
       <File FileName="CityWebServer/RequestHandlers/InstancesRequestHandler.cs" Line="16" Column="6" />
       <File FileName="CityWebServer/WebServer.cs" Line="26" Column="14" />
-      <File FileName="CityWebServer/IntegratedWebServer.cs" Line="19" Column="18" />
-      <File FileName="CityWebServer/RequestHandlers/HeightMapRequestHandler.cs" Line="24" Column="3" NotebookId="1" />
+      <File FileName="CityWebServer/IntegratedWebServer.cs" Line="270" Column="10" />
+      <File FileName="CityWebServer/RequestHandlers/CityInfoRequestHandler.cs" Line="53" Column="6" />
+      <File FileName="CityWebServer Status" />
+      <File FileName="CityWebServer/RequestHandlers/HeightMapRequestHandler.cs" Line="22" Column="31" NotebookId="1" />
       <File FileName="CityWebServer.Extensibility/RequestHandlerBase.cs" Line="119" Column="21" NotebookId="1" />
       <File FileName="CityWebServer.Extensibility/ResponseFormatters/PlainTextResponseFormatter.cs" Line="11" Column="3" NotebookId="1" />
-      <File FileName="CityWebServer.Extensibility/ResponseFormatters/BinaryResponseFormatter.cs" Line="17" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer Status" NotebookId="1" />
+      <File FileName="CityWebServer.Extensibility/ResponseFormatters/BinaryResponseFormatter.cs" Line="20" Column="3" NotebookId="1" />
+      <File FileName="CityWebServer/Models/CityInfo.cs" Line="18" Column="2" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -20,7 +21,7 @@
               <Node name="Models" expanded="True" />
               <Node name="Properties" expanded="True" />
               <Node name="RequestHandlers" expanded="True">
-                <Node name="HeightMapRequestHandler.cs" selected="True" />
+                <Node name="CityInfoRequestHandler.cs" selected="True" />
               </Node>
             </Node>
             <Node name="CityWebServer.Extensibility" expanded="True">

@@ -56,9 +56,15 @@ namespace CityWebServer.RequestHandlers {
 			var simulationManager = Singleton<SimulationManager>.instance;
 			var gameAreaManager = Singleton<GameAreaManager>.instance;
 			Boolean[] isUnlocked = new Boolean[gameAreaManager.MaxAreaCount];
+			int x = 0, y = 0;
 			for(int i = 0; i < gameAreaManager.MaxAreaCount; i++) {
-				gameAreaManager.GetTileXZ(i, out int x, out int z);
-				isUnlocked[i] = gameAreaManager.IsUnlocked(x, z);
+				isUnlocked[i] = gameAreaManager.IsUnlocked(x, y);
+				x++;
+				if(x == GameAreaManager.TOTAL_AREA_RESOLUTION) {
+					x = 0;
+					y++;
+				}
+				//XXX how will this work with 81 tile mod?
 			}
 
 			var cityInfo = new CityInfo {

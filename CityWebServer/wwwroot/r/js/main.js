@@ -46,7 +46,7 @@ class App {
         $('#main').masonry({
             itemSelector: '.box',
             columnWidth: '.grid-sizer',
-            //horizontalOrder: true,
+            horizontalOrder: true,
             //percentPosition: true,
             transitionDuration: 0,
             initLayout: true,
