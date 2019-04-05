@@ -13,7 +13,6 @@ using ColossalFramework;
 using ColossalFramework.Plugins;
 using ICities;
 using JetBrains.Annotations;
-using UnityEngine;
 
 namespace CityWebServer {
 	[UsedImplicitly]

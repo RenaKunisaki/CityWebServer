@@ -15,6 +15,7 @@ class App {
         this.currentDate    = null;
         this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
+        this.heightMap      = new HeightMap(this);
         this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
@@ -36,6 +37,7 @@ class App {
 
         this.budget.run();
         this.chirper.run();
+        this.heightMap.run();
         this.limits.run();
         //this.population.run();
         this.problems.run();
@@ -99,6 +101,8 @@ class App {
             this.data = data;
             this.currentDate = new Date(this.data.Time);
             this._updateClock(data);
+            //XXX only do this if GameAreaManager.m_areaCount changed
+            this.heightMap.updateLockedTiles(data);
 
             document.title = this.data.Name;
             $('#city-name').attr('title',

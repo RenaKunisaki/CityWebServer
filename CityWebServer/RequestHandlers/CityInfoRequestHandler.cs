@@ -54,6 +54,13 @@ namespace CityWebServer.RequestHandlers {
 			}
 
 			var simulationManager = Singleton<SimulationManager>.instance;
+			var gameAreaManager = Singleton<GameAreaManager>.instance;
+			Boolean[] isUnlocked = new Boolean[gameAreaManager.MaxAreaCount];
+			for(int i = 0; i < gameAreaManager.MaxAreaCount; i++) {
+				gameAreaManager.GetTileXZ(i, out int x, out int z);
+				isUnlocked[i] = gameAreaManager.IsUnlocked(x, z);
+			}
+
 			var cityInfo = new CityInfo {
 				Name = simulationManager.m_metaData.m_CityName,
 				mapName = simulationManager.m_metaData.m_MapName,
@@ -64,6 +71,7 @@ namespace CityWebServer.RequestHandlers {
 				isNight = simulationManager.m_isNightTime,
 				simSpeed = simulationManager.SelectedSimulationSpeed,
 				isPaused = simulationManager.SimulationPaused,
+				isTileUnlocked = isUnlocked,
 			};
 
 			return JsonResponse(cityInfo);

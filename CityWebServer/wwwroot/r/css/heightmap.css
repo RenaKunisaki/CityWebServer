@@ -1,0 +1,15 @@
+#map {
+    width: 540px;
+    max-width: 540px;
+}
+
+#map .canvas {
+    width: 540px;
+    height: 540px;
+    overflow: hidden;
+}
+
+#map canvas {
+    transform: scale(0.5);
+    transform-origin: top left;
+}

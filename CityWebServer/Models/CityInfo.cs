@@ -13,5 +13,6 @@ namespace CityWebServer.Models
 		public Boolean isNight;
 		public int simSpeed;
 		public Boolean isPaused;
-    }
+		public Boolean[] isTileUnlocked;
+	}
 }
