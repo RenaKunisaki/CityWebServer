@@ -78,7 +78,7 @@ namespace CityWebServer {
 
 		public static void Log(String message) {
 			String time = DateTime.Now.ToUniversalTime()
-				.ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss'.'fff");
+				.ToString("yyyyMMdd' 'HHmmss'.'fff");
 			message = $"{time}: {message}{Environment.NewLine}";
 			Trace.Write(message);
 			Trace.Flush();
@@ -236,6 +236,8 @@ namespace CityWebServer {
 				IRequestHandler handlerInstance = null;
 				Boolean exists = false;
 
+				//XXX this tries to register RequestHandlerBase itself,
+				//which fails, adding a useless exception to the log.
 				try {
 					if(typeof(RequestHandlerBase).IsAssignableFrom(handler)) {
 						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler, this);

@@ -37,9 +37,9 @@ namespace CityWebServer {
 				Log($"Handling connection from {client.Client.RemoteEndPoint}");
 				HttpRequest req = new HttpRequest().Read(stream, out String body);
 				Log($"Request: method={req.method} path={req.path} ver={req.version}");
-				foreach(KeyValuePair<String, String> header in req.headers) {
-					Log($"Request header '{header.Key}' = '{header.Value}'");
-				}
+				//foreach(KeyValuePair<String, String> header in req.headers) {
+				//	Log($"Request header '{header.Key}' = '{header.Value}'");
+				//}
 				//Log($"Request body = '{body}'");
 
 				var handler = server.GetHandler(req);
@@ -49,8 +49,14 @@ namespace CityWebServer {
 						handler.Handle(req);
 					}
 					catch(Exception ex) {
-						Log($"Error in handler {handler.Name} for {req.method} {req.path}: {ex}");
-						SendErrorResponse(req, HttpStatusCode.InternalServerError, ex.ToString());
+						if(ex is System.IO.IOException) {
+							//probably the client closed the socket
+							Log($"IO error (probably harmless) in handler {handler.Name} for {req.method} {req.path}: {ex.Message}");
+						}
+						else {
+							Log($"Error in handler {handler.Name} for {req.method} {req.path}: {ex}");
+							SendErrorResponse(req, HttpStatusCode.InternalServerError, ex.ToString());
+						}
 					}
 					return;
 				}

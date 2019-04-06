@@ -49,7 +49,7 @@ namespace CityWebServer {
 		}
 
 		protected void Log(string msg) {
-			WebServer.Log(msg);
+			WebServer.Log($"{Name}: {msg}");
 		}
 
 		/// <summary>
