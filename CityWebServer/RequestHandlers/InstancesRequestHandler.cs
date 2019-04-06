@@ -19,7 +19,8 @@ namespace CityWebServer.RequestHandlers {
 				"Instances", "Rena", 100, "/Instances") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			Dictionary<String, Dictionary<String, float>> instances =
 			new Dictionary<String, Dictionary<String, float>> {
 				["AudioManager"] = GetAudio(),
@@ -62,7 +63,7 @@ namespace CityWebServer.RequestHandlers {
 
 				["ZoneManager"] = GetZones(),
 			};
-			return JsonResponse(instances);
+			SendJson(instances);
 		}
 
 		public Dictionary<String, float> GetAudio() {
@@ -100,7 +101,7 @@ namespace CityWebServer.RequestHandlers {
 			};
 		}
 
-        public Dictionary<String, float> GetDisasters() {
+		public Dictionary<String, float> GetDisasters() {
 			var manager = Singleton<DisasterManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -113,16 +114,16 @@ namespace CityWebServer.RequestHandlers {
 			};
 		}
 
-        public Dictionary<String, float> GetDistricts() {
+		public Dictionary<String, float> GetDistricts() {
 			var manager = Singleton<DistrictManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_districtCount"] = manager.m_districtCount,
 				["m_parkCount"] = manager.m_parkCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetEconomy() {
+		public Dictionary<String, float> GetEconomy() {
 			var manager = Singleton<EconomyManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -131,17 +132,17 @@ namespace CityWebServer.RequestHandlers {
 				["LastCashDelta"] = manager.LastCashDelta,
 				["StartMoney"] = manager.StartMoney,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetElectricity() {
+		public Dictionary<String, float> GetElectricity() {
 			var manager = Singleton<ElectricityManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["ElectricityMapVisible"] = manager.ElectricityMapVisible ? 1 : 0,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetEvents() {
+		public Dictionary<String, float> GetEvents() {
 			var manager = Singleton<EventManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -150,9 +151,9 @@ namespace CityWebServer.RequestHandlers {
 				["m_finalBandPopularityBonus"] = manager.m_finalBandPopularityBonus,
 				["m_infoCount"] = manager.m_infoCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetGameAreas() {
+		public Dictionary<String, float> GetGameAreas() {
 			var manager = Singleton<GameAreaManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -160,9 +161,9 @@ namespace CityWebServer.RequestHandlers {
 				["m_areaCount"] = manager.m_areaCount,
 				["m_maxAreaCount"] = manager.m_maxAreaCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetNetworks() {
+		public Dictionary<String, float> GetNetworks() {
 			var manager = Singleton<NetManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -175,35 +176,35 @@ namespace CityWebServer.RequestHandlers {
 				["m_treatWetAsSnow"] = manager.m_treatWetAsSnow ? 1 : 0,
 				["m_wetnessChanged"] = manager.m_wetnessChanged,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetPaths() {
+		public Dictionary<String, float> GetPaths() {
 			var manager = Singleton<PathManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_pathUnitCount"] = manager.m_pathUnitCount,
 				["m_renderPathGizmo"] = manager.m_renderPathGizmo,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetProps() {
+		public Dictionary<String, float> GetProps() {
 			var manager = Singleton<PropManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_infoCount"] = manager.m_infoCount,
 				["m_propCount"] = manager.m_propCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetRender() {
+		public Dictionary<String, float> GetRender() {
 			var manager = Singleton<RenderManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["CameraHeight"] = manager.CameraHeight,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetSimulation() {
+		public Dictionary<String, float> GetSimulation() {
 			var manager = Singleton<SimulationManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -229,9 +230,9 @@ namespace CityWebServer.RequestHandlers {
 				["SimulationPaused"] = manager.SimulationPaused ? 1 : 0,
 				["Terminated"] = manager.Terminated ? 1 : 0,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetTerrain() {
+		public Dictionary<String, float> GetTerrain() {
 			var manager = Singleton<TerrainManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -243,35 +244,35 @@ namespace CityWebServer.RequestHandlers {
 				["m_modifyingZones"] = manager.m_modifyingZones ? 1 : 0,
 				["RawDirtBuffer"] = manager.RawDirtBuffer,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetTransfers() {
+		public Dictionary<String, float> GetTransfers() {
 			var manager = Singleton<TransferManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_unitCount"] = manager.m_unitCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetTransport() {
+		public Dictionary<String, float> GetTransport() {
 			var manager = Singleton<TransportManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_infoCount"] = manager.m_infoCount,
 				["m_lineCount"] = manager.m_lineCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetTrees() {
+		public Dictionary<String, float> GetTrees() {
 			var manager = Singleton<TreeManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
 				["m_infoCount"] = manager.m_infoCount,
 				["m_treeCount"] = manager.m_treeCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetVehicles() {
+		public Dictionary<String, float> GetVehicles() {
 			var manager = Singleton<VehicleManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -282,9 +283,9 @@ namespace CityWebServer.RequestHandlers {
 				["m_totalTrafficFlow"] = manager.m_totalTrafficFlow,
 				["m_vehicleCount"] = manager.m_vehicleCount,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetWeather() {
+		public Dictionary<String, float> GetWeather() {
 			var manager = Singleton<WeatherManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -310,9 +311,9 @@ namespace CityWebServer.RequestHandlers {
 				["m_temperatureSpeed"] = manager.m_temperatureSpeed,
 				["m_windDirection"] = manager.m_windDirection,
 			};
-        }
+		}
 
-        public Dictionary<String, float> GetZones() {
+		public Dictionary<String, float> GetZones() {
 			var manager = Singleton<ZoneManager>.instance;
 			if(manager == null) return null;
 			return new Dictionary<String, float> {
@@ -325,6 +326,6 @@ namespace CityWebServer.RequestHandlers {
 				["m_residentialDemand"] = manager.m_residentialDemand,
 				["m_workplaceDemand"] = manager.m_workplaceDemand,
 			};
-        }
+		}
 	}
 }

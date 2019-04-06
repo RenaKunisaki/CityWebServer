@@ -44,17 +44,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IWebServer.cs" />
-    <Compile Include="RequestHandlerBase.cs" />
     <Compile Include="ResponseFormatters\HtmlResponseFormatter.cs" />
-    <Compile Include="ILogAppender.cs" />
-    <Compile Include="IRequestHandler.cs" />
     <Compile Include="IResponseFormatter.cs" />
     <Compile Include="ResponseFormatters\JsonResponseFormatter.cs" />
-    <Compile Include="LogAppenderEventArgs.cs" />
     <Compile Include="ResponseFormatters\PlainTextResponseFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestfulRequestHandlerBase.cs" />
     <Compile Include="ResponseFormatters\BinaryResponseFormatter.cs" />
     <Compile Include="ResponseFormatters\SocketResponseFormatter.cs" />
   </ItemGroup>

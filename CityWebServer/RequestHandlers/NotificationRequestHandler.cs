@@ -74,12 +74,13 @@ namespace CityWebServer.RequestHandlers {
 
 		public static Dictionary<Notification.Problem, string> ProblemFlags { get => problemFlags; set => problemFlags = value; }
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			// TODO: Expand upon this to expose substantially more information.
 			var buildingManager = Singleton<BuildingManager>.instance;
 			if(buildingManager == null) {
-				return new PlainTextResponseFormatter("",
-					HttpStatusCode.ServiceUnavailable);
+				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
+				return;
 			}
 
 			NotificationInfo info = new NotificationInfo {
@@ -99,7 +100,7 @@ namespace CityWebServer.RequestHandlers {
 				}
 			}
 
-			return JsonResponse(info);
+			SendJson(info);
 		}
 	}
 }

@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 using CityWebServer.Extensibility;
-using JetBrains.Annotations;
-using ICities;
-using System.Collections.Generic;
 using ColossalFramework.Plugins;
-using System.Linq;
+using ICities;
+using JetBrains.Annotations;
 
 namespace CityWebServer {
 	[UsedImplicitly]
@@ -21,6 +22,26 @@ namespace CityWebServer {
 		protected static String wwwRoot = null;
 		private static string _endpoint; //used for UI button
 		protected static FileWatcher fileWatcher = null;
+
+		// Not required, but prevents a number of spurious entries from making it to the log file.
+		private static readonly List<String> IgnoredAssemblies = new List<String> {
+			"Anonymously Hosted DynamicMethods Assembly",
+			"Assembly-CSharp",
+			"Assembly-CSharp-firstpass",
+			"Assembly-UnityScript-firstpass",
+			"Boo.Lang",
+			"ColossalManaged",
+			"ICSharpCode.SharpZipLib",
+			"ICities",
+			"Mono.Security",
+			"mscorlib",
+			"System",
+			"System.Configuration",
+			"System.Core",
+			"System.Xml",
+			"UnityEngine",
+			"UnityEngine.UI",
+		};
 
 		/* So, why using TcpListener instead of HttpListener?
 		 * Because, HttpListener closes the InputStream automatically
@@ -80,18 +101,21 @@ namespace CityWebServer {
 				logListener = new TextWriterTraceListener(logFile);
 				Trace.Listeners.Add(logListener);
 			}
+			Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			Log("Initializing...");
+
 			if(fileWatcher == null) {
 				fileWatcher = new FileWatcher();
 			}
-			Log("Initializing...");
 
 			GetWebRoot();
-			/* try {
+			try {
 				RegisterHandlers();
 			}
 			catch(Exception ex) {
+				Log($"Error registering handlers: {ex}");
 				UnityEngine.Debug.LogException(ex);
-			} */
+			}
 
 			Run();
 			base.OnCreated(threading);
@@ -112,6 +136,8 @@ namespace CityWebServer {
 		}
 		#endregion Release
 
+
+		#region User Methods
 		/// <summary>
 		/// Gets the full path to the directory where static pages are served from.
 		/// </summary>
@@ -131,13 +157,6 @@ namespace CityWebServer {
 			return null;
 		}
 
-		/// <summary>
-		/// Gets an array containing all currently registered request handlers.
-		/// </summary>
-		public IRequestHandler[] RequestHandlers {
-			get { return _requestHandlers.ToArray(); }
-		}
-
 		public void Run() {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
@@ -147,7 +166,7 @@ namespace CityWebServer {
 					while(true) {
 						//Wait for a client, and spawn a thread for it.
 						TcpClient client = _listener.AcceptTcpClient();
-						ThreadPool.QueueUserWorkItem(RequestHandlerCallback, client);
+						ThreadPool.QueueUserWorkItem(RequestProcessorCallback, client);
 					}
 				}
 				catch(Exception ex) {
@@ -161,11 +180,23 @@ namespace CityWebServer {
 			});
 		}
 
-		private void RequestHandlerCallback(object client) {
+		public void Stop() {
+			_listener.Stop();
+		}
+		#endregion User Methods
+
+		/// <summary>
+		/// Gets an array containing all currently registered request handlers.
+		/// </summary>
+		public IRequestHandler[] RequestHandlers {
+			get { return _requestHandlers.ToArray(); }
+		}
+
+		private void RequestProcessorCallback(object client) {
 			//Callback in the client handler thread.
 			try {
-				var handler = new RequestHandler(this, client as TcpClient);
-				handler.Handle();
+				var processor = new RequestProcessor(this, client as TcpClient);
+				processor.Handle();
 			}
 			catch(Exception ex) {
 				Log($"Error handling client: {ex}");
@@ -173,8 +204,120 @@ namespace CityWebServer {
 			}
 		}
 
-		public void Stop() {
-			_listener.Stop();
+		public IRequestHandler GetHandler(HttpRequest request) {
+			return _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
 		}
+
+		#region Built-in Handlers
+
+		/// <summary>
+		/// Searches all the assemblies in the current AppDomain for class definitions that implement the <see cref="IRequestHandler"/> interface.  Those classes are instantiated and registered as request handlers.
+		/// </summary>
+		private void RegisterHandlers() {
+			IEnumerable<Type> handlers = FindHandlersInLoadedAssemblies();
+			RegisterHandlers(handlers);
+		}
+
+		private void RegisterHandlers(IEnumerable<Type> handlers) {
+			if(handlers == null) { return; }
+
+			if(_requestHandlers == null) {
+				_requestHandlers = new List<IRequestHandler>();
+			}
+
+			foreach(var handler in handlers) {
+				// Only register handlers that we don't already have an instance of.
+				Log($"Attempting to register handler: {handler.Name}");
+				if(_requestHandlers.Any(h => h.GetType() == handler)) {
+					Log($"Handler {handler.Name} is already registered");
+					continue;
+				}
+
+				IRequestHandler handlerInstance = null;
+				Boolean exists = false;
+
+				try {
+					if(typeof(RequestHandlerBase).IsAssignableFrom(handler)) {
+						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler, this);
+					}
+					else {
+						handlerInstance = (IRequestHandler)Activator.CreateInstance(handler);
+					}
+
+					if(handlerInstance == null) {
+						Log($"Request Handler '{handler.Name}' could not be instantiated!");
+						continue;
+					}
+					Log($"Handler {handler.Name} instantiated OK");
+
+					// Duplicates handlers seem to pass the check above, so now we filter them based on their identifier values, which should work.
+					exists = _requestHandlers.Any(obj => obj.HandlerID == handlerInstance.HandlerID);
+				}
+				catch(Exception ex) {
+					Log($"Error instantiating handler '{handler.Name}': {ex.ToString()}");
+					continue;
+				}
+
+				if(exists) {
+					// TODO: Allow duplicate registrations to occur; previous registration is removed and replaced with a new one?
+					Log($"Supressing duplicate handler registration for '{handler.Name}'");
+				}
+				else {
+					_requestHandlers.Add(handlerInstance);
+					if(handlerInstance is ILogAppender) {
+						var logAppender = (handlerInstance as ILogAppender);
+						logAppender.LogMessage += RequestHandlerLogAppender_OnLogMessage;
+					}
+
+					Log($"Added Request Handler: {handler.FullName}");
+				}
+			}
+		}
+
+		private void RequestHandlerLogAppender_OnLogMessage(object sender, LogAppenderEventArgs logAppenderEventArgs) {
+			var senderTypeName = sender.GetType().Name;
+			Log($"[{senderTypeName}] {logAppenderEventArgs.LogLine}");
+		}
+
+		/// <summary>
+		/// Searches all the assemblies in the current AppDomain, and returns a collection of those that implement the <see cref="IRequestHandler"/> interface.
+		/// </summary>
+		private static IEnumerable<Type> FindHandlersInLoadedAssemblies() {
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+			foreach(var assembly in assemblies) {
+				var handlers = FetchHandlers(assembly);
+				foreach(var handler in handlers) {
+					yield return handler;
+				}
+			}
+		}
+
+		private static IEnumerable<Type> FetchHandlers(Assembly assembly) {
+			var assemblyName = assembly.GetName().Name;
+
+			// Skip any assemblies that we don't anticipate finding anything in.
+			if(IgnoredAssemblies.Contains(assemblyName)) { yield break; }
+
+			Type[] types = new Type[0];
+			try {
+				types = assembly.GetTypes();
+			}
+			catch { }
+
+			foreach(var type in types) {
+				Boolean isValid = false;
+				try {
+					isValid = typeof(IRequestHandler).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract;
+				}
+				catch { }
+
+				if(isValid) {
+					yield return type;
+				}
+			}
+		}
+
+		#endregion Built-in Handlers
 	}
 }

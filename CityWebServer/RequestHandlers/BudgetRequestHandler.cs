@@ -395,18 +395,19 @@ namespace CityWebServer.RequestHandlers {
 				"Budget", "Rychard", 100, "/Budget") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			var economyManager = Singleton<EconomyManager>.instance;
-			BudgetInfo budget  = this.GetOverview(economyManager);
-			budget.loans       = this.GetLoans(economyManager).ToArray();
-			budget.economy     = new Economy {
+			BudgetInfo budget = this.GetOverview(economyManager);
+			budget.loans = this.GetLoans(economyManager).ToArray();
+			budget.economy = new Economy {
 				incomesAndExpenses = this.GetIncomesAndExpenses(economyManager),
-				taxRates           = this.GetTaxRates(economyManager),
-				budgetRates        = this.GetBudgetRates(economyManager),
+				taxRates = this.GetTaxRates(economyManager),
+				budgetRates = this.GetBudgetRates(economyManager),
 			};
 
 			//LogMessage("Sending response.");
-			return JsonResponse(budget);
+			SendJson(budget);
 		}
 
 		public BudgetInfo GetOverview(EconomyManager economyManager) {
@@ -427,12 +428,12 @@ namespace CityWebServer.RequestHandlers {
 					//bank names aren't the ones shown in-game,
 					//they're just BankA, BankB, BankC. WTF?
 					//can LocaleFormatter give us the names?
-					BankName     = economyManager.GetBankName(i),
-					Amount       = loan.m_amountTaken,
-					PaymentLeft  = loan.m_amountLeft,
+					BankName = economyManager.GetBankName(i),
+					Amount = loan.m_amountTaken,
+					PaymentLeft = loan.m_amountLeft,
 					InterestRate = loan.m_interestRate,
 					InterestPaid = loan.m_interestPaid,
-					Length       = loan.m_length,
+					Length = loan.m_length,
 					//XXX how to get weekly cost, weeks left,
 					//correct bank name?
 					//do we just have to compute them? but we don't know
@@ -450,7 +451,7 @@ namespace CityWebServer.RequestHandlers {
 				if(group.Levels > 0) {
 					for(int i = 1; i <= group.Levels; i++) {
 						economyManager.GetIncomeAndExpenses(
-							group.Service, group.SubService, (ItemClass.Level)(i-1),
+							group.Service, group.SubService, (ItemClass.Level)(i - 1),
 							out long income, out long expense);
 						incomeExpenses[$"{group.Name}_Lv{i}"] = new IncomeExpense {
 							Income = income,

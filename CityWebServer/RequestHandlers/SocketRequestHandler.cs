@@ -40,10 +40,12 @@ namespace CityWebServer.RequestHandlers {
 				"Socket", "Rena", 100, "/Socket") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request, HttpListenerResponse response, HttpListenerContext ctx) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			WebServer.Log("Socket connection opening");
 			//ctx.AcceptWebSocketAsync() //lol too easy
 
+			/*
 			SocketResponseFormatter resp = new SocketResponseFormatter(request);
 			resp.WriteContent(response);
 
@@ -72,10 +74,10 @@ namespace CityWebServer.RequestHandlers {
 				//we're done, stream is closed
 				WebServer.Log("Socket connection closed");
 			}
-			return null;
+			*/
 		}
 
-		private String ReadMessage(HttpListenerRequest request) {
+		private String ReadMessage(HttpRequest request) {
 			byte[] bufMsg = new byte[16384];
 			int bufMsgPos = 0;
 			String message = "";
@@ -96,7 +98,7 @@ namespace CityWebServer.RequestHandlers {
 
 				//Read data
 				while(bufMsgPos < header.length) {
-					int readLen = request.InputStream.Read(
+					int readLen = request.stream.Read(
 						bufMsg, bufMsgPos, bufMsg.Length - bufMsgPos);
 					bufMsgPos += readLen;
 				}
@@ -113,13 +115,13 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
-		private SocketMessageHeader ReadHeader(HttpListenerRequest request, byte[] buffer) {
+		private SocketMessageHeader ReadHeader(HttpRequest request, byte[] buffer) {
 			int idx = 0;
 			//XXX deal with messages < 14 bytes (header is variable length)
 			while(idx < 14) {
 				Thread.Sleep(100);
 				WebServer.Log($"Socket read header {idx}");
-				int r = request.InputStream.Read(buffer, idx, 14 - idx);
+				int r = request.stream.Read(buffer, idx, 14 - idx);
 				if(r == 0) {
 					//socket is closed
 				}

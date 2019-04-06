@@ -1,10 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/HttpResponse.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/RequestHandlers/BudgetRequestHandler.cs">
     <Files>
-      <File FileName="CityWebServer/WebServer.cs" Line="12" Column="19" />
-      <File FileName="CityWebServer/RequestHandler.cs" Line="96" Column="24" />
-      <File FileName="CityWebServer/HttpResponse.cs" Line="44" Column="57" />
-      <File FileName="CityWebServer/IntegratedWebServer.cs.old" Line="281" Column="7" NotebookId="1" />
+      <File FileName="CityWebServer/WebServer.cs" Line="212" Column="45" />
+      <File FileName="CityWebServer/RequestProcessor.cs" Line="34" Column="45" />
+      <File FileName="CityWebServer/HttpResponse.cs" Line="58" Column="46" />
+      <File FileName="CityWebServer/HttpRequest.cs" Line="13" Column="25" />
+      <File FileName="CityWebServer/RequestHandlers/BudgetRequestHandler.cs" Line="394" Column="68" />
+      <File FileName="CityWebServer/IntegratedWebServer.cs.old" Line="206" Column="10" NotebookId="1" />
+      <File FileName="CityWebServer/IRequestHandler.cs" Line="27" Column="47" NotebookId="1" />
+      <File FileName="CityWebServer.Extensibility/ResponseFormatters/JsonResponseFormatter.cs" Line="15" Column="10" NotebookId="1" />
+      <File FileName="CityWebServer/RequestHandlerBase.cs" Line="23" Column="33" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -12,14 +17,12 @@
           <Node name="CityWebServer" expanded="True">
             <Node name="CityWebServer" expanded="True">
               <Node name="Helpers" expanded="True" />
-              <Node name="RequestHandlers" expanded="True" />
-              <Node name="HttpResponse.cs" selected="True" />
+              <Node name="RequestHandlers" expanded="True">
+                <Node name="BudgetRequestHandler.cs" selected="True" />
+              </Node>
             </Node>
             <Node name="CityWebServer.Extensibility" expanded="True">
               <Node name="ResponseFormatters" expanded="True" />
-            </Node>
-            <Node name="SampleWebServerExtension" expanded="True">
-              <Node name="Properties" expanded="True" />
             </Node>
           </Node>
         </State>
@@ -27,6 +30,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <DisabledProjects>
+    <String>SampleWebServerExtension/SampleWebServerExtension.csproj</String>
+  </DisabledProjects>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

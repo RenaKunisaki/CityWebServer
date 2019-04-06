@@ -18,11 +18,12 @@ namespace CityWebServer.RequestHandlers {
 			: base(server, new Guid("89c8ef27-fc8c-4fe8-9793-1f6432feb179"), "Transport", "Rychard", 100, "/Transport") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			var transportManager = Singleton<TransportManager>.instance;
 			if(transportManager == null) {
-				return new PlainTextResponseFormatter("",
-					HttpStatusCode.ServiceUnavailable);
+				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
+				return;
 			}
 			//LogMessage("got transportManager");
 
@@ -37,8 +38,7 @@ namespace CityWebServer.RequestHandlers {
 			}
 			catch(Exception ex) {
 				LogMessage($"Error getting transport lines buffer: {ex}");
-				return new PlainTextResponseFormatter("",
-					HttpStatusCode.InternalServerError);
+				throw;
 			}
 
 			foreach(var line in lines) {
@@ -71,15 +71,14 @@ namespace CityWebServer.RequestHandlers {
 				catch(System.NullReferenceException) {
 					//Game isn't loaded yet.
 					//XXX pinpoint where this error happens.
-					return new PlainTextResponseFormatter("",
-						HttpStatusCode.ServiceUnavailable);
+					SendErrorResponse(HttpStatusCode.ServiceUnavailable);
 				}
 			}
 
 			//LogMessage("Transport: ordering");
 			lineModels = lineModels.OrderBy(obj => obj.Name).ToList();
 
-			return JsonResponse(lineModels);
+			SendJson(lineModels);
 		}
 
 		private new void LogMessage(string msg) {

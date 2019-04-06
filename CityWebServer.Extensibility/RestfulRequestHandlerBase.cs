@@ -14,7 +14,7 @@ namespace CityWebServer.Extensibility
 
         public override int Priority { get { return _priority; } }
 
-        public override string Name { get { return _name; } }
+        public override string DisplayName { get { return _name; } }
 
         public override string Author { get { return _author; } }
 

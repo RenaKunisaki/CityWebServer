@@ -17,7 +17,8 @@ namespace CityWebServer.RequestHandlers {
 				"Limits", "Rena", 100, "/Limits") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			Dictionary<String, Dictionary<String, float>> limits =
 			new Dictionary<String, Dictionary<String, float>> {
 				["AudioManager"] = new Dictionary<String, float> {
@@ -213,7 +214,7 @@ namespace CityWebServer.RequestHandlers {
 					["ZONEGRID_RESOLUTION"] = ZoneManager.ZONEGRID_RESOLUTION,
 				},
 			};
-			return JsonResponse(limits);
+			SendJson(limits);
 		}
 	}
 }

@@ -94,10 +94,15 @@
     <Compile Include="RequestHandlers\InstancesRequestHandler.cs" />
     <Compile Include="RequestHandlers\HeightMapRequestHandler.cs" />
     <Compile Include="RequestHandlers\SocketRequestHandler.cs" />
-    <Compile Include="RequestHandler.cs" />
+    <Compile Include="RequestProcessor.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="FileWatcher.cs" />
+    <Compile Include="IRequestHandler.cs" />
+    <Compile Include="IWebServer.cs" />
+    <Compile Include="RequestHandlerBase.cs" />
+    <Compile Include="ILogAppender.cs" />
+    <Compile Include="LogAppenderEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

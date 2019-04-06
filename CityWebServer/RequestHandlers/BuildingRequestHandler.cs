@@ -13,10 +13,11 @@ namespace CityWebServer.RequestHandlers {
 			: base(server, new Guid("03897cb0-d53f-4189-a613-e7d22705dc2f"), "Building", "Rychard", 100, "/Building") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
 			var buildingManager = Singleton<BuildingManager>.instance;
 
-			if(request.Url.AbsolutePath.StartsWith("/Building/List")) {
+			if(request.path.StartsWith("/Building/List")) {
 				List<ushort> buildingIDs = new List<ushort>();
 
 				var len = buildingManager.m_buildings.m_buffer.Length;
@@ -26,7 +27,7 @@ namespace CityWebServer.RequestHandlers {
 					buildingIDs.Add(i);
 				}
 
-				return JsonResponse(buildingIDs);
+				SendJson(buildingIDs);
 			}
 
 			foreach(var building in buildingManager.m_buildings.m_buffer) {
@@ -35,7 +36,7 @@ namespace CityWebServer.RequestHandlers {
 				// TODO: Something with Buildings.
 			}
 
-			return JsonResponse("");
+			SendJson("");
 		}
 	}
 }

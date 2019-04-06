@@ -6,57 +6,51 @@ using CityWebServer.Extensibility;
 using ColossalFramework;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers
-{
-    [UsedImplicitly]
-    public class VehicleRequestHandler : RequestHandlerBase
-    {
+namespace CityWebServer.RequestHandlers {
+	[UsedImplicitly]
+	public class VehicleRequestHandler: RequestHandlerBase {
 		/** Handles `/Vehicle`.
 		 *  Returns information about vehicles.
 		 */
 		public VehicleRequestHandler(IWebServer server)
-            : base(server, new Guid("2be6546a-d416-4939-8e08-1d0b739be835"), "Vehicle", "Rychard", 100, "/Vehicle")
-        {
-        }
+			: base(server, new Guid("2be6546a-d416-4939-8e08-1d0b739be835"), "Vehicle", "Rychard", 100, "/Vehicle") {
+		}
 
-        public override IResponseFormatter Handle(HttpListenerRequest request)
-        {
-            var vehicleManager = Singleton<VehicleManager>.instance;
+		public override void Handle(HttpRequest request) {
+			this.request = request;
+			var vehicleManager = Singleton<VehicleManager>.instance;
 
-            if (request.Url.AbsolutePath.StartsWith("/Vehicle/List"))
-            {
-                List<ushort> vehicleIds = new List<ushort>();
+			if(request.path.StartsWith("/Vehicle/List")) {
+				List<ushort> vehicleIds = new List<ushort>();
 
-                var len = vehicleManager.m_vehicles.m_buffer.Length;
-                for (ushort i = 0; i < len; i++)
-                {
-                    if (vehicleManager.m_vehicles.m_buffer[i].m_flags == 0) { continue; }
+				var len = vehicleManager.m_vehicles.m_buffer.Length;
+				for(ushort i = 0; i < len; i++) {
+					if(vehicleManager.m_vehicles.m_buffer[i].m_flags == 0) { continue; }
 
-                    vehicleIds.Add(i);
-                }
+					vehicleIds.Add(i);
+				}
 
-                return JsonResponse(vehicleIds);
-            }
+				SendJson(vehicleIds);
+				return;
+			}
 
-            List<ushort> s = new List<ushort>();
+			List<ushort> s = new List<ushort>();
 
-            foreach (var vehicle in vehicleManager.m_vehicles.m_buffer)
-            {
-                if (vehicle.m_flags == 0) { continue; }
+			foreach(var vehicle in vehicleManager.m_vehicles.m_buffer) {
+				if(vehicle.m_flags == 0) { continue; }
 
-                if ((vehicle.m_flags & Vehicle.Flags.Spawned) == Vehicle.Flags.Spawned && (vehicle.m_flags & Vehicle.Flags.Created) == Vehicle.Flags.Created)
-                {
-                    var origin = (vehicle.m_sourceBuilding);
-                    var target = (vehicle.m_targetBuilding);
+				if((vehicle.m_flags & Vehicle.Flags.Spawned) == Vehicle.Flags.Spawned && (vehicle.m_flags & Vehicle.Flags.Created) == Vehicle.Flags.Created) {
+					var origin = (vehicle.m_sourceBuilding);
+					var target = (vehicle.m_targetBuilding);
 
-                    if (origin > 0) { s.Add(origin); }
-                    if (target > 0) { s.Add(target); }
-                }
-            }
+					if(origin > 0) { s.Add(origin); }
+					if(target > 0) { s.Add(target); }
+				}
+			}
 
-            var grouped = s.GroupBy(obj => obj).Select(group => new { BuildingID = group.Key, Count = group.Count() }).OrderByDescending(obj => obj.Count).Select(obj => new { Building = BuildingManager.instance.GetBuildingName(obj.BuildingID, new InstanceID()), obj.Count }).ToList();
+			var grouped = s.GroupBy(obj => obj).Select(group => new { BuildingID = group.Key, Count = group.Count() }).OrderByDescending(obj => obj.Count).Select(obj => new { Building = BuildingManager.instance.GetBuildingName(obj.BuildingID, new InstanceID()), obj.Count }).ToList();
 
-            return JsonResponse(grouped);
-        }
-    }
+			SendJson(grouped);
+		}
+	}
 }

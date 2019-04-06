@@ -18,19 +18,20 @@ namespace CityWebServer.RequestHandlers {
 			: base(server, new Guid("eeada0d0-f1d2-43b0-9595-2a6a4d917631"), "City Info", "Rychard", 100, "/CityInfo") {
 		}
 
-		public override IResponseFormatter Handle(HttpListenerRequest request) {
-			if(request.QueryString.HasKey("showList")) {
+		public override void Handle(HttpRequest request) {
+			this.request = request;
+			/* if(request.QueryString.HasKey("showList")) {
 				return HandleDistrictList();
-			}
-			return HandleDistrict(request);
+			} */
+			HandleDistrict(request);
 		}
 
-		private IResponseFormatter HandleDistrictList() {
+		private void HandleDistrictList() {
 			var districtIDs = DistrictInfo.GetDistricts().ToArray();
-			return JsonResponse(districtIDs);
+			SendJson(districtIDs);
 		}
 
-		private IResponseFormatter HandleDistrict(HttpListenerRequest request) {
+		private void HandleDistrict(HttpRequest request) {
 			var districtIDs = GetDistrictsFromRequest(request);
 
 			DistrictInfo globalDistrictInfo = null;
@@ -80,7 +81,7 @@ namespace CityWebServer.RequestHandlers {
 				isTileUnlocked = isUnlocked,
 			};
 
-			return JsonResponse(cityInfo);
+			SendJson(cityInfo);
 		}
 
 		private Dictionary<int, int> GetBuildingBreakdownByDistrict() {
@@ -120,9 +121,9 @@ namespace CityWebServer.RequestHandlers {
 			return districtVehicles;
 		}
 
-		private IEnumerable<int> GetDistrictsFromRequest(HttpListenerRequest request) {
+		private IEnumerable<int> GetDistrictsFromRequest(HttpRequest request) {
 			IEnumerable<int> districtIDs;
-			if(request.QueryString.HasKey("districtID")) {
+			/* if(request.QueryString.HasKey("districtID")) {
 				List<int> districtIDList = new List<int>();
 				var districtID = request.QueryString.GetInteger("districtID");
 				if(districtID.HasValue) {
@@ -130,9 +131,9 @@ namespace CityWebServer.RequestHandlers {
 				}
 				districtIDs = districtIDList;
 			}
-			else {
-				districtIDs = DistrictInfo.GetDistricts();
-			}
+			else { */
+			districtIDs = DistrictInfo.GetDistricts();
+			//}
 			return districtIDs;
 		}
 	}

@@ -14,7 +14,7 @@ namespace CityWebServer {
 		public Dictionary<String, String> headers;
 		protected byte[] buffer;
 		protected String message = "";
-		protected Stream stream;
+		public Stream stream;
 		//These are arrays because lol C#
 		protected static readonly String[] _split_crlf = { "\r\n" };
 		protected static readonly String[] _split_crlf2 = { "\r\n\r\n" };

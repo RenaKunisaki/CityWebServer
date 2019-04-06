@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Net;
-using CityWebServer.Extensibility.Responses;
 
-namespace CityWebServer.Extensibility {
+namespace CityWebServer {
 	public class RequestHandlerBase: IRequestHandler, ILogAppender {
 		#region ILogAppender Implementation
 
@@ -23,6 +22,7 @@ namespace CityWebServer.Extensibility {
 		protected String _name;
 		protected String _author;
 		protected String _mainPath;
+		protected HttpRequest request;
 
 		private RequestHandlerBase() {
 		}
@@ -34,6 +34,31 @@ namespace CityWebServer.Extensibility {
 			_author = author;
 			_priority = priority;
 			_mainPath = mainPath;
+		}
+
+		protected void SendJson<T>(T body, HttpStatusCode statusCode = HttpStatusCode.OK) {
+			HttpResponse response = new HttpResponse(
+				request.stream, statusCode: statusCode);
+			response.SendJson<T>(body);
+		}
+
+		protected void SendBinary(byte[] body, String contentType = "application/octet-stream", HttpStatusCode statusCode = HttpStatusCode.OK) {
+			HttpResponse response = new HttpResponse(request.stream,
+				contentType: contentType,
+				statusCode: statusCode);
+			response.SendBody(body);
+		}
+
+		public void SendErrorResponse(HttpStatusCode status, String message = null) {
+			/** Send an error resposne to the client.
+			 */
+			var resp = new HttpResponse(request.stream,
+				contentType: "text/plain",
+				statusCode: status);
+			if(message == null) {
+				message = HttpResponse.StatusCodeToName(status);
+			}
+			resp.SendBody(message);
 		}
 
 		/// <summary>
@@ -72,52 +97,16 @@ namespace CityWebServer.Extensibility {
 		/// <summary>
 		/// Returns a value that indicates whether this handler is capable of servicing the given request.
 		/// </summary>
-		public virtual Boolean ShouldHandle(HttpListenerRequest request) {
-			return (request.Url.AbsolutePath.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
+		public virtual Boolean ShouldHandle(HttpRequest request) {
+			return (request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
 		}
 
 		/// <summary>
 		/// Handles the specified request.  The method should not close the stream.
 		/// </summary>
 		/// <exception cref="T:System.NotImplementedException"></exception>
-		public virtual IResponseFormatter Handle(HttpListenerRequest request) {
+		public virtual void Handle(HttpRequest request) {
 			throw new NotImplementedException();
-		}
-
-		public virtual IResponseFormatter Handle(HttpListenerRequest request, HttpListenerResponse response) {
-			return Handle(request);
-		}
-
-		public virtual IResponseFormatter Handle(HttpListenerRequest request, HttpListenerResponse response, HttpListenerContext ctx) {
-			return Handle(request, response);
-		}
-
-		/// <summary>
-		/// Returns a response in JSON format.
-		/// </summary>
-		protected IResponseFormatter JsonResponse<T>(T content, HttpStatusCode statusCode = HttpStatusCode.OK) {
-			return new JsonResponseFormatter<T>(content, statusCode);
-		}
-
-		/// <summary>
-		/// Returns a response in HTML format.
-		/// </summary>
-		protected IResponseFormatter HtmlResponse(String content, HttpStatusCode statusCode = HttpStatusCode.OK) {
-			return new HtmlResponseFormatter(content, statusCode);
-		}
-
-		/// <summary>
-		/// Returns a response in plain text format.
-		/// </summary>
-		protected IResponseFormatter PlainTextResponse(String content, HttpStatusCode statusCode = HttpStatusCode.OK) {
-			return new PlainTextResponseFormatter(content, statusCode);
-		}
-
-		/// <summary>
-		/// Returns a response in binary format.
-		/// </summary>
-		protected IResponseFormatter BinaryResponse(byte[] content, HttpStatusCode statusCode = HttpStatusCode.OK) {
-			return new BinaryResponseFormatter(content, statusCode);
 		}
 	}
 }

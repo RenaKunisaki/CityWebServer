@@ -6,14 +6,15 @@ using System.Threading;
 using UnityEngine;
 using System.IO;
 using ApacheMimeTypes;
+using System.Runtime.InteropServices;
 
 namespace CityWebServer {
-	public class RequestHandler {
+	public class RequestProcessor {
 		protected WebServer server;
 		protected TcpClient client;
 		protected NetworkStream stream;
 
-		public RequestHandler(WebServer server, TcpClient client) {
+		public RequestProcessor(WebServer server, TcpClient client) {
 			this.server = server;
 			this.client = client;
 			this.stream = client.GetStream();
@@ -40,6 +41,20 @@ namespace CityWebServer {
 					Log($"Request header '{header.Key}' = '{header.Value}'");
 				}
 				//Log($"Request body = '{body}'");
+
+				var handler = server.GetHandler(req);
+				if(handler != null) {
+					try {
+						Log($"Using handler '{handler.Name}' for {req.method} {req.path}");
+						handler.Handle(req);
+					}
+					catch(Exception ex) {
+						Log($"Error in handler {handler.Name} for {req.method} {req.path}: {ex}");
+						SendErrorResponse(req, HttpStatusCode.InternalServerError, ex.ToString());
+					}
+					return;
+				}
+				Log($"No handler found for {req.method} {req.path}");
 
 				if(req.method == "GET") HandleGet(req);
 				else {
@@ -77,18 +92,23 @@ namespace CityWebServer {
 			 */
 			String path = request.path;
 			Log($"Handling GET path '{path}");
+			//Sanitize and make relative
 			path = path.Replace("..", "%2E%2E");
 			while(path.StartsWith("/", StringComparison.Ordinal)) {
 				path = path.Substring(1);
 			}
 			if(path == "") path = "index.html";
+
 			path = path.Replace("/", Path.DirectorySeparatorChar.ToString());
-			String root = WebServer.GetWebRoot();
-			var absolutePath = Path.Combine(root, path);
-			var extension = Path.GetExtension(absolutePath);
-			Log($"Sending file '{absolutePath}'; root='{root}' path='{path}'");
+			var absolutePath = Path.Combine(WebServer.GetWebRoot(), path);
+			SendFile(request, absolutePath);
+		}
+
+		public void SendFile(HttpRequest request, String absolutePath) {
+			Log($"Sending file: {absolutePath}");
 
 			try {
+				var extension = Path.GetExtension(absolutePath);
 				var contentType = Apache.GetMime(extension);
 				var resp = new HttpResponse(stream);
 				if(contentType != null) resp.AddHeader("Content-Type", contentType);

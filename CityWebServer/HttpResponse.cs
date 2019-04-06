@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
@@ -35,13 +36,13 @@ namespace CityWebServer {
 		public void SendHeaders() {
 			if(sentHeaders) return;
 			WebServer.Log($"Sending HTTP response, status:{statusCode}");
-			byte[] msg = System.Text.Encoding.UTF8.GetBytes(this.BuildResponseText());
+			byte[] msg = Encoding.UTF8.GetBytes(this.BuildResponseText());
 			stream.Write(msg, 0, msg.Length);
 			sentHeaders = true;
 		}
 
 		public void SendBody(String body) {
-			byte[] msg = System.Text.Encoding.UTF8.GetBytes(body);
+			byte[] msg = Encoding.UTF8.GetBytes(body);
 			SendBody(msg);
 		}
 
@@ -53,9 +54,18 @@ namespace CityWebServer {
 			stream.Write(body, 0, body.Length);
 		}
 
+		public void SendJson<T>(T body) {
+			var writer = new JsonFx.Json.JsonWriter();
+			var serializedData = writer.Write(body);
+			byte[] buf = Encoding.UTF8.GetBytes(serializedData);
+			AddHeader("Content-Type", "text/json");
+			AddHeader("Content-Length", buf.Length.ToString());
+			SendBody(buf);
+		}
+
 		public void SendPartialBody(String body) {
 			SendHeaders();
-			byte[] msg = System.Text.Encoding.UTF8.GetBytes(body);
+			byte[] msg = Encoding.UTF8.GetBytes(body);
 			stream.Write(msg, 0, msg.Length);
 		}
 
