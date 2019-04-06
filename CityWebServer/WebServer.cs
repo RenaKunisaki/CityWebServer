@@ -264,11 +264,6 @@ namespace CityWebServer {
 				}
 				else {
 					_requestHandlers.Add(handlerInstance);
-					if(handlerInstance is ILogAppender) {
-						var logAppender = (handlerInstance as ILogAppender);
-						logAppender.LogMessage += RequestHandlerLogAppender_OnLogMessage;
-					}
-
 					Log($"Added Request Handler: {handler.FullName}");
 				}
 			}

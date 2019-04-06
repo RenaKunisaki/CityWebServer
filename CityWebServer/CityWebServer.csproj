@@ -101,7 +101,6 @@
     <Compile Include="IRequestHandler.cs" />
     <Compile Include="IWebServer.cs" />
     <Compile Include="RequestHandlerBase.cs" />
-    <Compile Include="ILogAppender.cs" />
     <Compile Include="LogAppenderEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

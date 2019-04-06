@@ -2,20 +2,7 @@
 using System.Net;
 
 namespace CityWebServer {
-	public class RequestHandlerBase: IRequestHandler, ILogAppender {
-		#region ILogAppender Implementation
-
-		public event EventHandler<LogAppenderEventArgs> LogMessage;
-
-		protected void OnLogMessage(String message) {
-			var handler = LogMessage;
-			if(handler != null) {
-				handler(this, new LogAppenderEventArgs(message));
-			}
-		}
-
-		#endregion ILogAppender Implementation
-
+	public class RequestHandlerBase: IRequestHandler {
 		protected readonly IWebServer _server;
 		protected Guid _handlerID;
 		protected int _priority;
