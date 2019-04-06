@@ -21,6 +21,20 @@ namespace CityWebServer {
 		protected static String wwwRoot = null;
 		private static string _endpoint; //used for UI button
 
+		/* So, why using TcpListener instead of HttpListener?
+		 * Because, HttpListener closes the InputStream automatically
+		 * after reading the request. There doesn't seem to be any way
+		 * to prevent this.
+		 * As a result, it's impossible to create a WebSocket connection.
+		 * There is a `AcceptWebSocketAsync` method, but it's not showing
+		 * up for me; I think MonoDevelop hasn't caught up to it yet.
+		 * So because of that one little helpful feature, I've had to
+		 * completely gut the server logic and reinvent the wheel, doing
+		 * all my own header parsing, method handling, and response
+		 * formatting and writing, just to have control over when the
+		 * socket gets closed. Thanks, Microsoft!
+		 */
+
 		/// <summary>
 		/// Gets the root endpoint for which the server is configured to service HTTP requests.
 		/// </summary>
@@ -131,8 +145,12 @@ namespace CityWebServer {
 					}
 				}
 				catch(Exception ex) {
-					Log($"Error running server: {ex}");
-					UnityEngine.Debug.LogException(ex);
+					//ignore these, just means socket closed 
+					//because we're shutting down
+					if(!(ex is System.Net.Sockets.SocketException)) {
+						Log($"Error running server: {ex}");
+						UnityEngine.Debug.LogException(ex);
+					}
 				}
 			});
 		}
