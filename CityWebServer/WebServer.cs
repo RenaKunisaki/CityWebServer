@@ -20,6 +20,7 @@ namespace CityWebServer {
 		protected static TextWriterTraceListener logListener;
 		protected static String wwwRoot = null;
 		private static string _endpoint; //used for UI button
+		protected static FileWatcher fileWatcher = null;
 
 		/* So, why using TcpListener instead of HttpListener?
 		 * Because, HttpListener closes the InputStream automatically
@@ -52,6 +53,10 @@ namespace CityWebServer {
 			_endpoint = "xxx";
 			_listener = new TcpListener(address, port);
 			//Log("Created Server");
+
+			if(fileWatcher is null) {
+				fileWatcher = new FileWatcher();
+			}
 		}
 
 		public static void Log(String message) {
@@ -80,6 +85,7 @@ namespace CityWebServer {
 				Trace.Listeners.Add(logListener);
 			}
 			Log("Initializing...");
+			GetWebRoot();
 			/* try {
 				RegisterHandlers();
 			}

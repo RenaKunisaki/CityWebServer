@@ -97,6 +97,7 @@
     <Compile Include="RequestHandler.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="HttpResponse.cs" />
+    <Compile Include="FileWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

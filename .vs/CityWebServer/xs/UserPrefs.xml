@@ -1,28 +1,18 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/RequestHandler.cs">
     <Files>
-      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="168" Column="21" />
-      <File FileName="CityWebServer/WebServer.cs" Line="120" Column="25" />
-      <File FileName="CityWebServer/RequestHandler.cs" Line="23" Column="3" />
-      <File FileName="CityWebServer/RequestHandlers/BudgetRequestHandler.cs" Line="517" Column="2" />
-      <File FileName="CityWebServer/WebsiteButton.cs" Line="133" Column="64" />
-      <File FileName="CityWebServer/Helpers/TemplateHelper.cs" Line="73" Column="18" />
-      <File FileName="CityWebServer/RequestHandlers/TransportRequestHandler.cs" Line="86" Column="17" />
-      <File FileName="CityWebServer Status" />
-      <File FileName="CityWebServer/RequestHandlers/HeightMapRequestHandler.cs" Line="14" Column="6" NotebookId="1" />
-      <File FileName="CityWebServer.Extensibility/RequestHandlerBase.cs" Line="6" Column="38" NotebookId="1" />
-      <File FileName="CityWebServer.Extensibility/ResponseFormatters/BinaryResponseFormatter.cs" Line="15" Column="43" NotebookId="1" />
-      <File FileName="CityWebServer.Extensibility/ResponseFormatters/SocketResponseFormatter.cs" Line="24" Column="23" NotebookId="1" />
-      <File FileName="CityWebServer.Extensibility/IRequestHandler.cs" Line="14" Column="32" NotebookId="1" />
-      <File FileName="CityWebServer/IntegratedWebServer.cs.old" Line="90" Column="33" NotebookId="1" />
-      <File FileName="CityWebServer/HttpRequest.cs" Line="17" Column="3" NotebookId="1" />
-      <File FileName="CityWebServer/HttpResponse.cs" Line="20" Column="52" NotebookId="1" />
+      <File FileName="CityWebServer/WebServer.cs" Line="43" Column="4" />
+      <File FileName="CityWebServer/RequestHandler.cs" Line="8" Column="26" />
+      <File FileName="CityWebServer/FileWatcher.cs" Line="1" Column="46" />
+      <File FileName="CityWebServer/IntegratedWebServer.cs.old" Line="245" Column="4" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CityWebServer" expanded="True">
             <Node name="CityWebServer" expanded="True">
+              <Node name="Helpers" expanded="True" />
+              <Node name="RequestHandlers" expanded="True" />
               <Node name="RequestHandler.cs" selected="True" />
             </Node>
             <Node name="CityWebServer.Extensibility" expanded="True">
