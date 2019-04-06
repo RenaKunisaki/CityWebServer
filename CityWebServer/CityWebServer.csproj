@@ -69,7 +69,6 @@
     <Compile Include="Helpers\DistrictExtensions.cs" />
     <Compile Include="Helpers\EnumExtensions.cs" />
     <Compile Include="Helpers\NameValueCollectionExtensions.cs" />
-    <Compile Include="Helpers\TemplateHelper.cs" />
     <Compile Include="Models\ChirperMessage.cs" />
     <Compile Include="Models\CityInfo.cs" />
     <Compile Include="Models\DistrictInfo.cs" />
@@ -101,7 +100,6 @@
     <Compile Include="IRequestHandler.cs" />
     <Compile Include="IWebServer.cs" />
     <Compile Include="RequestHandlerBase.cs" />
-    <Compile Include="LogAppenderEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

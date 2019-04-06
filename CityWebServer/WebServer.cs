@@ -269,11 +269,6 @@ namespace CityWebServer {
 			}
 		}
 
-		private void RequestHandlerLogAppender_OnLogMessage(object sender, LogAppenderEventArgs logAppenderEventArgs) {
-			var senderTypeName = sender.GetType().Name;
-			Log($"[{senderTypeName}] {logAppenderEventArgs.LogLine}");
-		}
-
 		/// <summary>
 		/// Searches all the assemblies in the current AppDomain, and returns a collection of those that implement the <see cref="IRequestHandler"/> interface.
 		/// </summary>
