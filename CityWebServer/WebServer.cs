@@ -53,10 +53,6 @@ namespace CityWebServer {
 			_endpoint = "xxx";
 			_listener = new TcpListener(address, port);
 			//Log("Created Server");
-
-			if(fileWatcher is null) {
-				fileWatcher = new FileWatcher();
-			}
 		}
 
 		public static void Log(String message) {
@@ -68,8 +64,8 @@ namespace CityWebServer {
 			try {
 				UnityEngine.Debug.Log("[WebServer] " + message);
 			}
-			catch {
-				//it's possible the logger isn't set up yet...
+			catch(NullReferenceException) {
+				//Happens if Unity's logger isn't set up yet.
 			}
 		}
 
@@ -84,7 +80,11 @@ namespace CityWebServer {
 				logListener = new TextWriterTraceListener(logFile);
 				Trace.Listeners.Add(logListener);
 			}
+			if(fileWatcher == null) {
+				fileWatcher = new FileWatcher();
+			}
 			Log("Initializing...");
+
 			GetWebRoot();
 			/* try {
 				RegisterHandlers();
