@@ -43,9 +43,11 @@ namespace CityWebServer.Extensibility
         /// </summary>
         Boolean ShouldHandle(HttpListenerRequest request);
 
-        /// <summary>
-        /// Handles the specified request.  The method should not close the stream.
-        /// </summary>
-        IResponseFormatter Handle(HttpListenerRequest request);
-    }
+		/// <summary>
+		/// Handles the specified request.  The method should not close the stream.
+		/// </summary>
+		IResponseFormatter Handle(HttpListenerRequest request);
+		IResponseFormatter Handle(HttpListenerRequest request, HttpListenerResponse response);
+		IResponseFormatter Handle(HttpListenerRequest request, HttpListenerResponse response, HttpListenerContext ctx);
+	}
 }

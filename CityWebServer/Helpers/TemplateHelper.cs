@@ -70,7 +70,7 @@ namespace CityWebServer.Helpers
             }
             catch (Exception ex)
             {
-                IntegratedWebServer.LogMessage(ex.ToString());
+				WebServer.Log(ex.ToString());
                 return tokenReplacements["#PAGEBODY#"];
             }
         }

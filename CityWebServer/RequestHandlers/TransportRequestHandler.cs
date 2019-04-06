@@ -83,7 +83,7 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		private new void LogMessage(string msg) {
-			IntegratedWebServer.LogMessage(msg);
+			WebServer.Log(msg);
 		}
 	}
 }

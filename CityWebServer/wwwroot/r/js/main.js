@@ -32,6 +32,23 @@ class App {
             this._refresh();
         }, this.updateInterval);
 
+        this.socket = new WebSocket(`ws://${window.location.host}/Socket`);
+        console.log("Created socket", this.socket);
+
+        this.socket.onopen = (event) => {
+            console.log("Socket opened");
+            this.socket.send("{hello_there_server_is_this_message_long_enough_for_you:42}");
+        };
+        this.socket.onclose = (event) => {
+            console.log("Socket closed");
+        };
+        this.socket.onerror = (event) => {
+            console.log("Socket error", event);
+        };
+        this.socket.onmessage = (event) => {
+            console.log("Socket received", event);
+        };
+
         $('#chirper').append(this.chirper.element);
         $('#transit').append(this.transit.element);
 
@@ -46,7 +63,7 @@ class App {
         $('#main').masonry({
             itemSelector: '.box',
             columnWidth: '.grid-sizer',
-            horizontalOrder: true,
+            //horizontalOrder: true,
             //percentPosition: true,
             transitionDuration: 0,
             initLayout: true,

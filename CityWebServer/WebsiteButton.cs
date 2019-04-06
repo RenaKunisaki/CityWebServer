@@ -131,7 +131,7 @@ namespace CityWebServer
             else if (!Input.GetKey(KeyCode.LeftShift))
             {
                 // Accept clicks only when shift isn't pressed.
-                var endpoint = String.Format("{0}index.html", IntegratedWebServer.Endpoint);
+                var endpoint = String.Format("{0}index.html", WebServer.Endpoint);
                 Process.Start(endpoint);
             }
         }

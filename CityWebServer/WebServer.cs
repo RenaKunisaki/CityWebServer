@@ -1,85 +1,156 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
+using CityWebServer.Extensibility;
+using JetBrains.Annotations;
+using ICities;
+using System.Collections.Generic;
+using ColossalFramework.Plugins;
+using System.Linq;
 
-namespace CityWebServer
-{
-    public class WebServer
-    {
-        private readonly HttpListener _listener = new HttpListener();
-        private readonly Action<HttpListenerRequest, HttpListenerResponse> _responderMethod;
+namespace CityWebServer {
+	[UsedImplicitly]
+	public class WebServer: ThreadingExtensionBase, IWebServer {
+		private List<IRequestHandler> _requestHandlers;
+		private readonly TcpListener _listener;
+		protected static Stream logFile = null;
+		protected static TextWriterTraceListener logListener;
+		protected static String wwwRoot = null;
+		private static string _endpoint; //used for UI button
 
-        public WebServer(String[] prefixes, Action<HttpListenerRequest, HttpListenerResponse> method)
-        {
-            if (!HttpListener.IsSupported) { throw new NotSupportedException("This wouldn't happen if you upgraded your operating system more than once a decade."); }
+		/// <summary>
+		/// Gets the root endpoint for which the server is configured to service HTTP requests.
+		/// </summary>
+		public static String Endpoint {
+			get { return _endpoint; }
+		}
 
-            // URI prefixes are required, for example:
-            // "http://localhost:8080/index/".
-            if (prefixes == null || prefixes.Length == 0) { throw new ArgumentException("prefixes"); }
+		public WebServer() {
+			// We need a place to store all the request handlers that have been registered.
+			_requestHandlers = new List<IRequestHandler>();
 
-            // A responder method is required
-            if (method == null) { throw new ArgumentException("method"); }
+			IPAddress address = IPAddress.Parse("127.0.0.1");
+			int port = 7135;
+			//_endpoint = $"http://{address.ToString()}:{port}/";
+			_endpoint = "xxx";
+			_listener = new TcpListener(address, port);
+			//Log("Created Server");
+		}
 
-            foreach (String s in prefixes)
-            {
-                _listener.Prefixes.Add(s);
-            }
+		public static void Log(String message) {
+			String time = DateTime.Now.ToUniversalTime()
+				.ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss'.'fff");
+			message = $"{time}: {message}{Environment.NewLine}";
+			Trace.Write(message);
+			Trace.Flush();
+			try {
+				UnityEngine.Debug.Log("[WebServer] " + message);
+			}
+			catch {
+				//it's possible the logger isn't set up yet...
+			}
+		}
 
-            _responderMethod = method;
-            _listener.Start();
-        }
+		#region Create
+		/// <summary>
+		/// Called by the game after this instance is created.
+		/// </summary>
+		/// <param name="threading">The threading.</param>
+		public override void OnCreated(IThreading threading) {
+			if(logFile == null) {
+				logFile = File.Create("CSL-WebServer.log");
+				logListener = new TextWriterTraceListener(logFile);
+				Trace.Listeners.Add(logListener);
+			}
+			Log("Initializing...");
+			/* try {
+				RegisterHandlers();
+			}
+			catch(Exception ex) {
+				UnityEngine.Debug.LogException(ex);
+			} */
 
-        public WebServer(Action<HttpListenerRequest, HttpListenerResponse> method, params String[] prefixes)
-            : this(prefixes, method)
-        {
-        }
+			Run();
+			base.OnCreated(threading);
+		}
+		#endregion Create
 
-        public void Run()
-        {
-            ThreadPool.QueueUserWorkItem(o =>
-            {
-                try
-                {
-                    while (_listener.IsListening)
-                    {
-                        ThreadPool.QueueUserWorkItem(RequestHandlerCallback, _listener.GetContext());
-                    }
-                }
-                catch { } // Suppress exceptions.
-            });
-        }
+		#region Release
+		/// <summary>
+		/// Called by the game before this instance is about to be destroyed.
+		/// </summary>
+		public override void OnReleased() {
+			Log("Shutting down.");
+			if(_listener != null) _listener.Stop();
 
-        private void RequestHandlerCallback(Object context)
-        {
-            var ctx = context as HttpListenerContext;
-            try
-            {
-                if (ctx != null)
-                {
-                    var request = ctx.Request;
-                    var response = ctx.Response;
+			// TODO: Unregister from events (i.e. ILogAppender.LogMessage)
+			if(_requestHandlers != null) _requestHandlers.Clear();
+			base.OnReleased();
+		}
+		#endregion Release
 
-                    // Allow accessing pages from pages hosted from another local web-server, such as IIS, for instance.
-                    response.AddHeader("Access-Control-Allow-Origin", "http://localhost");
+		/// <summary>
+		/// Gets the full path to the directory where static pages are served from.
+		/// </summary>
+		public static String GetWebRoot() {
+			if(wwwRoot != null) return wwwRoot;
+			var modPaths = PluginManager.instance.GetPluginsInfo().Select(obj => obj.modPath);
+			foreach(var path in modPaths) {
+				var testPath = Path.Combine(path, "wwwroot");
+				Log($"Trying path \"{testPath}\"...");
+				if(Directory.Exists(testPath)) {
+					Log($"Found wwwroot: \"{testPath}\"...");
+					wwwRoot = testPath;
+					return testPath;
+				}
+			}
+			Log($"No wwwroot found!");
+			return null;
+		}
 
-                    _responderMethod(request, response);
-                }
-            }
-            catch { } // Suppress any exceptions.
-            finally
-            {
-                if (ctx != null)
-                {
-                    // Ensure that the stream is never left open.
-                    ctx.Response.OutputStream.Close();
-                }
-            }
-        }
+		/// <summary>
+		/// Gets an array containing all currently registered request handlers.
+		/// </summary>
+		public IRequestHandler[] RequestHandlers {
+			get { return _requestHandlers.ToArray(); }
+		}
 
-        public void Stop()
-        {
-            _listener.Stop();
-            _listener.Close();
-        }
-    }
+		public void Run() {
+			Log("Server starting");
+			ThreadPool.QueueUserWorkItem(o => {
+				Log("Server running");
+				_listener.Start();
+				try {
+					while(true) {
+						//Wait for a client, and spawn a thread for it.
+						TcpClient client = _listener.AcceptTcpClient();
+						ThreadPool.QueueUserWorkItem(RequestHandlerCallback, client);
+					}
+				}
+				catch(Exception ex) {
+					Log($"Error running server: {ex}");
+					UnityEngine.Debug.LogException(ex);
+				}
+			});
+		}
+
+		private void RequestHandlerCallback(object client) {
+			//Callback in the client handler thread.
+			try {
+				var handler = new RequestHandler(this, client as TcpClient);
+				handler.Handle();
+			}
+			catch(Exception ex) {
+				Log($"Error handling client: {ex}");
+				UnityEngine.Debug.LogException(ex);
+			}
+		}
+
+		public void Stop() {
+			_listener.Stop();
+		}
+	}
 }

@@ -32,8 +32,7 @@ namespace CityWebServer {
 		protected static TextWriterTraceListener logListener;
 
 		// Not required, but prevents a number of spurious entries from making it to the log file.
-		private static readonly List<String> IgnoredAssemblies = new List<String>
-		{
+		private static readonly List<String> IgnoredAssemblies = new List<String> {
 			"Anonymously Hosted DynamicMethods Assembly",
 			"Assembly-CSharp",
 			"Assembly-CSharp-firstpass",
@@ -148,19 +147,19 @@ namespace CityWebServer {
 			// There's no need to use multiple bindings for internal references, we only need a single one.
 			_endpoint = bindings.First();
 
-			WebServer ws = new WebServer(HandleRequest, bindings.ToArray());
+			WebServer ws = new WebServer();
 			_server = ws;
 			_server.Run();
 			LogMessage("Server Initialized.");
 
 			_requestHandlers = new List<IRequestHandler>();
 
-			try {
+			/* try {
 				RegisterHandlers();
 			}
 			catch(Exception ex) {
 				UnityEngine.Debug.LogException(ex);
-			}
+			} */
 		}
 
 		#endregion Create
@@ -200,7 +199,7 @@ namespace CityWebServer {
 		/// Defers execution to an appropriate request handler, except for requests to the reserved endpoints: <c>~/</c> and <c>~/Log</c>.<br />
 		/// Returns a default error message if an appropriate request handler can not be found.
 		/// </remarks>
-		private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response) {
+		private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, HttpListenerContext ctx) {
 			//LogMessage($"{request.HttpMethod} {request.RawUrl}");
 
 			var simulationManager = Singleton<SimulationManager>.instance;
@@ -224,7 +223,7 @@ namespace CityWebServer {
 			if(handler != null) {
 				//LogMessage($"Using handler: {handler.Name}");
 				try {
-					IResponseFormatter responseFormatterWriter = handler.Handle(request);
+					IResponseFormatter responseFormatterWriter = handler.Handle(request, response);
 					responseFormatterWriter.WriteContent(response);
 
 					return;
@@ -264,7 +263,7 @@ namespace CityWebServer {
 			var relativePath = request.Url.AbsolutePath.Substring(1);
 			relativePath = relativePath.Replace("/", Path.DirectorySeparatorChar.ToString());
 			var absolutePath = Path.Combine(wwwroot, relativePath);
-			LogMessage($"Sending file: {absolutePath}");
+			//LogMessage($"Sending file: {absolutePath}");
 
 			if(File.Exists(absolutePath)) {
 				try {
@@ -280,7 +279,7 @@ namespace CityWebServer {
 							response.OutputStream.Write(buffer, 0, read);
 						}
 					}
-					LogMessage($"Sent file OK: {relativePath}");
+					//LogMessage($"Sent file OK: {relativePath}");
 				}
 				catch(Exception ex) {
 					LogMessage($"Error sending file {absolutePath}: {ex}");
@@ -290,7 +289,7 @@ namespace CityWebServer {
 				}
 			}
 			else {
-				LogMessage($"Not found: {relativePath}");
+				//LogMessage($"Not found: {relativePath}");
 				String body = String.Format("No resource is available at the specified filepath: {0}", absolutePath);
 				IResponseFormatter notFoundResponseFormatter = new PlainTextResponseFormatter(body, HttpStatusCode.NotFound);
 				notFoundResponseFormatter.WriteContent(response);
