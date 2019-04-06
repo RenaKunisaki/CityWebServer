@@ -510,9 +510,5 @@ namespace CityWebServer.RequestHandlers {
 			}
 			return budgetRates;
 		}
-
-		private new void LogMessage(string msg) {
-			WebServer.Log(msg);
-		}
 	}
 }

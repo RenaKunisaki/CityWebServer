@@ -48,6 +48,10 @@ namespace CityWebServer {
 			resp.SendBody(message);
 		}
 
+		protected void Log(string msg) {
+			WebServer.Log(msg);
+		}
+
 		/// <summary>
 		/// Gets the server that is currently servicing this instance.
 		/// </summary>

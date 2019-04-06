@@ -37,7 +37,7 @@ namespace CityWebServer.RequestHandlers {
 				lineModels = new List<PublicTransportLine>();
 			}
 			catch(Exception ex) {
-				LogMessage($"Error getting transport lines buffer: {ex}");
+				Log($"Error getting transport lines buffer: {ex}");
 				throw;
 			}
 
@@ -79,10 +79,6 @@ namespace CityWebServer.RequestHandlers {
 			lineModels = lineModels.OrderBy(obj => obj.Name).ToList();
 
 			SendJson(lineModels);
-		}
-
-		private new void LogMessage(string msg) {
-			WebServer.Log(msg);
 		}
 	}
 }
