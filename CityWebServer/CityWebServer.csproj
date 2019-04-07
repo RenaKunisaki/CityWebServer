@@ -75,23 +75,13 @@
     <Compile Include="Models\Economy.cs" />
     <Compile Include="Models\PolicyInfo.cs" />
     <Compile Include="Models\PopulationGroup.cs" />
-    <Compile Include="RequestHandlers\BudgetRequestHandler.cs" />
-    <Compile Include="RequestHandlers\BuildingRequestHandler.cs" />
-    <Compile Include="RequestHandlers\MessageRequestHandler.cs" />
-    <Compile Include="RequestHandlers\CityInfoRequestHandler.cs" />
     <Compile Include="Models\PublicTransportLine.cs" />
-    <Compile Include="RequestHandlers\TransportRequestHandler.cs" />
-    <Compile Include="RequestHandlers\VehicleRequestHandler.cs" />
     <Compile Include="Retrievers\ChirpRetriever.cs" />
     <Compile Include="UserModInfo.cs" />
     <Compile Include="WebServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebsiteButton.cs" />
-    <Compile Include="RequestHandlers\NotificationRequestHandler.cs" />
     <Compile Include="Models\Notification.cs" />
-    <Compile Include="RequestHandlers\LimitsRequestHandler.cs" />
-    <Compile Include="RequestHandlers\InstancesRequestHandler.cs" />
-    <Compile Include="RequestHandlers\HeightMapRequestHandler.cs" />
     <Compile Include="RequestHandlers\SocketRequestHandler.cs" />
     <Compile Include="RequestProcessor.cs" />
     <Compile Include="HttpRequest.cs" />
@@ -100,6 +90,7 @@
     <Compile Include="IRequestHandler.cs" />
     <Compile Include="IWebServer.cs" />
     <Compile Include="RequestHandlerBase.cs" />
+    <Compile Include="RequestHandlers\DefaultRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

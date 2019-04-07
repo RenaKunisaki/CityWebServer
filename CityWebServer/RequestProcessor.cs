@@ -45,8 +45,13 @@ namespace CityWebServer {
 				var handler = server.GetHandler(req);
 				if(handler != null) {
 					try {
-						Log($"Using handler '{handler.Name}' for {req.method} {req.path}");
-						handler.Handle(req);
+						Log($"Using handler '{handler.Name}' for {req.method} {req.path} from {client.Client.RemoteEndPoint}");
+						//Create a new instance of the handler to deal with
+						//this request, so that they don't stomp on eachother
+						//when multiple threads are involved.
+						IRequestHandler instance = (IRequestHandler)Activator.CreateInstance(handler.GetType(),
+							new object[] { server, req });
+						instance.Handle();
 					}
 					catch(Exception ex) {
 						if(ex is System.IO.IOException) {
@@ -54,19 +59,16 @@ namespace CityWebServer {
 							Log($"IO error (probably harmless) in handler {handler.Name} for {req.method} {req.path}: {ex.Message}");
 						}
 						else {
-							Log($"Error in handler {handler.Name} for {req.method} {req.path}: {ex}");
+							Log($"Error in handler {handler.Name} for {req.method} {req.path} with client {client.Client.RemoteEndPoint}: {ex}");
 							SendErrorResponse(req, HttpStatusCode.InternalServerError, ex.ToString());
 						}
 					}
+					Log($"Done handling client {client.Client.RemoteEndPoint}");
 					return;
 				}
 				Log($"No handler found for {req.method} {req.path}");
-
-				if(req.method == "GET") HandleGet(req);
-				else {
-					SendErrorResponse(req, HttpStatusCode.MethodNotAllowed);
-				}
-				Log($"Done handling client {client.Client.RemoteEndPoint}");
+				SendErrorResponse(req, HttpStatusCode.InternalServerError,
+					"No handler responded to this request");
 			}
 			finally {
 				Finish();
@@ -91,51 +93,6 @@ namespace CityWebServer {
 				message = HttpResponse.StatusCodeToName(status);
 			}
 			resp.SendBody(message);
-		}
-
-		public void HandleGet(HttpRequest request) {
-			/** Handle a GET request.
-			 */
-			String path = request.path;
-			Log($"Handling GET path '{path}");
-			//Sanitize and make relative
-			path = path.Replace("..", "%2E%2E");
-			while(path.StartsWith("/", StringComparison.Ordinal)) {
-				path = path.Substring(1);
-			}
-			if(path == "") path = "index.html";
-
-			path = path.Replace("/", Path.DirectorySeparatorChar.ToString());
-			var absolutePath = Path.Combine(WebServer.GetWebRoot(), path);
-			SendFile(request, absolutePath);
-		}
-
-		public void SendFile(HttpRequest request, String absolutePath) {
-			Log($"Sending file: {absolutePath}");
-
-			try {
-				var extension = Path.GetExtension(absolutePath);
-				var contentType = Apache.GetMime(extension);
-				var resp = new HttpResponse(stream);
-				if(contentType != null) resp.AddHeader("Content-Type", contentType);
-
-				using(FileStream fileReader = File.OpenRead(absolutePath)) {
-					byte[] buffer = new byte[4096];
-					int read;
-					while((read = fileReader.Read(buffer, 0, buffer.Length)) > 0) {
-						resp.SendPartialBody(buffer, 0, read);
-					}
-				}
-			}
-			catch(System.IO.FileNotFoundException) {
-				Log($"Not found: '{absolutePath}'");
-				SendErrorResponse(request, HttpStatusCode.NotFound);
-			}
-			catch(Exception ex) {
-				Log($"Error sending '{absolutePath}': {ex}");
-				SendErrorResponse(request,
-					HttpStatusCode.InternalServerError, ex.ToString());
-			}
 		}
 	}
 }

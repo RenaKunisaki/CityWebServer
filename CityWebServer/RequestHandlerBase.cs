@@ -3,7 +3,7 @@ using System.Net;
 
 namespace CityWebServer {
 	public class RequestHandlerBase: IRequestHandler {
-		protected readonly IWebServer _server;
+		protected readonly WebServer _server;
 		protected Guid _handlerID;
 		protected int _priority;
 		protected String _name;
@@ -11,11 +11,21 @@ namespace CityWebServer {
 		protected String _mainPath;
 		protected HttpRequest request;
 
-		private RequestHandlerBase() {
+		protected RequestHandlerBase(WebServer server, HttpRequest request) {
+			/** This constructor is used when we're creating a new instance
+			 *  to actually handle a request.
+			 */
+			this._server = server;
+			this.request = request;
 		}
 
-		protected RequestHandlerBase(IWebServer server, Guid handlerID, String name, String author, int priority, String mainPath) {
-			_server = server;
+		protected RequestHandlerBase(Guid handlerID, String name, String author, int priority, String mainPath) {
+			/** This constructor is used when the server is starting up and
+			 *  enumerating all available handlers.
+			 *  The instance created here won't be used to serve requests.
+			 *  This is a bit hackish. I'd rather this info be static members,
+			 *  but I'm not sure how to make that work.		 
+			 */
 			_handlerID = handlerID;
 			_name = name;
 			_author = author;
@@ -89,14 +99,15 @@ namespace CityWebServer {
 		/// Returns a value that indicates whether this handler is capable of servicing the given request.
 		/// </summary>
 		public virtual Boolean ShouldHandle(HttpRequest request) {
-			return (request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
+			return (request.method.Equals("GET") &&
+				request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
 		}
 
 		/// <summary>
 		/// Handles the specified request.  The method should not close the stream.
 		/// </summary>
 		/// <exception cref="T:System.NotImplementedException"></exception>
-		public virtual void Handle(HttpRequest request) {
+		public virtual void Handle() {
 			throw new NotImplementedException();
 		}
 	}

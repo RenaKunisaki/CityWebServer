@@ -12,6 +12,14 @@ using ColossalFramework.Plugins;
 using ICities;
 using JetBrains.Annotations;
 
+/* Thoughts:
+ * - move the "serve from wwwroot" logic into a default handler with priority 0
+ *   (is priority implemented?)
+ * - no need for most of the request handlers to support HTTP; convert them to
+ *   a new class designed to be used with SocketRequestHandler. Then they can
+ *   also automatically send more info when it's available.
+ */
+
 namespace CityWebServer {
 	[UsedImplicitly]
 	public class WebServer: ThreadingExtensionBase, IWebServer {
@@ -240,7 +248,7 @@ namespace CityWebServer {
 				//which fails, adding a useless exception to the log.
 				try {
 					if(typeof(RequestHandlerBase).IsAssignableFrom(handler)) {
-						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler, this);
+						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler);
 					}
 					else {
 						handlerInstance = (IRequestHandler)Activator.CreateInstance(handler);
@@ -269,6 +277,10 @@ namespace CityWebServer {
 					Log($"Added Request Handler: {handler.FullName}");
 				}
 			}
+
+			//Sort handlers by priority.
+			_requestHandlers.OrderBy(handler => handler.Priority);
+
 		}
 
 		/// <summary>

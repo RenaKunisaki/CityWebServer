@@ -44,6 +44,6 @@ namespace CityWebServer {
 		/// <summary>
 		/// Handles the specified request.  The method should not close the stream.
 		/// </summary>
-		void Handle(HttpRequest request);
+		void Handle();
 	}
 }

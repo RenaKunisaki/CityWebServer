@@ -52,13 +52,15 @@ namespace CityWebServer.RequestHandlers {
 
 		protected Stream stream;
 
-		public SocketRequestHandler(IWebServer server)
-			: base(server, new Guid("d33918b9-8efb-409e-9456-935669907038"),
+		public SocketRequestHandler()
+			: base(new Guid("d33918b9-8efb-409e-9456-935669907038"),
 				"Socket", "Rena", 100, "/Socket") {
 		}
 
-		public override void Handle(HttpRequest request) {
-			this.request = request;
+		public SocketRequestHandler(WebServer server, HttpRequest request)
+		: base(server, request) { }
+
+		public override void Handle() {
 			this.stream = request.stream;
 			Log("Connection opening");
 
