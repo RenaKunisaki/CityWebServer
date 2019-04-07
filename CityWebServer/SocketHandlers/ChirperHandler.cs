@@ -14,10 +14,13 @@ using JetBrains.Annotations;
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
 	public class ChirperHandler: SocketHandlerBase {
+		/** Pushes new Chirper messages to client.
+		 */
 		private readonly MessageManager messageManager;
 		private List<ChirperMessage> messages;
 
-		public ChirperHandler(SocketRequestHandler handler) : base(handler, "Chirper") {
+		public ChirperHandler(SocketRequestHandler handler) :
+		base(handler, "Chirper") {
 			Log("ChirperHandler created");
 
 			//Since we aren't inheriting IUserMod, we have to manually
@@ -31,42 +34,41 @@ namespace CityWebServer.RequestHandlers {
 		#region MessageManager callbacks
 
 		public void OnMessagesUpdated() {
-			/** Thread: Main
-			 * Invoked when the Chirper synchronize messages
+			/** Invoked when the Chirper synchronize messages
 			 * (after loading a save i.e)
 			 */
-			Log("OnMessagesUpdated");
+			DateTime now = Singleton<SimulationManager>.instance.m_currentGameTime;
 			try {
 				var msgs = messageManager.GetRecentMessages();
 				messages = msgs.Select(obj => new ChirperMessage {
 					SenderID = (int)obj.GetSenderID(),
 					SenderName = obj.GetSenderName(),
 					Text = obj.GetText(),
+					Time = now,
+					//no way to get the actual time of the message unfortunately
 				}).ToList();
-				SendJson(new Dictionary<String, List<ChirperMessage>> {
-					{"Chirper", messages},
-				});
+				SendJson(messages);
 			}
 			catch(Exception ex) {
-				Log($"OnMMessagesUpdated: {ex}");
+				Log($"OnMessagesUpdated: {ex}");
 			}
 		}
 
 		public void OnNewMessage(IChirperMessage message) {
-			/** Thread: Main
-			 * Invoked when the Chirper receives a new message
+			/** Invoked when the Chirper receives a new message
 			 */
-			Log("OnNewMessage");
 			try {
 				var msg = new ChirperMessage {
 					SenderID = (int)message.senderID,
 					SenderName = message.senderName,
-					Text = message.text
+					Text = message.text,
+					Time = Singleton<SimulationManager>.instance.m_currentGameTime,
 				};
 				messages.Add(msg);
+				SendJson(msg);
 			}
 			catch(Exception ex) {
-				Log($"OnMNewMessages: {ex}");
+				Log($"OnNewMessage: {ex}");
 			}
 		}
 

@@ -11,12 +11,12 @@ using CityWebServer.Extensibility;
 namespace CityWebServer.RequestHandlers {
 	public class SocketRequestHandler: RequestHandlerBase {
 		/** Handles `/Socket`.
-		 *  Returns a WebSocket connection.
+		 *  Opens a WebSocket connection. Returns when the socket is closed.
 		 */
 
 		//This GUID is specified by RFC 6455 and must be appended
 		//to the socket key given by the client. It's also case sensitive.
-		private static readonly String KeyGuid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+		public static readonly String KeyGuid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 		public struct SocketMessageRawHeader {
 			public byte flagsAndOpcode;
@@ -69,6 +69,9 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		public override void Handle() {
+			/** Handle the HTTP request.
+			 *  This method won't return until the socket closes!		
+			 */
 			this.stream = request.stream;
 			Log("Connection opening");
 
@@ -87,6 +90,12 @@ namespace CityWebServer.RequestHandlers {
 			response.AddHeader("Sec-WebSocket-Accept", respKey);
 			response.SendHeaders();
 
+			RunSocket();
+		}
+
+		protected void RunSocket() {
+			/** Main loop, runs the WebSocket connection.
+			 */
 			Log($"Creating ChirperHandler (thread: {Thread.CurrentThread.Name})");
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 
@@ -111,14 +120,10 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
-		protected void SendJson<T>(T body) {
-			var writer = new JsonFx.Json.JsonWriter();
-			var serializedData = writer.Write(body);
-			byte[] buf = Encoding.UTF8.GetBytes(serializedData);
-			SendFrame(buf);
-		}
-
-		protected void SendFrame(byte[] data, SocketOpcode opcode = SocketOpcode.TEXT, bool isFIN = true) {
+		protected void SendFrame(byte[] data,
+		SocketOpcode opcode = SocketOpcode.TEXT, bool isFIN = true) {
+			/** Send a WebSocket frame to the client.
+			 */
 			byte[] header = new byte[14];
 			header[0] = (byte)((isFIN ? 0x80 : 0) | (byte)opcode);
 			int idx = 2;
@@ -153,12 +158,18 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		public void EnqueueMessage(String message) {
+			/** Called by handlers to add an outgoing message
+			 *  to the queue to be sent to the client.
+			 */
 			lock(this.sendQueueLock) {
 				this.sendQueue.Enqueue(message);
 			}
 		}
 
 		protected String GetNextOutgoingMessage() {
+			/** Retrieve the next outgoing message from the queue.
+			 *  Returns null if no message is queued.
+			 */
 			lock(this.sendQueueLock) {
 				try {
 					return this.sendQueue.Dequeue();
@@ -171,20 +182,15 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		protected void HandleNextMessage() {
+			/** Get the next message from the client and deal with it.
+			 *  This is called once we know a message is available.
+			 */
 			try {
 				var reader = new JsonFx.Json.JsonReader();
 				String message = ReadMessage(request);
 				var input = reader.Read<Dictionary<string, object>>(message);
 				Log($"message: {input}");
-
-
-				//SendJson("Hello there");
-				//Not entirely sure what to do with the message...
-				//Thinking some type of subscription mechanism.
-				//Like {subscribe:"CityInfo"} and then it will send you
-				//{CityInfo:{...}} right then and again when it changes.
-				//Figuring out how to get change notifications into the
-				//socket handler thread might be interesting...
+				//XXX pass message on to appropriate handler.
 			}
 			catch(Exception ex) {
 				if(ex is ObjectDisposedException
@@ -196,6 +202,10 @@ namespace CityWebServer.RequestHandlers {
 		}
 
 		private String ReadMessage(HttpRequest req) {
+			/** Read the raw WebSocket message from the socket.
+			 *  Throws OperationCanceledException or ObjectDisposedException
+			 *  if the socket was closed while reading.		 
+			 */
 			byte[] bufMsg = new byte[16384];
 			int bufMsgPos = 0;
 			String message = "";
@@ -203,23 +213,23 @@ namespace CityWebServer.RequestHandlers {
 				//Read header
 				byte[] bufHeader = new byte[32];
 				SocketMessageHeader header = ReadHeader(req, bufHeader);
-				Log(
-					$"Got WebSock msg header ({header.headerLength} bytes): op={header.opcode}, " +
-					$"FIN={header.isFIN}, mask={header.isMask}, " +
-					$"length={header.length}, key={header.maskKey[0]} " +
-					$"{header.maskKey[1]} {header.maskKey[2]} {header.maskKey[3]}");
+				//Log(
+				//$"Got WebSock msg header ({header.headerLength} bytes): op={header.opcode}, " +
+				//$"FIN={header.isFIN}, mask={header.isMask}, " +
+				//$"length={header.length}, key={header.maskKey[0]} " +
+				//$"{header.maskKey[1]} {header.maskKey[2]} {header.maskKey[3]}");
 
 				//XXX deal with FIN bit, different opcodes
 
 				//Read remaining buffer after header
-				Log($"Got {header.readLength - header.headerLength} extra bytes after header");
+				//Log($"Got {header.readLength - header.headerLength} extra bytes after header");
 				for(int i = header.headerLength; i < header.readLength; i++) {
 					bufMsg[bufMsgPos++] = bufHeader[i];
 				}
 
 				//Read data
 				while(bufMsgPos < header.length && bufMsgPos < bufMsg.Length) {
-					Log($"Have {bufMsgPos} of {header.length} bytes");
+					//Log($"Have {bufMsgPos} of {header.length} bytes");
 					int readLen = req.stream.Read(
 						bufMsg, bufMsgPos, bufMsg.Length - bufMsgPos);
 					if(readLen <= 0) throw new OperationCanceledException();
@@ -228,37 +238,42 @@ namespace CityWebServer.RequestHandlers {
 
 				//Decode data
 				if(header.isMask) {
-					Log("Decoding message");
-					String dbg = "";
+					//Log("Decoding message");
+					//String dbg = "";
 					for(int i = 0; i < bufMsgPos; i++) {
 						bufMsg[i] ^= header.maskKey[i & 3];
-						String b = bufMsg[i].ToString("X2");
-						dbg += $"{b} ";
+						//String b = bufMsg[i].ToString("X2");
+						//dbg += $"{b} ";
 					}
-					Log($"Decoded data: {dbg}");
+					//Log($"Decoded data: {dbg}");
 				}
-				else Log("Message is not encoded");
+				//else Log("Message is not encoded");
 				bufMsg[bufMsgPos] = 0; //Add null terminator
 
 				message += System.Text.Encoding.UTF8.GetString(bufMsg);
-				WebServer.Log($"Decoded socket msg: {message}");
+				//WebServer.Log($"Decoded socket msg: {message}");
 				if(header.isFIN) return message;
 			}
 		}
 
 		private SocketMessageHeader ReadHeader(HttpRequest req, byte[] buffer) {
+			/** Read the WebSocket frame header from the socket.
+			 *  Throws OperationCanceledException or ObjectDisposedException
+			 *  if the socket was closed while reading.		
+			 */
 			int idx = 0;
+			//Read the header bytes.
 			//XXX deal with messages < 14 bytes (header is variable length)
 			//14 is the maximum possible length
 			while(idx < 14) {
-				//Thread.Sleep(100);
 				int r = req.stream.Read(buffer, idx, 14 - idx);
 				if(r <= 0) throw new OperationCanceledException(); //closed
 				idx += r;
 			}
-			WebServer.Log($"Socket got header {buffer[0]} {buffer[1]}, read {idx} bytes");
+			//WebServer.Log($"Socket got header {buffer[0]} {buffer[1]}, read {idx} bytes");
 			int bufLen = idx;
 
+			//Decode the header.
 			SocketMessageRawHeader header = new SocketMessageRawHeader {
 				flagsAndOpcode = buffer[0],
 				maskAndLength = buffer[1],
@@ -268,6 +283,8 @@ namespace CityWebServer.RequestHandlers {
 			bool isMask = (header.maskAndLength & 0x80) != 0;
 			long length = header.maskAndLength & 0x7F;
 			byte[] maskKey = new byte[4];
+
+			//Decode the length.
 			if(length == 126) { //XXX verify byte order
 				length = (buffer[2] << 8) | buffer[3];
 				idx = 4;
@@ -285,15 +302,18 @@ namespace CityWebServer.RequestHandlers {
 				idx = 10;
 			}
 			else idx = 2;
-			Log($"Message length: {length}, opcode: {opcode}, mask: {isMask} @{idx}");
+			//Log($"Message length: {length}, opcode: {opcode}, mask: {isMask} @{idx}");
+
+			//Read the mask key.
 			if(isMask) {
 				maskKey[0] = buffer[idx + 0];
 				maskKey[1] = buffer[idx + 1];
 				maskKey[2] = buffer[idx + 2];
 				maskKey[3] = buffer[idx + 3];
-				Log($"Reading mask key from buffer pos {idx}: {maskKey[0]} {maskKey[1]} {maskKey[2]} {maskKey[3]}");
+				//Log($"Reading mask key from buffer pos {idx}: {maskKey[0]} {maskKey[1]} {maskKey[2]} {maskKey[3]}");
 				idx += 4;
 			}
+			//else, we don't care what maskKey is, we won't use it.
 
 			return new SocketMessageHeader {
 				opcode = opcode,

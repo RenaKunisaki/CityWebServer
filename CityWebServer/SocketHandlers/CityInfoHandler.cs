@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using CityWebServer.Extensibility;
-using CityWebServer.Helpers;
 using CityWebServer.Models;
 using ColossalFramework;
 using JetBrains.Annotations;
 
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
-	public class CityInfoRequestHandler: SocketHandlerBase {
-		public CityInfoRequestHandler(SocketRequestHandler handler) : base(handler, "CityInfo") { }
+	public class CityInfoHandler: SocketHandlerBase {
+		public CityInfoHandler(SocketRequestHandler handler) : base(handler, "CityInfo") { }
 
 		/* public override void Handle(HttpRequest request) {
 			this.request = request;
