@@ -9,29 +9,27 @@
 
 class App {
     constructor() {
-        this.updateInterval = 2000; //msec
         this._isInit        = false;
         this.viewModel      = null;
         this.currentDate    = null;
-        this.budget         = new Budget(this);
+        /* this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
         this.heightMap      = new HeightMap(this);
         this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
-        this.transit        = new Transit(this);
+        this.transit        = new Transit(this); */
 
         this.monthNames = [ //XXX get from game for localization
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
         ];
+        this.messageHandlers = {};
+        this.data = {};
     }
 
     run() {
-        window.setInterval(() => {
-            this._refresh();
-        }, this.updateInterval);
-
+        //Create socket to receive data from game.
         this.socket = new WebSocket(`ws://${window.location.host}/Socket`);
         console.log("Created socket", this.socket);
 
@@ -41,15 +39,21 @@ class App {
         };
         this.socket.onclose = (event) => {
             console.log("Socket closed");
+            $('#navbar-error').text("Not connected to game").show();
         };
         this.socket.onerror = (event) => {
             console.log("Socket error", event);
+            $('#navbar-error').text("Not connected to game").show();
         };
         this.socket.onmessage = (event) => {
-            console.log("Socket received", event);
+            this._onMessage(event.data);
         };
 
-        $('#chirper').append(this.chirper.element);
+        //Set up some default handlers.
+        this.registerMessageHandler("Frame", data => this._onFrame(data));
+        this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
+
+        /* $('#chirper').append(this.chirper.element);
         $('#transit').append(this.transit.element);
 
         this.budget.run();
@@ -58,8 +62,9 @@ class App {
         this.limits.run();
         //this.population.run();
         this.problems.run();
-        this.transit.run();
+        this.transit.run(); */
 
+        //Set up layout.
         $('#main').masonry({
             itemSelector: '.box',
             columnWidth: '.grid-sizer',
@@ -68,14 +73,23 @@ class App {
             transitionDuration: 0,
             initLayout: true,
         });
-
         setTimeout(() => {
             $('#main').masonry('layout');
         }, 500);
-        this._refresh();
+    }
+
+    registerMessageHandler(name, handler) {
+        /** Register a callback for a message from the game.
+         */
+        if(this.messageHandlers[name] == undefined) {
+            this.messageHandlers[name] = [];
+        }
+        this.messageHandlers[name].push(handler);
     }
 
     makeNameColor(name) {
+        /** Generate a color based on a string.
+         */
         //Try to match game colors
         if(name.startsWith('Residential_Low'))  return '#80FF00';
         if(name.startsWith('Residential_High')) return '#40C000';
@@ -96,7 +110,11 @@ class App {
         return `hsl(${hue}, ${sat}%, ${light}%)`;
     }
 
-    _updateClock(data) {
+    _onFrame(Frame) {
+        /** Callback for Frame message.
+         */
+        this.currentDate = new Date(Frame.Time);
+
         //build displayed date string
         let year   = this.currentDate.getFullYear();
         let month  = this.monthNames[this.currentDate.getMonth()];
@@ -104,42 +122,70 @@ class App {
         let hour   = String(this.currentDate.getHours()).padStart(2, '0');
         let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
         let second = String(this.currentDate.getSeconds()).padStart(2, '0');
-        let night  = data.isNight ? '☽' : '☀';
+        let night  = Frame.isNight ? '☽' : '☀';
 
         this.data.friendlyDate =
             `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
-        $('#clock').toggleClass('game-paused', data.isPaused)
+        $('#clock').toggleClass('game-paused', Frame.isPaused)
+
+        //Init/update KO
+        if(this._isInit) {
+            ko.mapping.fromJS(this.data, this.viewModel);
+        }
+        else {
+            this.viewModel = ko.mapping.fromJS(this.data);
+            ko.applyBindings(this.viewModel);
+            this._isInit = true;
+        }
+
+        //Update layout
+        $('#main').masonry('layout');
+    }
+
+    _updateCityInfo(CityInfo) {
+        /** Callback for CityInfo message.
+         */
+        document.title = CityInfo.Name;
+        $('#city-name').attr('title',
+            `Map: ${CityInfo.mapName}\n` +
+            `Climate: ${CityInfo.environment}`);
+    }
+
+    _onMessage(message) {
+        /** Called when a new message arrives on the socket.
+         */
+        $('#navbar-error').hide();
+        message = JSON.parse(message);
+
+        for(const [name, field] of Object.entries(message)) {
+            //Merge new data into existing data
+            this.data[name] = field;
+        }
+
+        for(const [name, field] of Object.entries(message)) {
+            //Call handlers
+            const handlers = this.messageHandlers[name];
+            if(handlers) {
+                for(const handler of handlers) {
+                    try { handler(field); }
+                    catch(ex) {
+                        console.error("Error handling message", name, ex);
+                    }
+                }
+            }
+        }
     }
 
     _refresh() {
+        //XXX this is old and no longer used.
         $.getJSON('/CityInfo', (data) => {
             //console.log("CityInfo:", data);
-            $('#navbar-error').hide();
-            this.data = data;
-            this.currentDate = new Date(this.data.Time);
-            this._updateClock(data);
             //XXX only do this if GameAreaManager.m_areaCount changed
             this.heightMap.updateLockedTiles(data);
-
-            document.title = this.data.Name;
-            $('#city-name').attr('title',
-                `Map: ${data.mapName}\n` +
-                `Climate: ${data.environment}`);
-
-            if(!this._isInit) {
-                this.viewModel = ko.mapping.fromJS(this.data);
-                ko.applyBindings(this.viewModel);
-
-                //chart = initializeChart(viewModel);
-                this._isInit = true;
-                return;
-            }
-
             this.population.update(data);
-            ko.mapping.fromJS(this.data, this.viewModel);
-            $('#main').masonry('layout');
+
         }).fail(() => {
-            $('#navbar-error').text("Not connected to game").show();
+
         });
     }
 }

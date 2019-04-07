@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using CityWebServer.Extensibility;
+using CityWebServer.SocketHandlers;
 //using CityWebServer.Extensibility.Responses;
 
 namespace CityWebServer.RequestHandlers {
@@ -99,6 +100,7 @@ namespace CityWebServer.RequestHandlers {
 
 			//We don't really need to store the handlers;
 			//just create them and let them call our EnqueueMessage method.
+			//XXX automatically find these like WebServer does.
 			Log($"Creating socket handlers (thread: {Thread.CurrentThread.Name})");
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);

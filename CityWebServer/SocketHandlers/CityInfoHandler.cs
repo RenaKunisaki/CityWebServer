@@ -2,21 +2,83 @@
 using System.Collections.Generic;
 using System.Linq;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers {
+namespace CityWebServer.SocketHandlers {
 	[UsedImplicitly]
+	///Pushes updated city info to client.
 	public class CityInfoHandler: SocketHandlerBase {
+		protected float totalTimeDelta;
+
 		public CityInfoHandler(SocketRequestHandler handler) :
 		base(handler, "CityInfo") {
+			totalTimeDelta = 0;
 			(handler.Server as WebServer).RegisterFrameCallback(Update);
+			SendInitialInfo();
 		}
 
-		protected void Update(object param) {
-			Log("CityInfoHandler update");
+		/// <summary>
+		/// Send initial city info to new client.
+		/// </summary>
+		protected void SendInitialInfo() {
 			var simulationManager = Singleton<SimulationManager>.instance;
-			SendJson(simulationManager.m_metaData.m_currentDateTime);
+			SendJson(new InitialCityInfo {
+				Name = simulationManager.m_metaData.m_CityName,
+				mapName = simulationManager.m_metaData.m_MapName,
+				environment = simulationManager.m_metaData.m_environment,
+				//GlobalDistrict = globalDistrictInfo,
+				//Districts = districtInfoList.ToArray(),
+				isTileUnlocked = GetUnlockedTiles(),
+			});
+			SendNewInfo(); //also send that info that isn't included above
+		}
+
+		/// <summary>
+		/// Send updated info to existing client.
+		/// </summary>
+		protected void SendNewInfo() {
+			var simulationManager = Singleton<SimulationManager>.instance;
+			SendJson(new VolatileCityInfo {
+				Time = simulationManager.m_currentGameTime,
+				isNight = simulationManager.m_isNightTime,
+				simSpeed = simulationManager.SelectedSimulationSpeed,
+				isPaused = simulationManager.SimulationPaused,
+			}, "Frame");
+		}
+
+		/// <summary>
+		/// Called each frame to send new data to client.
+		/// </summary>
+		/// <param name="param">Callback parameters.</param>
+		protected void Update(FrameCallbackParam param) {
+			totalTimeDelta += param.realTimeDelta;
+			if(totalTimeDelta >= 1) { //only update once per second
+				SendNewInfo();
+				totalTimeDelta = 0;
+			}
+		}
+
+		/// <summary>
+		/// Get list of unlock flags for each tile.
+		/// </summary>
+		/// <returns>A Boolean for each tile, where true=unlocked.</returns>
+		public Boolean[] GetUnlockedTiles() {
+			var simulationManager = Singleton<SimulationManager>.instance;
+			var gameAreaManager = Singleton<GameAreaManager>.instance;
+			Boolean[] isUnlocked = new Boolean[gameAreaManager.MaxAreaCount];
+			int x = 0, y = 0;
+			for(int i = 0; i < gameAreaManager.MaxAreaCount; i++) {
+				isUnlocked[i] = gameAreaManager.IsUnlocked(x, y);
+				x++;
+				if(x == GameAreaManager.TOTAL_AREA_RESOLUTION) {
+					x = 0;
+					y++;
+				}
+				//XXX how will this work with 81 tile mod?
+			}
+			return isUnlocked;
 		}
 
 		/* public override void Handle(HttpRequest request) {
@@ -55,34 +117,9 @@ namespace CityWebServer.RequestHandlers {
 				}
 			}
 
-			var simulationManager = Singleton<SimulationManager>.instance;
-			var gameAreaManager = Singleton<GameAreaManager>.instance;
-			Boolean[] isUnlocked = new Boolean[gameAreaManager.MaxAreaCount];
-			int x = 0, y = 0;
-			for(int i = 0; i < gameAreaManager.MaxAreaCount; i++) {
-				isUnlocked[i] = gameAreaManager.IsUnlocked(x, y);
-				x++;
-				if(x == GameAreaManager.TOTAL_AREA_RESOLUTION) {
-					x = 0;
-					y++;
-				}
-				//XXX how will this work with 81 tile mod?
-			}
 
-			var cityInfo = new CityInfo {
-				Name = simulationManager.m_metaData.m_CityName,
-				mapName = simulationManager.m_metaData.m_MapName,
-				environment = simulationManager.m_metaData.m_environment,
-				Time = simulationManager.m_currentGameTime,
-				GlobalDistrict = globalDistrictInfo,
-				Districts = districtInfoList.ToArray(),
-				isNight = simulationManager.m_isNightTime,
-				simSpeed = simulationManager.SelectedSimulationSpeed,
-				isPaused = simulationManager.SimulationPaused,
-				isTileUnlocked = isUnlocked,
-			};
 
-			SendJson(cityInfo);
+
 		}
 
 		private Dictionary<int, int> GetBuildingBreakdownByDistrict() {

@@ -12,14 +12,6 @@ using ColossalFramework.Plugins;
 using ICities;
 using JetBrains.Annotations;
 
-/* Thoughts:
- * - move the "serve from wwwroot" logic into a default handler with priority 0
- *   (is priority implemented?)
- * - no need for most of the request handlers to support HTTP; convert them to
- *   a new class designed to be used with SocketRequestHandler. Then they can
- *   also automatically send more info when it's available.
- */
-
 namespace CityWebServer {
 	[UsedImplicitly]
 	public class WebServer: ThreadingExtensionBase, IWebServer {
@@ -52,7 +44,7 @@ namespace CityWebServer {
 		private List<IRequestHandler> _requestHandlers;
 		private readonly TcpListener _listener;
 		public IThreading threading;
-		protected List<Action<object>> frameCallbacks;
+		protected List<Action<FrameCallbackParam>> frameCallbacks;
 		private readonly object frameCallbacksLock;
 
 
@@ -90,6 +82,11 @@ namespace CityWebServer {
 			//Log("Created Server");
 		}
 
+		/// <summary>
+		/// Writes a message to the debug logs. "WebServer" tag,
+		/// timestamp, and thread ID/name are automatically prepended.
+		/// </summary>
+		/// <param name="message">Message.</param>
 		public static void Log(String message) {
 			String time = DateTime.Now.ToUniversalTime()
 				.ToString("yyyyMMdd' 'HHmmss'.'fff");
@@ -126,7 +123,7 @@ namespace CityWebServer {
 				fileWatcher = new FileWatcher();
 			}
 
-			frameCallbacks = new List<Action<object>>();
+			frameCallbacks = new List<Action<FrameCallbackParam>>();
 
 			GetWebRoot();
 			try {
@@ -148,7 +145,7 @@ namespace CityWebServer {
 			Log("Shutting down.");
 			if(_listener != null) _listener.Stop();
 
-			// TODO: Unregister from events (i.e. ILogAppender.LogMessage)
+			// TODO: Unregister from events
 			if(_requestHandlers != null) _requestHandlers.Clear();
 			base.OnReleased();
 		}
@@ -162,19 +159,28 @@ namespace CityWebServer {
 		/// from main thread. On normal speed it is roughly same as realTimeDelta.</param>
 		public override void OnUpdate(float realTimeDelta, float simulationTimeDelta) {
 			//Log($"Start frame callbacks, dt={realTimeDelta}, {simulationTimeDelta}");
-			Action<object>[] actions;
+			Action<FrameCallbackParam>[] actions;
 			lock(frameCallbacksLock) {
-				actions = new Action<object>[frameCallbacks.Count];
+				actions = new Action<FrameCallbackParam>[frameCallbacks.Count];
 				frameCallbacks.CopyTo(actions);
 			}
+			var param = new FrameCallbackParam {
+				realTimeDelta = realTimeDelta,
+				simulationTimeDelta = simulationTimeDelta,
+			};
 			foreach(var action in actions) {
 				//Log($"Calling frame callback {action}");
-				action(null);
+				try {
+					action(param);
+				}
+				catch(Exception ex) {
+					Log($"Error in frame callback {action}: {ex}");
+				}
 			}
 			//Log("Done frame callbacks");
 		}
 
-		public void RegisterFrameCallback(Action<object> callback) {
+		public void RegisterFrameCallback(Action<FrameCallbackParam> callback) {
 			Log($"Registering frame callback {callback}");
 			lock(frameCallbacksLock) {
 				frameCallbacks.Add(callback);
@@ -204,6 +210,9 @@ namespace CityWebServer {
 			throw new FileNotFoundException("WebServer: Can't find wwwroot directory!");
 		}
 
+		/// <summary>
+		/// Begin serving requests.
+		/// </summary>
 		public void Run() {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
@@ -233,6 +242,10 @@ namespace CityWebServer {
 			});
 		}
 
+		/// <summary>
+		/// Stop serving new requests. Requests currently being served will
+		/// still be finished.
+		/// </summary>
 		public void Stop() {
 			_listener.Stop();
 		}
@@ -245,8 +258,11 @@ namespace CityWebServer {
 			get { return _requestHandlers.ToArray(); }
 		}
 
+		/// <summary>
+		/// Callback in the client handler thread.
+		/// </summary>
+		/// <param name="client">TcpClient; new client socket.</param>
 		private void RequestProcessorCallback(object client) {
-			//Callback in the client handler thread.
 			TcpClient clnt = client as TcpClient;
 			//clnt.ReceiveTimeout = 10000; //msec
 			try {
@@ -265,6 +281,11 @@ namespace CityWebServer {
 			}
 		}
 
+		/// <summary>
+		/// Find a handler for this request.
+		/// </summary>
+		/// <returns>The handler.</returns>
+		/// <param name="request">Request.</param>
 		public IRequestHandler GetHandler(HttpRequest request) {
 			return _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
 		}

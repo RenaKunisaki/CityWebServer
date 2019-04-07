@@ -7,15 +7,15 @@ using System.Net.Sockets;
 using CityWebServer.Extensibility;
 using CityWebServer.Helpers;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using ICities;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers {
+namespace CityWebServer.SocketHandlers {
 	[UsedImplicitly]
+	///Pushes new Chirper messages to client.
 	public class ChirperHandler: SocketHandlerBase {
-		/** Pushes new Chirper messages to client.
-		 */
 		private readonly MessageManager messageManager;
 		private List<ChirperMessage> messages;
 
@@ -33,10 +33,10 @@ namespace CityWebServer.RequestHandlers {
 
 		#region MessageManager callbacks
 
+		/// <summary>
+		/// Invoked when the Chirper synchronize messages (after loading a save i.e)
+		/// </summary>
 		public void OnMessagesUpdated() {
-			/** Invoked when the Chirper synchronize messages
-			 * (after loading a save i.e)
-			 */
 			DateTime now = Singleton<SimulationManager>.instance.m_currentGameTime;
 			try {
 				var msgs = messageManager.GetRecentMessages();
@@ -54,9 +54,11 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
+		/// <summary>
+		/// Invoked when the Chirper receives a new message
+		/// </summary>
+		/// <param name="message">New message.</param>
 		public void OnNewMessage(IChirperMessage message) {
-			/** Invoked when the Chirper receives a new message
-			 */
 			try {
 				var msg = new ChirperMessage {
 					SenderID = (int)message.senderID,

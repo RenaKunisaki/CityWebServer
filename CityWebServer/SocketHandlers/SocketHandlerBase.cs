@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CityWebServer.RequestHandlers;
 
-namespace CityWebServer {
+namespace CityWebServer.SocketHandlers {
 	public class SocketHandlerBase {
 		/** Base class for WebSocket handlers.
 		 *  These are instantiated by SocketRequestHandler and can enqueue

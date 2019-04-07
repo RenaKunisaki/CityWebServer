@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title data-bind="text: Name"></title>
+    <title></title>
     <link href='/r/css/main.css' rel='stylesheet'>
     <link href='/r/css/budget.css' rel='stylesheet'>
     <link href='/r/css/chirp.css' rel='stylesheet'>
@@ -34,7 +34,7 @@
 <body>
     <!-- Fixed navbar -->
     <nav id="navbar">
-        <span id="city-name" data-bind="text: Name"></span>
+        <span id="city-name" data-bind="text: CityInfo.Name"></span>
         <span id="navbar-population" class="population number"></span>
         <span id="navbar-error"></span>
         <div id="clock" data-bind="text: friendlyDate"></div>
