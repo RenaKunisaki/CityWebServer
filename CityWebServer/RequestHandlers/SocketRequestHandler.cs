@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -85,8 +86,15 @@ namespace CityWebServer.RequestHandlers {
 					try {
 						var reader = new JsonFx.Json.JsonReader();
 						String message = ReadMessage(request);
-						var input = reader.Read(message);
+						var input = reader.Read<Dictionary<string, object>>(message);
+						Log($"message: {input}");
 						SendJson("Hello there");
+						//Not entirely sure what to do with the message...
+						//Thinking some type of subscription mechanism.
+						//Like {subscribe:"CityInfo"} and then it will send you
+						//{CityInfo:{...}} right then and again when it changes.
+						//Figuring out how to get change notifications into the
+						//socket handler thread might be interesting...
 					}
 					catch(Exception ex) {
 						if(ex is ObjectDisposedException

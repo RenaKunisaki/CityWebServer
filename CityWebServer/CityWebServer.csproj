@@ -91,6 +91,9 @@
     <Compile Include="IWebServer.cs" />
     <Compile Include="RequestHandlerBase.cs" />
     <Compile Include="RequestHandlers\DefaultRequestHandler.cs" />
+    <Compile Include="RequestHandlers\HeightMapRequestHandler.cs" />
+    <Compile Include="SocketHandlers\CityInfoRequestHandler.cs" />
+    <Compile Include="SocketHandlers\SocketHandlerBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">
@@ -199,6 +202,9 @@
     <None Include="wwwroot\r\css\heightmap.css" />
     <None Include="wwwroot\r\js\heightmap.js" />
     <None Include="IntegratedWebServer.cs.old" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SocketHandlers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

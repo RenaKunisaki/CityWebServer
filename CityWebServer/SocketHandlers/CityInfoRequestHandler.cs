@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using CityWebServer.Extensibility;
@@ -10,21 +11,16 @@ using JetBrains.Annotations;
 
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
-	public class CityInfoRequestHandler: RequestHandlerBase {
-		/** Handles `/CityInfo`.
-		 *  Returns general information about the city.
-		 */
-		public CityInfoRequestHandler(IWebServer server)
-			: base(server, new Guid("eeada0d0-f1d2-43b0-9595-2a6a4d917631"), "City Info", "Rychard", 100, "/CityInfo") {
-		}
+	public class CityInfoRequestHandler: SocketHandlerBase {
+		public CityInfoRequestHandler(Stream stream) : base(stream) { }
 
-		public override void Handle(HttpRequest request) {
+		/* public override void Handle(HttpRequest request) {
 			this.request = request;
-			/* if(request.QueryString.HasKey("showList")) {
+			if(request.QueryString.HasKey("showList")) {
 				return HandleDistrictList();
-			} */
+			}
 			HandleDistrict(request);
-		}
+		} */
 
 		private void HandleDistrictList() {
 			var districtIDs = DistrictInfo.GetDistricts().ToArray();
