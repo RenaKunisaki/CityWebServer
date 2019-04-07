@@ -9,10 +9,12 @@ namespace CityWebServer.SocketHandlers {
 		 *  XXX they should also be able to respond to incoming messages.
 		 */
 		protected SocketRequestHandler handler;
+		protected WebServer server;
 		protected string Name;
 
 		public SocketHandlerBase(SocketRequestHandler handler, string name) {
 			this.handler = handler;
+			this.server = handler.Server as WebServer;
 			this.Name = name;
 		}
 

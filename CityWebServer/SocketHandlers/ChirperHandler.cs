@@ -13,8 +13,9 @@ using ICities;
 using JetBrains.Annotations;
 
 namespace CityWebServer.SocketHandlers {
-	[UsedImplicitly]
-	///Pushes new Chirper messages to client.
+	/// <summary>
+	/// Pushes new Chirper messages to client.
+	/// </summary>
 	public class ChirperHandler: SocketHandlerBase {
 		private readonly MessageManager messageManager;
 		private List<ChirperMessage> messages;

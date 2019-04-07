@@ -94,7 +94,9 @@
     <Compile Include="SocketHandlers\CityInfoHandler.cs" />
     <Compile Include="SocketHandlers\SocketHandlerBase.cs" />
     <Compile Include="SocketHandlers\ChirperHandler.cs" />
-    <Compile Include="FrameCallbackParam.cs" />
+    <Compile Include="Models\CallbackParams.cs" />
+    <Compile Include="SocketHandlers\BudgetHandler.cs" />
+    <Compile Include="SocketHandlers\TerrainHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

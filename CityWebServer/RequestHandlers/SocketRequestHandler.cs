@@ -102,8 +102,10 @@ namespace CityWebServer.RequestHandlers {
 			//just create them and let them call our EnqueueMessage method.
 			//XXX automatically find these like WebServer does.
 			Log($"Creating socket handlers (thread: {Thread.CurrentThread.Name})");
+			BudgetHandler budgetHandler = new BudgetHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
+			TerrainHandler terrainHandler = new TerrainHandler(this);
 
 			Log("Waiting for messages");
 			try {

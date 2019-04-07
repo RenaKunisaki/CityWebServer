@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CityWebServer.Callbacks;
 using CityWebServer.Models;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using JetBrains.Annotations;
 
 namespace CityWebServer.SocketHandlers {
-	[UsedImplicitly]
-	///Pushes updated city info to client.
+	/// <summary>
+	/// Pushes updated city info to client.
+	/// </summary>
 	public class CityInfoHandler: SocketHandlerBase {
 		protected float totalTimeDelta;
+		protected int demandR, demandC, demandW;
 
 		public CityInfoHandler(SocketRequestHandler handler) :
 		base(handler, "CityInfo") {
 			totalTimeDelta = 0;
-			(handler.Server as WebServer).RegisterFrameCallback(Update);
+			server.frameCallbacks.Register(Update);
+			server.unlockAreaCallbacks.Register(OnAreaUnlocked);
+			server.updateDemandCallbacks.Register(OnUpdateDemand);
 			SendInitialInfo();
 		}
 
@@ -24,10 +29,13 @@ namespace CityWebServer.SocketHandlers {
 		/// </summary>
 		protected void SendInitialInfo() {
 			var simulationManager = Singleton<SimulationManager>.instance;
+			var meta = simulationManager.m_metaData;
 			SendJson(new InitialCityInfo {
-				Name = simulationManager.m_metaData.m_CityName,
-				mapName = simulationManager.m_metaData.m_MapName,
-				environment = simulationManager.m_metaData.m_environment,
+				Name = meta.m_CityName,
+				mapName = meta.m_MapName,
+				environment = meta.m_environment,
+				invertTraffic = meta.m_invertTraffic == SimulationMetaData.MetaBool.True,
+				startingDateTime = meta.m_startingDateTime,
 				//GlobalDistrict = globalDistrictInfo,
 				//Districts = districtInfoList.ToArray(),
 				isTileUnlocked = GetUnlockedTiles(),
@@ -45,6 +53,9 @@ namespace CityWebServer.SocketHandlers {
 				isNight = simulationManager.m_isNightTime,
 				simSpeed = simulationManager.SelectedSimulationSpeed,
 				isPaused = simulationManager.SimulationPaused,
+				demandR = demandR,
+				demandC = demandC,
+				demandW = demandW,
 			}, "Frame");
 		}
 
@@ -57,6 +68,23 @@ namespace CityWebServer.SocketHandlers {
 			if(totalTimeDelta >= 1) { //only update once per second
 				SendNewInfo();
 				totalTimeDelta = 0;
+			}
+		}
+
+		/// <summary>
+		/// Called when a new area is unlocked.
+		/// </summary>
+		/// <param name="param">Parameter.</param>
+		protected void OnAreaUnlocked(UnlockAreaCallbackParam param) {
+			SendJson(param, "UnlockArea");
+		}
+
+		protected void OnUpdateDemand(UpdateDemandParam param) {
+			switch(param.which) {
+				case 'R': demandR = param.demand; break;
+				case 'C': demandC = param.demand; break;
+				case 'W': demandW = param.demand; break;
+				default: Log($"Unknown demand type '{param.which}'"); break;
 			}
 		}
 

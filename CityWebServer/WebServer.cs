@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using CityWebServer.Callbacks;
 using CityWebServer.Extensibility;
 using ColossalFramework.Plugins;
 using ICities;
@@ -14,7 +15,8 @@ using JetBrains.Annotations;
 
 namespace CityWebServer {
 	[UsedImplicitly]
-	public class WebServer: ThreadingExtensionBase, IWebServer {
+	public class WebServer: ThreadingExtensionBase, IWebServer, IAreasExtension,
+	IDemandExtension, ITerrainExtension {
 		protected static Stream logFile = null;
 		protected static TextWriterTraceListener logListener;
 		protected static String wwwRoot = null;
@@ -44,8 +46,10 @@ namespace CityWebServer {
 		private List<IRequestHandler> _requestHandlers;
 		private readonly TcpListener _listener;
 		public IThreading threading;
-		protected List<Action<FrameCallbackParam>> frameCallbacks;
-		private readonly object frameCallbacksLock;
+		public CallbackList<FrameCallbackParam> frameCallbacks;
+		public CallbackList<UnlockAreaCallbackParam> unlockAreaCallbacks;
+		public CallbackList<UpdateDemandParam> updateDemandCallbacks;
+		public CallbackList<TerrainCallbackParam> terrainCallbacks;
 
 
 		/* So, why using TcpListener instead of HttpListener?
@@ -72,7 +76,10 @@ namespace CityWebServer {
 		public WebServer() {
 			// We need a place to store all the request handlers that have been registered.
 			_requestHandlers = new List<IRequestHandler>();
-			frameCallbacksLock = new object();
+			frameCallbacks = new CallbackList<FrameCallbackParam>("Frame");
+			unlockAreaCallbacks = new CallbackList<UnlockAreaCallbackParam>("UnlockArea");
+			updateDemandCallbacks = new CallbackList<UpdateDemandParam>("updateDemand");
+			terrainCallbacks = new CallbackList<TerrainCallbackParam>("Terrain");
 
 			IPAddress address = IPAddress.Parse("127.0.0.1");
 			int port = 7135;
@@ -103,91 +110,6 @@ namespace CityWebServer {
 				//Happens if Unity's logger isn't set up yet.
 			}
 		}
-
-		#region ThreadingExtensionBase
-		/// <summary>
-		/// Called by the game after this instance is created.
-		/// </summary>
-		/// <param name="threading">The threading.</param>
-		public override void OnCreated(IThreading threading) {
-			this.threading = threading;
-			if(logFile == null) {
-				logFile = File.Create("CSL-WebServer.log");
-				logListener = new TextWriterTraceListener(logFile);
-				Trace.Listeners.Add(logListener);
-			}
-			Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			Log("Initializing...");
-
-			if(fileWatcher == null) {
-				fileWatcher = new FileWatcher();
-			}
-
-			frameCallbacks = new List<Action<FrameCallbackParam>>();
-
-			GetWebRoot();
-			try {
-				RegisterHandlers();
-			}
-			catch(Exception ex) {
-				Log($"Error registering handlers: {ex}");
-				UnityEngine.Debug.LogException(ex);
-			}
-
-			Run();
-			base.OnCreated(threading);
-		}
-
-		/// <summary>
-		/// Called by the game before this instance is about to be destroyed.
-		/// </summary>
-		public override void OnReleased() {
-			Log("Shutting down.");
-			if(_listener != null) _listener.Stop();
-
-			// TODO: Unregister from events
-			if(_requestHandlers != null) _requestHandlers.Clear();
-			base.OnReleased();
-		}
-
-		/// <summary>
-		/// Thread: Main
-		/// Called once per rendered frame
-		/// </summary>
-		/// <param name="realTimeDelta">Seconds since previous frame.</param>
-		/// <param name="simulationTimeDelta">Smoothly interpolated to be used
-		/// from main thread. On normal speed it is roughly same as realTimeDelta.</param>
-		public override void OnUpdate(float realTimeDelta, float simulationTimeDelta) {
-			//Log($"Start frame callbacks, dt={realTimeDelta}, {simulationTimeDelta}");
-			Action<FrameCallbackParam>[] actions;
-			lock(frameCallbacksLock) {
-				actions = new Action<FrameCallbackParam>[frameCallbacks.Count];
-				frameCallbacks.CopyTo(actions);
-			}
-			var param = new FrameCallbackParam {
-				realTimeDelta = realTimeDelta,
-				simulationTimeDelta = simulationTimeDelta,
-			};
-			foreach(var action in actions) {
-				//Log($"Calling frame callback {action}");
-				try {
-					action(param);
-				}
-				catch(Exception ex) {
-					Log($"Error in frame callback {action}: {ex}");
-				}
-			}
-			//Log("Done frame callbacks");
-		}
-
-		public void RegisterFrameCallback(Action<FrameCallbackParam> callback) {
-			Log($"Registering frame callback {callback}");
-			lock(frameCallbacksLock) {
-				frameCallbacks.Add(callback);
-			}
-		}
-
-		#endregion ThreadingExtensionBase
 
 
 		#region User Methods
@@ -251,6 +173,8 @@ namespace CityWebServer {
 		}
 		#endregion User Methods
 
+		#region Request handlers
+
 		/// <summary>
 		/// Gets an array containing all currently registered request handlers.
 		/// </summary>
@@ -289,8 +213,6 @@ namespace CityWebServer {
 		public IRequestHandler GetHandler(HttpRequest request) {
 			return _requestHandlers.FirstOrDefault(obj => obj.ShouldHandle(request));
 		}
-
-		#region Built-in Handlers
 
 		/// <summary>
 		/// Searches all the assemblies in the current AppDomain for class definitions that implement the <see cref="IRequestHandler"/> interface.  Those classes are instantiated and registered as request handlers.
@@ -396,6 +318,178 @@ namespace CityWebServer {
 			}
 		}
 
-		#endregion Built-in Handlers
+		#endregion Request handlers
+
+
+		#region ThreadingExtensionBase
+		/// <summary>
+		/// Called by the game after this instance is created.
+		/// </summary>
+		/// <param name="threading">The threading.</param>
+		public override void OnCreated(IThreading threading) {
+			this.threading = threading;
+			if(logFile == null) {
+				logFile = File.Create("CSL-WebServer.log");
+				logListener = new TextWriterTraceListener(logFile);
+				Trace.Listeners.Add(logListener);
+			}
+			Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			Log("Initializing...");
+
+			if(fileWatcher == null) {
+				fileWatcher = new FileWatcher();
+			}
+
+			GetWebRoot();
+			try {
+				RegisterHandlers();
+			}
+			catch(Exception ex) {
+				Log($"Error registering handlers: {ex}");
+				UnityEngine.Debug.LogException(ex);
+			}
+
+			Run();
+			base.OnCreated(threading);
+		}
+
+		/// <summary>
+		/// Called by the game before this instance is about to be destroyed.
+		/// </summary>
+		public override void OnReleased() {
+			Log("Shutting down.");
+			if(_listener != null) _listener.Stop();
+
+			// TODO: Unregister from events
+			if(_requestHandlers != null) _requestHandlers.Clear();
+			base.OnReleased();
+		}
+
+		/// <summary>
+		/// Called once per rendered frame.
+		/// Thread: Main
+		/// </summary>
+		/// <param name="realTimeDelta">Seconds since previous frame.</param>
+		/// <param name="simulationTimeDelta">Smoothly interpolated to be used
+		/// from main thread. On normal speed it is roughly same as realTimeDelta.</param>
+		public override void OnUpdate(float realTimeDelta, float simulationTimeDelta) {
+			//Log($"Start frame callbacks, dt={realTimeDelta}, {simulationTimeDelta}");
+			frameCallbacks.Call(new FrameCallbackParam {
+				realTimeDelta = realTimeDelta,
+				simulationTimeDelta = simulationTimeDelta,
+			});
+		}
+
+		#endregion ThreadingExtensionBase
+
+		#region IAreasExtension
+
+		/// <summary>
+		/// Invoked when the extension initializes.
+		/// Thread: Main
+		/// For more info on IAreas, see #IAreas.
+		/// We don't use this because we already have another OnCreated method.
+		/// </summary>
+		/// <param name="areas">Areas.</param>
+		public void OnCreated(IAreas areas) { }
+
+		/// <summary>
+		/// Invoked when the game checks if a tile can be unlocked
+		/// Thread: Any
+		/// </summary>
+		/// <returns><c>true</c>, if can unlock area, <c>false</c> otherwise.</returns>
+		/// <param name="x">The x coordinate.</param>
+		/// <param name="z">The z coordinate.</param>
+		/// <param name="originalResult">Original result from game.</param>
+		public bool OnCanUnlockArea(int x, int z, bool originalResult) {
+			return originalResult;
+		}
+
+		/// <summary>
+		/// Invoked when the game calculates the price of a tile.
+		/// Thread: Any
+		/// </summary>
+		/// <returns>The area price.</returns>
+		/// <param name="ore">Amount of Ore.</param>
+		/// <param name="oil">Amount of Oil.</param>
+		/// <param name="forest">Amount of Forest.</param>
+		/// <param name="fertility">Amount of Fertile Land.</param>
+		/// <param name="water">Amount of Water.</param>
+		/// <param name="road">Whether roads are present.</param>
+		/// <param name="train">Whether railways are present.</param>
+		/// <param name="ship">Whether ship paths are present.</param>
+		/// <param name="plane">Whether plane paths are present.</param>
+		/// <param name="landFlatness">Land flatness.</param>
+		/// <param name="originalPrice">Original price from game.</param>
+		public int OnGetAreaPrice(uint ore, uint oil, uint forest,
+		uint fertility, uint water, bool road, bool train, bool ship,
+		bool plane, float landFlatness, int originalPrice) {
+			return originalPrice;
+		}
+
+		/// <summary>
+		/// Invoked when the game unlocks a tile.
+		/// Thread: Simulation
+		/// </summary>
+		/// <param name="x">The x coordinate.</param>
+		/// <param name="z">The z coordinate.</param>
+		public void OnUnlockArea(int x, int z) {
+			unlockAreaCallbacks.Call(new UnlockAreaCallbackParam { x = x, z = z });
+		}
+
+		#endregion IAreasExtension
+
+		#region IDemandExtension
+
+		public void OnCreated(IDemand demand) { }
+
+		public int OnCalculateResidentialDemand(int originalDemand) {
+			updateDemandCallbacks.Call(new UpdateDemandParam {
+				demand = originalDemand, which = 'R'
+			});
+			return originalDemand;
+		}
+
+		public int OnCalculateCommercialDemand(int originalDemand) {
+			updateDemandCallbacks.Call(new UpdateDemandParam {
+				demand = originalDemand, which = 'C'
+			});
+			return originalDemand;
+		}
+
+		public int OnCalculateWorkplaceDemand(int originalDemand) {
+			updateDemandCallbacks.Call(new UpdateDemandParam {
+				demand = originalDemand, which = 'W'
+			});
+			return originalDemand;
+		}
+
+		public int OnUpdateDemand(int lastDemand, int nextDemand, int targetDemand) { return lastDemand; }
+
+		#endregion IDemandExtension
+
+
+		#region ITerrainExtension
+
+		public void OnCreated(ITerrain terrain) { }
+
+		/// <summary>
+		/// Invoked after the terrain heights have been modified
+		/// Thread: Simulation
+		/// </summary>
+		/// <param name="minX">Minimum X coord of modification.</param>
+		/// <param name="minZ">Minimum Z coord of modification.</param>
+		/// <param name="maxX">Maximum X coord of modification.</param>
+		/// <param name="maxZ">Maximum Z coord of modification.</param>
+		public void OnAfterHeightsModified(float minX, float minZ, float maxX, float maxZ) {
+			terrainCallbacks.Call(new TerrainCallbackParam {
+				minX = minX,
+				minZ = minZ,
+				maxX = maxX,
+				maxZ = maxZ,
+			});
+		}
+
+		#endregion ITerrainExtension
 	}
 }

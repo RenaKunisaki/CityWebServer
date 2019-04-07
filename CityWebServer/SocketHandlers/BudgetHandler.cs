@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using CityWebServer.Callbacks;
 using CityWebServer.Extensibility;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using UnityEngine;
 
-namespace CityWebServer.RequestHandlers {
-	public class BudgetRequestHandler: RequestHandlerBase {
-		/** Handles `/Budget`.
-		 *  Returns information about the incomes and expenses of various things
-		 *  and the current budget balance. 
-		 */
+namespace CityWebServer.SocketHandlers {
+	/// <summary>
+	/// Pushes budget info to client.
+	/// </summary>
+	public class BudgetHandler: SocketHandlerBase {
 		public static readonly IList<IncomeExpenseGroup> expenseGroups = new System.Collections.ObjectModel.ReadOnlyCollection<IncomeExpenseGroup>(
 			new List<IncomeExpenseGroup> {
 				//Tax income from zones
@@ -390,27 +391,42 @@ namespace CityWebServer.RequestHandlers {
 			}
 		);
 
-		public BudgetRequestHandler(IWebServer server)
-			: base(server, new Guid("87205a0d-1b53-47bd-91fa-9cddf0a3bd9e"),
-				"Budget", "Rychard", 100, "/Budget") {
+		protected float totalTimeDelta;
+		protected EconomyManager economyManager;
+
+		public BudgetHandler(SocketRequestHandler handler) :
+		base(handler, "Budget") {
+			totalTimeDelta = 0;
+			economyManager = Singleton<EconomyManager>.instance;
 		}
 
-		public override void Handle(HttpRequest request) {
-			this.request = request;
-			var economyManager = Singleton<EconomyManager>.instance;
-			BudgetInfo budget = this.GetOverview(economyManager);
-			budget.loans = this.GetLoans(economyManager).ToArray();
-			budget.economy = new Economy {
-				incomesAndExpenses = this.GetIncomesAndExpenses(economyManager),
-				taxRates = this.GetTaxRates(economyManager),
-				budgetRates = this.GetBudgetRates(economyManager),
-			};
+		/// <summary>
+		/// Send new data to client.
+		/// </summary>
+		/// <param name="param">Callback parameters.</param>
+		protected void Update(FrameCallbackParam param) {
+			totalTimeDelta += param.realTimeDelta;
+			if(totalTimeDelta < 1) { //only update once per second
+									 //XXX update when info actually changes.
+				return;
+			}
+			totalTimeDelta = 0;
 
-			//LogMessage("Sending response.");
+			BudgetInfo budget = this.GetOverview();
+			budget.loans = this.GetLoans().ToArray();
+			budget.economy = new Economy {
+				incomesAndExpenses = this.GetIncomesAndExpenses(),
+				taxRates = this.GetTaxRates(),
+				budgetRates = this.GetBudgetRates(),
+			};
 			SendJson(budget);
 		}
 
-		public BudgetInfo GetOverview(EconomyManager economyManager) {
+		/// <summary>
+		/// Get basic budget info.
+		/// </summary>
+		/// <returns>The overview.</returns>
+		public BudgetInfo GetOverview() {
 			BudgetInfo budget = new BudgetInfo();
 			economyManager.GetIncomeAndExpenses(
 				(ItemClass)ScriptableObject.CreateInstance("ItemClass"),
@@ -419,7 +435,13 @@ namespace CityWebServer.RequestHandlers {
 			return budget;
 		}
 
-		public List<Loan> GetLoans(EconomyManager economyManager) {
+		/// <summary>
+		/// Get list of active loans.
+		/// </summary>
+		/// <returns>The loans.</returns>
+		/// XXX this actually returns all 3 loans even if inactive.
+		/// The inactive ones just have PaymentLeft = 0.
+		public List<Loan> GetLoans() {
 			List<Loan> loans = new List<Loan>(EconomyManager.MAX_LOANS);
 			//for(int i = 0; i < economyManager.CountLoans(); i++) {
 			for(int i = 0; i < EconomyManager.MAX_LOANS; i++) {
@@ -443,8 +465,11 @@ namespace CityWebServer.RequestHandlers {
 			return loans;
 		}
 
-		public Dictionary<String, IncomeExpense> GetIncomesAndExpenses(EconomyManager economyManager) {
-			//Get income/expenses for each group
+		/// <summary>
+		/// Get income and expense details for each service (see expenseGroups).
+		/// </summary>
+		/// <returns>Dictionary of name => IncomeExpense.</returns>
+		public Dictionary<String, IncomeExpense> GetIncomesAndExpenses() {
 			//LogMessage("Getting Income/Expense info.");
 			Dictionary<String, IncomeExpense> incomeExpenses = new Dictionary<String, IncomeExpense>();
 			foreach(IncomeExpenseGroup group in expenseGroups) {
@@ -488,7 +513,12 @@ namespace CityWebServer.RequestHandlers {
 			return incomeExpenses;
 		}
 
-		public Dictionary<String, int> GetTaxRates(EconomyManager economyManager) {
+		/// <summary>
+		/// Get tax rates for each zone. (See taxGroups)
+		/// </summary>
+		/// <returns>Dictionary of name => rate.</returns>
+		/// <remarks>Rate is a percentage.</remarks>
+		public Dictionary<String, int> GetTaxRates() {
 			//Get tax rates for each group
 			//LogMessage("Getting tax info.");
 			Dictionary<String, int> taxRates = new Dictionary<string, int>();
@@ -500,7 +530,13 @@ namespace CityWebServer.RequestHandlers {
 			return taxRates;
 		}
 
-		public Dictionary<String, int> GetBudgetRates(EconomyManager economyManager) {
+		/// <summary>
+		/// Get the funding setting for each service.
+		/// </summary>
+		/// <returns>Dictionary of name => funding.</returns>
+		/// <remarks>Funding is a percentage, and can be more than 100%.
+		/// In-game range is 50% to 200%.</remarks>
+		public Dictionary<String, int> GetBudgetRates() {
 			Dictionary<String, int> budgetRates = new Dictionary<string, int>();
 			foreach(BudgetGroup group in budgetGroups) {
 				budgetRates[$"{group.Name}_Day"] =
