@@ -14,7 +14,7 @@ namespace CityWebServer {
 		public Dictionary<String, String> headers;
 		protected byte[] buffer;
 		protected String message = "";
-		public Stream stream;
+		public NetworkStream stream;
 		//These are arrays because lol C#
 		protected static readonly String[] _split_crlf = { "\r\n" };
 		protected static readonly String[] _split_crlf2 = { "\r\n\r\n" };
@@ -23,7 +23,7 @@ namespace CityWebServer {
 			buffer = new byte[1024];
 		}
 
-		public HttpRequest Read(Stream stream, out String body) {
+		public HttpRequest Read(NetworkStream stream, out String body) {
 			/** Read the request from a stream.
 			 *  <param name="stream">Stream to read from.</param>
 			 *  <param name="body">Receives request body, if any.</param>

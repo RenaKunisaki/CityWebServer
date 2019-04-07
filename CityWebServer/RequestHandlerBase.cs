@@ -11,12 +11,13 @@ namespace CityWebServer {
 		protected String _mainPath;
 		protected HttpRequest request;
 
-		protected RequestHandlerBase(WebServer server, HttpRequest request) {
+		protected RequestHandlerBase(WebServer server, HttpRequest request, String name) {
 			/** This constructor is used when we're creating a new instance
 			 *  to actually handle a request.
 			 */
 			this._server = server;
 			this.request = request;
+			this._name = name;
 		}
 
 		protected RequestHandlerBase(Guid handlerID, String name, String author, int priority, String mainPath) {

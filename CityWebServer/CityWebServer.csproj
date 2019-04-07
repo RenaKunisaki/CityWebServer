@@ -94,6 +94,7 @@
     <Compile Include="RequestHandlers\HeightMapRequestHandler.cs" />
     <Compile Include="SocketHandlers\CityInfoRequestHandler.cs" />
     <Compile Include="SocketHandlers\SocketHandlerBase.cs" />
+    <Compile Include="SocketHandlers\ChirperHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using CityWebServer.Extensibility;
 using CityWebServer.Helpers;
 using CityWebServer.Models;
@@ -12,7 +13,7 @@ using JetBrains.Annotations;
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
 	public class CityInfoRequestHandler: SocketHandlerBase {
-		public CityInfoRequestHandler(Stream stream) : base(stream) { }
+		public CityInfoRequestHandler(SocketRequestHandler handler) : base(handler, "CityInfo") { }
 
 		/* public override void Handle(HttpRequest request) {
 			this.request = request;

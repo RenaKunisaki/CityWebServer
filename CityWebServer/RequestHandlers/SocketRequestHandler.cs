@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using CityWebServer.Extensibility;
@@ -51,15 +52,21 @@ namespace CityWebServer.RequestHandlers {
 			public int readLength;
 		}
 
-		protected Stream stream;
+		protected NetworkStream stream;
+		//Not using ConcurrentQueue because .Net 3.5 doesn't support it
+		protected Queue<String> sendQueue;
+		protected readonly object sendQueueLock;
 
 		public SocketRequestHandler()
 			: base(new Guid("d33918b9-8efb-409e-9456-935669907038"),
 				"Socket", "Rena", 100, "/Socket") {
 		}
 
-		public SocketRequestHandler(WebServer server, HttpRequest request)
-		: base(server, request) { }
+		public SocketRequestHandler(WebServer server, HttpRequest request, String name)
+		: base(server, request, name) {
+			sendQueueLock = new object();
+			sendQueue = new Queue<String>();
+		}
 
 		public override void Handle() {
 			this.stream = request.stream;
@@ -80,29 +87,19 @@ namespace CityWebServer.RequestHandlers {
 			response.AddHeader("Sec-WebSocket-Accept", respKey);
 			response.SendHeaders();
 
+			Log($"Creating ChirperHandler (thread: {Thread.CurrentThread.Name})");
+			ChirperHandler chirperHandler = new ChirperHandler(this);
+
 			Log("Waiting for messages");
 			try {
 				while(true) {
-					try {
-						var reader = new JsonFx.Json.JsonReader();
-						String message = ReadMessage(request);
-						var input = reader.Read<Dictionary<string, object>>(message);
-						Log($"message: {input}");
-						SendJson("Hello there");
-						//Not entirely sure what to do with the message...
-						//Thinking some type of subscription mechanism.
-						//Like {subscribe:"CityInfo"} and then it will send you
-						//{CityInfo:{...}} right then and again when it changes.
-						//Figuring out how to get change notifications into the
-						//socket handler thread might be interesting...
+					if(stream.DataAvailable) HandleNextMessage();
+					String msg = GetNextOutgoingMessage();
+					if(msg != null) {
+						byte[] buf = Encoding.UTF8.GetBytes(msg);
+						SendFrame(buf);
 					}
-					catch(Exception ex) {
-						if(ex is ObjectDisposedException
-						|| ex is OperationCanceledException) {
-							throw;
-						}
-						Log($"Error handling socket msg: {ex}");
-					}
+					Thread.Sleep(100);
 				}
 			}
 			catch(ObjectDisposedException) {
@@ -153,6 +150,49 @@ namespace CityWebServer.RequestHandlers {
 
 			stream.Write(header, 0, idx);
 			stream.Write(data, 0, data.Length);
+		}
+
+		public void EnqueueMessage(String message) {
+			lock(this.sendQueueLock) {
+				this.sendQueue.Enqueue(message);
+			}
+		}
+
+		protected String GetNextOutgoingMessage() {
+			lock(this.sendQueueLock) {
+				try {
+					return this.sendQueue.Dequeue();
+				}
+				catch(InvalidOperationException) {
+					//queue is empty
+					return null;
+				}
+			}
+		}
+
+		protected void HandleNextMessage() {
+			try {
+				var reader = new JsonFx.Json.JsonReader();
+				String message = ReadMessage(request);
+				var input = reader.Read<Dictionary<string, object>>(message);
+				Log($"message: {input}");
+
+
+				//SendJson("Hello there");
+				//Not entirely sure what to do with the message...
+				//Thinking some type of subscription mechanism.
+				//Like {subscribe:"CityInfo"} and then it will send you
+				//{CityInfo:{...}} right then and again when it changes.
+				//Figuring out how to get change notifications into the
+				//socket handler thread might be interesting...
+			}
+			catch(Exception ex) {
+				if(ex is ObjectDisposedException
+				|| ex is OperationCanceledException) {
+					throw;
+				}
+				Log($"Error handling socket msg: {ex}");
+			}
 		}
 
 		private String ReadMessage(HttpRequest req) {

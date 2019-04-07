@@ -50,7 +50,7 @@ namespace CityWebServer {
 						//this request, so that they don't stomp on eachother
 						//when multiple threads are involved.
 						IRequestHandler instance = (IRequestHandler)Activator.CreateInstance(handler.GetType(),
-							new object[] { server, req });
+							new object[] { server, req, handler.Name });
 						instance.Handle();
 					}
 					catch(Exception ex) {

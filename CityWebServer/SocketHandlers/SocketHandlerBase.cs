@@ -1,19 +1,25 @@
 ﻿using System.IO;
+using System.Net.Sockets;
 using System.Text;
+using CityWebServer.RequestHandlers;
 
 namespace CityWebServer {
 	public class SocketHandlerBase {
-		protected Stream stream;
+		protected SocketRequestHandler handler;
+		protected string Name;
 
-		public SocketHandlerBase(Stream stream) {
-			this.stream = stream;
+		public SocketHandlerBase(SocketRequestHandler handler, string name) {
+			this.handler = handler;
+			this.Name = name;
 		}
 
 		public void SendJson<T>(T body) {
 			var writer = new JsonFx.Json.JsonWriter();
-			var serializedData = writer.Write(body);
-			byte[] buf = Encoding.UTF8.GetBytes(serializedData);
-			stream.Write(buf, 0, buf.Length);
+			handler.EnqueueMessage(writer.Write(body));
+		}
+
+		protected void Log(string msg) {
+			WebServer.Log($"Socket.{Name}: {msg}");
 		}
 	}
 }

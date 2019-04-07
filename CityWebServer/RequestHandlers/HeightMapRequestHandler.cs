@@ -17,8 +17,8 @@ namespace CityWebServer.RequestHandlers {
 				"HeightMap", "Rena", 100, "/HeightMap") {
 		}
 
-		public HeightMapRequestHandler(WebServer server, HttpRequest request)
-		: base(server, request) { }
+		public HeightMapRequestHandler(WebServer server, HttpRequest request, String name)
+		: base(server, request, name) { }
 
 		public override void Handle() {
 			byte[] map = Singleton<TerrainManager>.instance.GetHeightmap();

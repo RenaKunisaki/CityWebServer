@@ -15,8 +15,8 @@ namespace CityWebServer.RequestHandlers {
 				"Default", "Rena", 999, "/") {
 		}
 
-		public DefaultRequestHandler(WebServer server, HttpRequest request)
-		: base(server, request) { }
+		public DefaultRequestHandler(WebServer server, HttpRequest request, String name)
+		: base(server, request, name) { }
 
 		public override Boolean ShouldHandle(HttpRequest request) {
 			//This is the fallback handler when no others can handle,
@@ -63,6 +63,7 @@ namespace CityWebServer.RequestHandlers {
 						resp.SendPartialBody(buffer, 0, read);
 					}
 				}
+				Log($"Done sending file: {absolutePath}");
 			}
 			catch(System.IO.FileNotFoundException) {
 				Log($"Not found: '{absolutePath}'");

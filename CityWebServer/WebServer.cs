@@ -87,7 +87,10 @@ namespace CityWebServer {
 		public static void Log(String message) {
 			String time = DateTime.Now.ToUniversalTime()
 				.ToString("yyyyMMdd' 'HHmmss'.'fff");
-			message = $"{time}: {message}{Environment.NewLine}";
+			var tid = Thread.CurrentThread.ManagedThreadId;
+			var tname = Thread.CurrentThread.Name;
+			if(tname == "") tname = "?";
+			message = $"{time} {tid}/{tname}: {message}{Environment.NewLine}";
 			Trace.Write(message);
 			Trace.Flush();
 			try {
@@ -169,6 +172,7 @@ namespace CityWebServer {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
 				Log("Server running");
+				Thread.CurrentThread.Name = "WebServerMain";
 				_listener.Start();
 				try {
 					while(true) {
@@ -202,8 +206,16 @@ namespace CityWebServer {
 
 		private void RequestProcessorCallback(object client) {
 			//Callback in the client handler thread.
+			TcpClient clnt = client as TcpClient;
+			//clnt.ReceiveTimeout = 10000; //msec
 			try {
-				var processor = new RequestProcessor(this, client as TcpClient);
+				try {
+					Thread.CurrentThread.Name = "WebServerRequestHandler";
+				}
+				catch(System.InvalidOperationException) {
+					//Thread name can only be set once
+				}
+				var processor = new RequestProcessor(this, clnt);
 				processor.Handle();
 			}
 			catch(Exception ex) {
