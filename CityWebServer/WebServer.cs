@@ -23,8 +23,6 @@ using JetBrains.Annotations;
 namespace CityWebServer {
 	[UsedImplicitly]
 	public class WebServer: ThreadingExtensionBase, IWebServer {
-		private List<IRequestHandler> _requestHandlers;
-		private readonly TcpListener _listener;
 		protected static Stream logFile = null;
 		protected static TextWriterTraceListener logListener;
 		protected static String wwwRoot = null;
@@ -51,6 +49,13 @@ namespace CityWebServer {
 			"UnityEngine.UI",
 		};
 
+		private List<IRequestHandler> _requestHandlers;
+		private readonly TcpListener _listener;
+		public IThreading threading;
+		protected List<Action<object>> frameCallbacks;
+		private readonly object frameCallbacksLock;
+
+
 		/* So, why using TcpListener instead of HttpListener?
 		 * Because, HttpListener closes the InputStream automatically
 		 * after reading the request. There doesn't seem to be any way
@@ -75,6 +80,7 @@ namespace CityWebServer {
 		public WebServer() {
 			// We need a place to store all the request handlers that have been registered.
 			_requestHandlers = new List<IRequestHandler>();
+			frameCallbacksLock = new object();
 
 			IPAddress address = IPAddress.Parse("127.0.0.1");
 			int port = 7135;
@@ -101,12 +107,13 @@ namespace CityWebServer {
 			}
 		}
 
-		#region Create
+		#region ThreadingExtensionBase
 		/// <summary>
 		/// Called by the game after this instance is created.
 		/// </summary>
 		/// <param name="threading">The threading.</param>
 		public override void OnCreated(IThreading threading) {
+			this.threading = threading;
 			if(logFile == null) {
 				logFile = File.Create("CSL-WebServer.log");
 				logListener = new TextWriterTraceListener(logFile);
@@ -118,6 +125,8 @@ namespace CityWebServer {
 			if(fileWatcher == null) {
 				fileWatcher = new FileWatcher();
 			}
+
+			frameCallbacks = new List<Action<object>>();
 
 			GetWebRoot();
 			try {
@@ -131,9 +140,7 @@ namespace CityWebServer {
 			Run();
 			base.OnCreated(threading);
 		}
-		#endregion Create
 
-		#region Release
 		/// <summary>
 		/// Called by the game before this instance is about to be destroyed.
 		/// </summary>
@@ -145,7 +152,36 @@ namespace CityWebServer {
 			if(_requestHandlers != null) _requestHandlers.Clear();
 			base.OnReleased();
 		}
-		#endregion Release
+
+		/// <summary>
+		/// Thread: Main
+		/// Called once per rendered frame
+		/// </summary>
+		/// <param name="realTimeDelta">Seconds since previous frame.</param>
+		/// <param name="simulationTimeDelta">Smoothly interpolated to be used
+		/// from main thread. On normal speed it is roughly same as realTimeDelta.</param>
+		public override void OnUpdate(float realTimeDelta, float simulationTimeDelta) {
+			//Log($"Start frame callbacks, dt={realTimeDelta}, {simulationTimeDelta}");
+			Action<object>[] actions;
+			lock(frameCallbacksLock) {
+				actions = new Action<object>[frameCallbacks.Count];
+				frameCallbacks.CopyTo(actions);
+			}
+			foreach(var action in actions) {
+				//Log($"Calling frame callback {action}");
+				action(null);
+			}
+			//Log("Done frame callbacks");
+		}
+
+		public void RegisterFrameCallback(Action<object> callback) {
+			Log($"Registering frame callback {callback}");
+			lock(frameCallbacksLock) {
+				frameCallbacks.Add(callback);
+			}
+		}
+
+		#endregion ThreadingExtensionBase
 
 
 		#region User Methods
@@ -165,14 +201,19 @@ namespace CityWebServer {
 				}
 			}
 			Log($"No wwwroot found!");
-			return null;
+			throw new FileNotFoundException("WebServer: Can't find wwwroot directory!");
 		}
 
 		public void Run() {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
 				Log("Server running");
-				Thread.CurrentThread.Name = "WebServerMain";
+				try {
+					Thread.CurrentThread.Name = "WebServerMain";
+				}
+				catch(System.InvalidOperationException) {
+					//Someone else already set the name; we can't set it again
+				}
 				_listener.Start();
 				try {
 					while(true) {

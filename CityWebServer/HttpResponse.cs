@@ -35,7 +35,7 @@ namespace CityWebServer {
 
 		public void SendHeaders() {
 			if(sentHeaders) return;
-			WebServer.Log($"Sending HTTP response, status:{statusCode}");
+			//WebServer.Log($"Sending HTTP response, status:{statusCode}");
 			byte[] msg = Encoding.UTF8.GetBytes(this.BuildResponseText());
 			stream.Write(msg, 0, msg.Length);
 			sentHeaders = true;

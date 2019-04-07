@@ -76,7 +76,6 @@
     <Compile Include="Models\PolicyInfo.cs" />
     <Compile Include="Models\PopulationGroup.cs" />
     <Compile Include="Models\PublicTransportLine.cs" />
-    <Compile Include="Retrievers\ChirpRetriever.cs" />
     <Compile Include="UserModInfo.cs" />
     <Compile Include="WebServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -206,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SocketHandlers\" />
+    <Folder Include="Retrievers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

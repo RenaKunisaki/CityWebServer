@@ -10,6 +10,12 @@ using UnityEngine;
 
 namespace CityWebServer.RequestHandlers {
 	public class DefaultRequestHandler: RequestHandlerBase {
+		/** Request handler for any requests that no other handler
+		 *  were able to handle.
+		 *  This handler tries to serve the requested path from
+		 *  the wwwroot directory.
+		 *  If that fails, it sends an error response.	 
+		 */
 		public DefaultRequestHandler()
 			: base(new Guid("9f2a91e2-8174-4592-8876-b2ceb9c77ddc"),
 				"Default", "Rena", 999, "/") {

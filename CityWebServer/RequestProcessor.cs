@@ -34,9 +34,9 @@ namespace CityWebServer {
 			/** Called to handle a client connection.
 			 */
 			try {
-				Log($"Handling connection from {client.Client.RemoteEndPoint}");
+				//Log($"Handling connection from {client.Client.RemoteEndPoint}");
 				HttpRequest req = new HttpRequest().Read(stream, out String body);
-				Log($"Request: method={req.method} path={req.path} ver={req.version}");
+				//Log($"Request: method={req.method} path={req.path} ver={req.version}");
 				//foreach(KeyValuePair<String, String> header in req.headers) {
 				//	Log($"Request header '{header.Key}' = '{header.Value}'");
 				//}
@@ -45,7 +45,7 @@ namespace CityWebServer {
 				var handler = server.GetHandler(req);
 				if(handler != null) {
 					try {
-						Log($"Using handler '{handler.Name}' for {req.method} {req.path} from {client.Client.RemoteEndPoint}");
+						//Log($"Using handler '{handler.Name}' for {req.method} {req.path} from {client.Client.RemoteEndPoint}");
 						//Create a new instance of the handler to deal with
 						//this request, so that they don't stomp on eachother
 						//when multiple threads are involved.
@@ -63,7 +63,7 @@ namespace CityWebServer {
 							SendErrorResponse(req, HttpStatusCode.InternalServerError, ex.ToString());
 						}
 					}
-					Log($"Done handling client {client.Client.RemoteEndPoint}");
+					//Log($"Done handling client {client.Client.RemoteEndPoint}");
 					return;
 				}
 				Log($"No handler found for {req.method} {req.path}");

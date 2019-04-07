@@ -96,8 +96,12 @@ namespace CityWebServer.RequestHandlers {
 		protected void RunSocket() {
 			/** Main loop, runs the WebSocket connection.
 			 */
-			Log($"Creating ChirperHandler (thread: {Thread.CurrentThread.Name})");
+
+			//We don't really need to store the handlers;
+			//just create them and let them call our EnqueueMessage method.
+			Log($"Creating socket handlers (thread: {Thread.CurrentThread.Name})");
 			ChirperHandler chirperHandler = new ChirperHandler(this);
+			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
 
 			Log("Waiting for messages");
 			try {

@@ -8,7 +8,16 @@ using JetBrains.Annotations;
 namespace CityWebServer.RequestHandlers {
 	[UsedImplicitly]
 	public class CityInfoHandler: SocketHandlerBase {
-		public CityInfoHandler(SocketRequestHandler handler) : base(handler, "CityInfo") { }
+		public CityInfoHandler(SocketRequestHandler handler) :
+		base(handler, "CityInfo") {
+			(handler.Server as WebServer).RegisterFrameCallback(Update);
+		}
+
+		protected void Update(object param) {
+			Log("CityInfoHandler update");
+			var simulationManager = Singleton<SimulationManager>.instance;
+			SendJson(simulationManager.m_metaData.m_currentDateTime);
+		}
 
 		/* public override void Handle(HttpRequest request) {
 			this.request = request;
