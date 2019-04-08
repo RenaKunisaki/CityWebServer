@@ -11,15 +11,18 @@ class HeightMap {
         oReq.onload = (event) => {
             console.log("Heightmap loaded.")
             const bytes = new Uint8Array(oReq.response);
-
-            $.getJSON('/Limits', (limits) => {
-                this._draw(bytes, limits);
-            });
+            this.update(bytes);
         };
         oReq.send();
     }
 
-    _draw(bytes, limits) {
+    update(bytes) {
+        const limits = this.app.data.Limits;
+        if(!limits) {
+            //XXX use await
+            setTimeout(() => {this.update(bytes)}, 500);
+            return;
+        }
         const resolution = limits.TerrainManager.RAW_RESOLUTION + 1; //XXX why?
         const canvas = $('#map canvas')[0];
         const ctx    = canvas.getContext('2d');

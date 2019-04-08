@@ -12,9 +12,9 @@ class App {
         this._isInit        = false;
         this.viewModel      = null;
         this.currentDate    = null;
+        this.heightMap      = new HeightMap(this);
         /* this.budget         = new Budget(this);
         this.chirper        = new Chirper(this);
-        this.heightMap      = new HeightMap(this);
         this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
@@ -53,12 +53,13 @@ class App {
         this.registerMessageHandler("Tick", data => this._onTick(data));
         this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
 
+        this.heightMap.run();
+
         /* $('#chirper').append(this.chirper.element);
         $('#transit').append(this.transit.element);
 
         this.budget.run();
         this.chirper.run();
-        this.heightMap.run();
         this.limits.run();
         //this.population.run();
         this.problems.run();
@@ -127,6 +128,7 @@ class App {
         this.data.friendlyDate =
             `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
         $('#clock').toggleClass('game-paused', Tick.isPaused)
+        $('.population.number').number(Tick.cityInfo.population);
 
         //Init/update KO
         if(this._isInit) {

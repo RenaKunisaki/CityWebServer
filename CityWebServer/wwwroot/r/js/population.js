@@ -65,7 +65,7 @@ class Population {
             this.rows[item.Name].number(item.Amount);
             dataSet.push(item.Amount);
         }
-        $('.population.number').number(data.GlobalDistrict.TotalPopulationCount);
+
         this.chart.data.datasets[0].data = dataSet;
         this.chart.update();
     }
