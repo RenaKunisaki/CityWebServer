@@ -21,8 +21,8 @@ namespace CityWebServer.RequestHandlers {
 				"Default", "Rena", 999, "/") {
 		}
 
-		public DefaultRequestHandler(WebServer server, HttpRequest request, String name)
-		: base(server, request, name) { }
+		public DefaultRequestHandler(WebServer server, HttpRequest request, IRequestHandler handler)
+		: base(server, request, handler) { }
 
 		public override Boolean ShouldHandle(HttpRequest request) {
 			//This is the fallback handler when no others can handle,
@@ -40,7 +40,7 @@ namespace CityWebServer.RequestHandlers {
 			 *  We'll do so by trying to send a file from wwwroot.		
 			 */
 			String path = request.path;
-			Log($"Handling GET path '{path}");
+			Log($"Handling GET path '{path}'");
 			//Sanitize and make relative
 			path = path.Replace("..", "%2E%2E");
 			while(path.StartsWith("/", StringComparison.Ordinal)) {

@@ -76,8 +76,8 @@ namespace CityWebServer.RequestHandlers {
 				"Socket", "Rena", 100, "/Socket") {
 		}
 
-		public SocketRequestHandler(WebServer server, HttpRequest request, String name)
-		: base(server, request, name) {
+		public SocketRequestHandler(WebServer server, HttpRequest request, IRequestHandler handler)
+		: base(server, request, handler) {
 			sendQueueLock = new object();
 			sendQueue = new Queue<String>();
 			messageHandlersLock = new object();

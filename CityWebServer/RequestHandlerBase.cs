@@ -11,13 +11,17 @@ namespace CityWebServer {
 		protected String _mainPath;
 		protected HttpRequest request;
 
-		protected RequestHandlerBase(WebServer server, HttpRequest request, String name) {
+		protected RequestHandlerBase(WebServer server, HttpRequest request, IRequestHandler handler) {
 			/** This constructor is used when we're creating a new instance
 			 *  to actually handle a request.
 			 */
 			this._server = server;
 			this.request = request;
-			this._name = name;
+			this._handlerID = handler.HandlerID;
+			this._priority = handler.Priority;
+			this._name = handler.Name;
+			this._author = handler.Author;
+			this._mainPath = handler.MainPath;
 		}
 
 		protected RequestHandlerBase(Guid handlerID, String name, String author, int priority, String mainPath) {
@@ -100,8 +104,9 @@ namespace CityWebServer {
 		/// Returns a value that indicates whether this handler is capable of servicing the given request.
 		/// </summary>
 		public virtual Boolean ShouldHandle(HttpRequest request) {
-			return (request.method.Equals("GET") &&
-				request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
+			//return (request.method.Equals("GET") &&
+			//	request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase));
+			return request.path.Equals(_mainPath, StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>

@@ -36,7 +36,7 @@ namespace CityWebServer {
 			try {
 				//Log($"Handling connection from {client.Client.RemoteEndPoint}");
 				HttpRequest req = new HttpRequest().Read(stream, out String body);
-				//Log($"Request: method={req.method} path={req.path} ver={req.version}");
+				Log($"Request: method={req.method} path={req.path} ver={req.version}");
 				//foreach(KeyValuePair<String, String> header in req.headers) {
 				//	Log($"Request header '{header.Key}' = '{header.Value}'");
 				//}
@@ -45,12 +45,12 @@ namespace CityWebServer {
 				var handler = server.GetHandler(req);
 				if(handler != null) {
 					try {
-						//Log($"Using handler '{handler.Name}' for {req.method} {req.path} from {client.Client.RemoteEndPoint}");
+						Log($"Using handler '{handler.Name}' for {req.method} {req.path} from {client.Client.RemoteEndPoint}");
 						//Create a new instance of the handler to deal with
 						//this request, so that they don't stomp on eachother
 						//when multiple threads are involved.
 						IRequestHandler instance = (IRequestHandler)Activator.CreateInstance(handler.GetType(),
-							new object[] { server, req, handler.Name });
+							new object[] { server, req, handler });
 						instance.Handle();
 					}
 					catch(Exception ex) {

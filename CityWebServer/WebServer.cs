@@ -275,7 +275,7 @@ namespace CityWebServer {
 			}
 
 			//Sort handlers by priority.
-			_requestHandlers.OrderBy(handler => handler.Priority);
+			_requestHandlers = _requestHandlers.OrderBy(handler => handler.Priority).ToList();
 
 		}
 
