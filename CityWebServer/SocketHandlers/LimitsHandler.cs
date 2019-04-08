@@ -5,20 +5,21 @@ using CityWebServer.Extensibility;
 //using CityWebServer.Extensibility.Responses;
 using CityWebServer.Model;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 
-namespace CityWebServer.RequestHandlers {
-	public class LimitsRequestHandler: RequestHandlerBase {
-		/** Handles `/Limits`.
-		 *  Returns a number of constants defining game limits.
-		 */
-		public LimitsRequestHandler(IWebServer server)
-			: base(server, new Guid("23377b43-a94a-4aaa-8bd2-a37ecfc14888"),
-				"Limits", "Rena", 100, "/Limits") {
+namespace CityWebServer.SocketHandlers {
+	/// <summary>
+	/// Sends info about game limits.
+	/// </summary>
+	public class LimitsHandler: SocketHandlerBase {
+
+		public LimitsHandler(SocketRequestHandler handler) :
+		base(handler, "Limits") {
+			Update();
 		}
 
-		public override void Handle(HttpRequest request) {
-			this.request = request;
+		protected void Update() {
 			Dictionary<String, Dictionary<String, float>> limits =
 			new Dictionary<String, Dictionary<String, float>> {
 				["AudioManager"] = new Dictionary<String, float> {

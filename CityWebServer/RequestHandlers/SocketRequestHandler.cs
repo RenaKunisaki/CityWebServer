@@ -105,6 +105,7 @@ namespace CityWebServer.RequestHandlers {
 			BudgetHandler budgetHandler = new BudgetHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
+			LimitsHandler limitsHandler = new LimitsHandler(this);
 			TerrainHandler terrainHandler = new TerrainHandler(this);
 
 			Log("Waiting for messages");

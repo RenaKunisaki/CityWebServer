@@ -1,15 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/CityInfoHandler.cs">
     <Files>
-      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="110" Column="32" />
-      <File FileName="CityWebServer/WebServer.cs" Line="460" Column="60" />
-      <File FileName="CityWebServer/Models/CityInfo.cs" Line="18" Column="2" />
-      <File FileName="CityWebServer/Models/CallbackParams.cs" Line="32" Column="16" />
-      <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="402" Column="3" />
-      <File FileName="CityWebServer Status" />
+      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="99" Column="7" />
+      <File FileName="CityWebServer/WebServer.cs" Line="318" Column="5" />
+      <File FileName="CityWebServer/Models/CityInfo.cs" Line="24" Column="39" />
+      <File FileName="CityWebServer/Models/CallbackParams.cs" Line="18" Column="16" />
+      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="22" Column="28" />
+      <File FileName="CityWebServer/Models/DistrictInfo.cs" Line="19" Column="52" />
       <File FileName="CityWebServer/SocketHandlers/SocketHandlerBase.cs" Line="13" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/CityInfoHandler.cs" Line="72" Column="4" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="17" Column="47" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CityInfoHandler.cs" Line="138" Column="5" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="19" Column="24" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -17,10 +17,10 @@
           <Node name="CityWebServer" expanded="True">
             <Node name="CityWebServer" expanded="True">
               <Node name="Models" expanded="True" />
-              <Node name="RequestHandlers" expanded="True">
-                <Node name="SocketRequestHandler.cs" selected="True" />
+              <Node name="RequestHandlers" expanded="True" />
+              <Node name="SocketHandlers" expanded="True">
+                <Node name="CityInfoHandler.cs" selected="True" />
               </Node>
-              <Node name="SocketHandlers" expanded="True" />
               <Node name="wwwroot" expanded="True" />
             </Node>
             <Node name="CityWebServer.Extensibility" expanded="True" />

@@ -48,6 +48,11 @@ namespace CityWebServer.SocketHandlers {
 		/// </summary>
 		protected void SendNewInfo() {
 			var simulationManager = Singleton<SimulationManager>.instance;
+			var citizenManager = Singleton<CitizenManager>.instance;
+			var districtManager = Singleton<DistrictManager>.instance;
+			var district = districtManager.m_districts.m_buffer[0];
+			var vehicleManager = Singleton<VehicleManager>.instance;
+
 			SendJson(new VolatileCityInfo {
 				Time = simulationManager.m_currentGameTime,
 				isNight = simulationManager.m_isNightTime,
@@ -56,7 +61,70 @@ namespace CityWebServer.SocketHandlers {
 				demandR = demandR,
 				demandC = demandC,
 				demandW = demandW,
-			}, "Frame");
+				citizenCount = citizenManager.m_citizenCount,
+				trafficFlow = vehicleManager.m_lastTrafficFlow,
+				vehicleCount = vehicleManager.m_vehicleCount,
+				parkedCount = vehicleManager.m_parkedCount,
+				cityInfo = GetDistrict(0),
+			}, "Tick");
+		}
+
+
+		public DistrictInfo GetDistrict(int districtID) {
+			var districtManager = Singleton<DistrictManager>.instance;
+			var district = districtManager.m_districts.m_buffer[districtID];
+			string name = "City";
+			if(districtID != 0) name = districtManager.GetDistrictName(districtID);
+
+			return new DistrictInfo {
+				name = name,
+				population = district.m_populationData.m_finalCount,
+				popDelta = district.m_populationData.GetWeeklyDelta(),
+				CremateCapacity = district.GetCremateCapacity(),
+				CriminalAmount = district.GetCriminalAmount(),
+				CriminalCapacity = district.GetCriminalCapacity(),
+				DeadAmount = district.GetDeadAmount(),
+				DeadCapacity = district.GetDeadCapacity(),
+				DeadCount = district.GetDeadCount(),
+				Education1Capacity = district.GetEducation1Capacity(),
+				Education1Need = district.GetEducation1Need(),
+				Education1Rate = district.GetEducation1Rate(),
+				Education2Capacity = district.GetEducation2Capacity(),
+				Education2Need = district.GetEducation2Need(),
+				Education2Rate = district.GetEducation2Rate(),
+				Education3Capacity = district.GetEducation3Capacity(),
+				Education3Need = district.GetEducation3Need(),
+				Education3Rate = district.GetEducation3Rate(),
+				ElectricityCapacity = district.GetElectricityCapacity(),
+				ElectricityConsumption = district.GetElectricityConsumption(),
+				ExportAmount = district.GetExportAmount(),
+				ExtraCriminals = district.GetExtraCriminals(),
+				GarbageAccumulation = district.GetGarbageAccumulation(),
+				GarbageAmount = district.GetGarbageAmount(),
+				GarbageCapacity = district.GetGarbageCapacity(),
+				GarbagePiles = district.GetGarbagePiles(),
+				GroundPollution = district.GetGroundPollution(),
+				HealCapacity = district.GetHealCapacity(),
+				HeatingCapacity = district.GetHeatingCapacity(),
+				HeatingConsumption = district.GetHeatingConsumption(),
+				ImportAmount = district.GetImportAmount(),
+				IncinerationCapacity = district.GetIncinerationCapacity(),
+				IncomeAccumulation = district.GetIncomeAccumulation(),
+				LandValue = district.GetLandValue(),
+				SewageAccumulation = district.GetSewageAccumulation(),
+				SewageCapacity = district.GetSewageCapacity(),
+				ShelterCitizenCapacity = district.GetShelterCitizenCapacity(),
+				ShelterCitizenNumber = district.GetShelterCitizenNumber(),
+				SickCount = district.GetSickCount(),
+				Unemployment = district.GetUnemployment(),
+				WaterCapacity = district.GetWaterCapacity(),
+				WaterConsumption = district.GetWaterConsumption(),
+				WaterPollution = district.GetWaterPollution(),
+				WaterStorageAmount = district.GetWaterStorageAmount(),
+				WaterStorageCapacity = district.GetWaterStorageCapacity(),
+				WorkerCount = district.GetWorkerCount(),
+				WorkplaceCount = district.GetWorkplaceCount(),
+			};
 		}
 
 		/// <summary>
@@ -117,12 +185,12 @@ namespace CityWebServer.SocketHandlers {
 			HandleDistrict(request);
 		} */
 
-		private void HandleDistrictList() {
+		/* private void HandleDistrictList() {
 			var districtIDs = DistrictInfo.GetDistricts().ToArray();
 			SendJson(districtIDs);
-		}
+		} */
 
-		private void HandleDistrict(HttpRequest request) {
+		/* private void HandleDistrict(HttpRequest request) {
 			var districtIDs = GetDistrictsFromRequest(request);
 
 			DistrictInfo globalDistrictInfo = null;
@@ -148,9 +216,9 @@ namespace CityWebServer.SocketHandlers {
 
 
 
-		}
+		} */
 
-		private Dictionary<int, int> GetBuildingBreakdownByDistrict() {
+		/* private Dictionary<int, int> GetBuildingBreakdownByDistrict() {
 			var districtManager = Singleton<DistrictManager>.instance;
 
 			Dictionary<int, int> districtBuildings = new Dictionary<int, int>();
@@ -186,10 +254,10 @@ namespace CityWebServer.SocketHandlers {
 			}
 			return districtVehicles;
 		}
-
-		private IEnumerable<int> GetDistrictsFromRequest(HttpRequest request) {
+		 */
+		/* private IEnumerable<int> GetDistrictsFromRequest(HttpRequest request) {
 			IEnumerable<int> districtIDs;
-			/* if(request.QueryString.HasKey("districtID")) {
+			if(request.QueryString.HasKey("districtID")) {
 				List<int> districtIDList = new List<int>();
 				var districtID = request.QueryString.GetInteger("districtID");
 				if(districtID.HasValue) {
@@ -197,10 +265,10 @@ namespace CityWebServer.SocketHandlers {
 				}
 				districtIDs = districtIDList;
 			}
-			else { */
-			districtIDs = DistrictInfo.GetDistricts();
-			//}
+			else {
+				districtIDs = DistrictInfo.GetDistricts();
+			}
 			return districtIDs;
-		}
+		} */
 	}
 }

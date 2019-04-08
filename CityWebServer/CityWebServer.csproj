@@ -97,6 +97,8 @@
     <Compile Include="Models\CallbackParams.cs" />
     <Compile Include="SocketHandlers\BudgetHandler.cs" />
     <Compile Include="SocketHandlers\TerrainHandler.cs" />
+    <Compile Include="CallbackList.cs" />
+    <Compile Include="SocketHandlers\LimitsHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

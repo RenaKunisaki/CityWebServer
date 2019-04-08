@@ -50,7 +50,7 @@ class App {
         };
 
         //Set up some default handlers.
-        this.registerMessageHandler("Frame", data => this._onFrame(data));
+        this.registerMessageHandler("Tick", data => this._onTick(data));
         this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
 
         /* $('#chirper').append(this.chirper.element);
@@ -110,10 +110,10 @@ class App {
         return `hsl(${hue}, ${sat}%, ${light}%)`;
     }
 
-    _onFrame(Frame) {
-        /** Callback for Frame message.
+    _onTick(Tick) {
+        /** Callback for Tick message.
          */
-        this.currentDate = new Date(Frame.Time);
+        this.currentDate = new Date(Tick.Time);
 
         //build displayed date string
         let year   = this.currentDate.getFullYear();
@@ -122,11 +122,11 @@ class App {
         let hour   = String(this.currentDate.getHours()).padStart(2, '0');
         let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
         let second = String(this.currentDate.getSeconds()).padStart(2, '0');
-        let night  = Frame.isNight ? '☽' : '☀';
+        let night  = Tick.isNight ? '☽' : '☀';
 
         this.data.friendlyDate =
             `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
-        $('#clock').toggleClass('game-paused', Frame.isPaused)
+        $('#clock').toggleClass('game-paused', Tick.isPaused)
 
         //Init/update KO
         if(this._isInit) {

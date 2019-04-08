@@ -382,6 +382,17 @@ namespace CityWebServer {
 
 		#endregion ThreadingExtensionBase
 
+		#region IUserMod
+		public void OnEnabled() {
+			Log("Mod enabled");
+		}
+
+		public void OnDisabled() {
+			Log("Mod disabled");
+		}
+
+		#endregion IUserMod
+
 		#region IAreasExtension
 
 		/// <summary>
