@@ -398,6 +398,7 @@ namespace CityWebServer.SocketHandlers {
 		base(handler, "Budget") {
 			totalTimeDelta = 0;
 			economyManager = Singleton<EconomyManager>.instance;
+			server.frameCallbacks.Register(Update);
 		}
 
 		/// <summary>
