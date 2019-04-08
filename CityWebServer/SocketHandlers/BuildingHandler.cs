@@ -4,6 +4,8 @@ using System.Net;
 using CityWebServer.Extensibility;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
+using CityWebServer.Callbacks;
+using System.Linq;
 
 namespace CityWebServer.SocketHandlers {
 	/// <summary>
@@ -13,13 +15,46 @@ namespace CityWebServer.SocketHandlers {
 		public BuildingHandler(SocketRequestHandler handler) :
 		base(handler, "Building") {
 			//SendAll();
-			//This causes a Write Failure and nothing gets sent.
-			//Probably it's sending too much at once.
+			handler.RegisterMessageHandler("Building", OnClientMessage);
+		}
+
+		/// <summary>
+		/// Handle "Building" message from client.
+		/// </summary>
+		/// <param name="_param">Parameter.</param>
+		/// <remarks>Expects a dict with one of the keys:
+		/// <c>get</c>: building ID => get info about specified building
+		/// <c>list</c>: (anything) => get list of valid IDs
+		/// </remarks>
+		public void OnClientMessage(SocketMessageHandlerParam _param) {
+			var param = _param.param as Dictionary<string, object>;
+			var key = param.Keys.First();
+			switch(key) {
+				case null:
+					SendErrorResponse(HttpStatusCode.BadRequest);
+					break;
+				case "get":
+					int? id = param["get"] as int?;
+					if(id == null) {
+						SendErrorResponse("Invalid building ID");
+						return;
+					}
+					SendBuilding((int)id);
+					break;
+				case "list":
+					SendList();
+					break;
+				default:
+					SendErrorResponse("Building has no method '{key}'");
+					break;
+			}
 		}
 
 		/// <summary>
 		/// Send list of all buildings.
 		/// </summary>
+		/// <remarks>This causes a Write Failure and nothing gets sent.
+		/// Probably it's sending too much at once.</remarks>
 		protected void SendAll() {
 			Log("Getting building list...");
 			var buildingManager = Singleton<BuildingManager>.instance;
@@ -33,6 +68,20 @@ namespace CityWebServer.SocketHandlers {
 			Log("Sending building list...");
 			SendJson(buildings);
 			Log("Sent building list.");
+		}
+
+		/// <summary>
+		/// Send list of valid building IDs.
+		/// </summary>
+		protected void SendList() {
+			var buildingManager = Singleton<BuildingManager>.instance;
+			var buildings = new List<int>();
+			for(int i = 0; i < buildingManager.m_buildings.m_buffer.Length; i++) {
+				var building = Singleton<BuildingManager>.instance.m_buildings.m_buffer[i];
+				if(building.m_flags == Building.Flags.None) continue;
+				buildings.Add(i);
+			}
+			SendJson(buildings, "BuildingIDs");
 		}
 
 		/// <summary>

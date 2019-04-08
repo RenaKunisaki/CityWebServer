@@ -11,6 +11,17 @@ namespace CityWebServer.Callbacks {
 		public float simulationTimeDelta;
 	}
 
+	public class SocketMessageHandlerParam {
+		public object param;
+	}
+
+	/// <summary>
+	/// Callback parameter for terrain height modified event.
+	/// </summary>
+	public class TerrainCallbackParam {
+		public float minX, maxX, minZ, maxZ;
+	}
+
 	/// <summary>
 	/// Callback parameter for area unlock event.
 	/// </summary>
@@ -25,12 +36,5 @@ namespace CityWebServer.Callbacks {
 	public class UpdateDemandParam {
 		public char which;
 		public int demand;
-	}
-
-	/// <summary>
-	/// Callback parameter for terrain height modified event.
-	/// </summary>
-	public class TerrainCallbackParam {
-		public float minX, maxX, minZ, maxZ;
 	}
 }

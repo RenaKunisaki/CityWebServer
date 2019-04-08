@@ -191,6 +191,6 @@ class App {
 }
 
 $(() => { //run when window loaded
-    const app = new App();
-    app.run();
+    window.app = new App();
+    window.app.run();
 });

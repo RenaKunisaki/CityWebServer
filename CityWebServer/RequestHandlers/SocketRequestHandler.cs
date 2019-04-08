@@ -5,25 +5,33 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using CityWebServer.Callbacks;
 using CityWebServer.Extensibility;
 using CityWebServer.SocketHandlers;
 //using CityWebServer.Extensibility.Responses;
+using System.Linq;
 
 namespace CityWebServer.RequestHandlers {
+	/// <summary>
+	/// Handles `/Socket`; Opens a WebSocket connection.
+	/// </summary>
+	/// <remarks>Doesn't return until socket is closed.</remarks>
 	public class SocketRequestHandler: RequestHandlerBase {
-		/** Handles `/Socket`.
-		 *  Opens a WebSocket connection. Returns when the socket is closed.
-		 */
-
 		//This GUID is specified by RFC 6455 and must be appended
 		//to the socket key given by the client. It's also case sensitive.
 		public static readonly String KeyGuid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
+		/// <summary>
+		/// Raw socket frame header.
+		/// </summary>
 		public struct SocketMessageRawHeader {
 			public byte flagsAndOpcode;
 			public byte maskAndLength;
 		};
 
+		/// <summary>
+		/// WebSocket frame opcodes.
+		/// </summary>
 		public enum SocketOpcode {
 			CONTINUE = 0,
 			TEXT,
@@ -43,6 +51,9 @@ namespace CityWebServer.RequestHandlers {
 			RESERVED15,
 		};
 
+		/// <summary>
+		/// Parsed socket frame header.
+		/// </summary>
 		public class SocketMessageHeader {
 			public SocketOpcode opcode;
 			public bool isFIN;
@@ -57,6 +68,8 @@ namespace CityWebServer.RequestHandlers {
 		//Not using ConcurrentQueue because .Net 3.5 doesn't support it
 		protected Queue<String> sendQueue;
 		protected readonly object sendQueueLock;
+		protected Dictionary<string, CallbackList<SocketMessageHandlerParam>> messageHandlers;
+		protected readonly object messageHandlersLock;
 
 		public SocketRequestHandler()
 			: base(new Guid("d33918b9-8efb-409e-9456-935669907038"),
@@ -67,12 +80,59 @@ namespace CityWebServer.RequestHandlers {
 		: base(server, request, name) {
 			sendQueueLock = new object();
 			sendQueue = new Queue<String>();
+			messageHandlersLock = new object();
+			messageHandlers = new Dictionary<string, CallbackList<SocketMessageHandlerParam>>();
 		}
 
+		/// <summary>
+		/// Register a handler for messages from client.
+		/// </summary>
+		/// <param name="message">Message to handle.</param>
+		/// <param name="handler">Handler.</param>
+		public void RegisterMessageHandler(string message,
+		Action<SocketMessageHandlerParam> handler) {
+			lock(messageHandlersLock) {
+				if(!messageHandlers.ContainsKey(message)) {
+					messageHandlers[message] = new
+						CallbackList<SocketMessageHandlerParam>(message);
+				}
+				messageHandlers[message].Register(handler);
+			}
+		}
+
+		/// <summary>
+		/// Unregister a client message handler.
+		/// </summary>
+		/// <param name="message">Message.</param>
+		/// <param name="handler">Handler.</param>
+		public void UnregisterMessageHandler(string message,
+		Action<SocketMessageHandlerParam> handler) {
+			lock(messageHandlersLock) {
+				if(!messageHandlers.ContainsKey(message)) return;
+				messageHandlers[message].Unregister(handler);
+			}
+		}
+
+		/// <summary>
+		/// Call handlers for a client message.
+		/// </summary>
+		/// <param name="message">Message.</param>
+		/// <param name="param">Parameter from client.</param>
+		protected void CallMessageHandler(string message,
+		SocketMessageHandlerParam param) {
+			CallbackList<SocketMessageHandlerParam> callbacks;
+			lock(messageHandlersLock) {
+				if(!messageHandlers.ContainsKey(message)) return;
+				callbacks = messageHandlers[message];
+			}
+			callbacks.Call(param);
+		}
+
+		/// <summary>
+		/// Handle the HTTP request.
+		/// </summary>
+		/// <remarks>This method won't return until the socket closes!</remarks>
 		public override void Handle() {
-			/** Handle the HTTP request.
-			 *  This method won't return until the socket closes!		
-			 */
 			this.stream = request.stream;
 			Log("Connection opening");
 
@@ -94,10 +154,10 @@ namespace CityWebServer.RequestHandlers {
 			RunSocket();
 		}
 
+		/// <summary>
+		/// Main loop, runs the WebSocket connection.
+		/// </summary>
 		protected void RunSocket() {
-			/** Main loop, runs the WebSocket connection.
-			 */
-
 			//We don't really need to store the handlers;
 			//just create them and let them call our EnqueueMessage method.
 			//XXX automatically find these like WebServer does.
@@ -133,10 +193,14 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
+		/// <summary>
+		/// Send a WebSocket frame to the client.
+		/// </summary>
+		/// <param name="data">Data to send.</param>
+		/// <param name="opcode">Frame opcode.</param>
+		/// <param name="isFIN">Whether frame has FIN bit set.</param>
 		protected void SendFrame(byte[] data,
 		SocketOpcode opcode = SocketOpcode.TEXT, bool isFIN = true) {
-			/** Send a WebSocket frame to the client.
-			 */
 			byte[] header = new byte[14];
 			header[0] = (byte)((isFIN ? 0x80 : 0) | (byte)opcode);
 			int idx = 2;
@@ -170,19 +234,22 @@ namespace CityWebServer.RequestHandlers {
 			stream.Write(data, 0, data.Length);
 		}
 
+		/// <summary>
+		/// Called by handlers to add an outgoing message
+		/// to the queue to be sent to the client.
+		/// </summary>
+		/// <param name="message">Message.</param>
 		public void EnqueueMessage(String message) {
-			/** Called by handlers to add an outgoing message
-			 *  to the queue to be sent to the client.
-			 */
 			lock(this.sendQueueLock) {
 				this.sendQueue.Enqueue(message);
 			}
 		}
 
+		/// <summary>
+		/// Retrieve the next outgoing message from the queue.
+		/// </summary>
+		/// <returns>The next outgoing message, or null if none queued.</returns>
 		protected String GetNextOutgoingMessage() {
-			/** Retrieve the next outgoing message from the queue.
-			 *  Returns null if no message is queued.
-			 */
 			lock(this.sendQueueLock) {
 				try {
 					return this.sendQueue.Dequeue();
@@ -194,16 +261,22 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
+		/// <summary>
+		/// Get the next message from the client and deal with it.
+		/// </summary>
+		/// <remarks>This is called once we know a message is available.</remarks>
 		protected void HandleNextMessage() {
-			/** Get the next message from the client and deal with it.
-			 *  This is called once we know a message is available.
-			 */
 			try {
 				var reader = new JsonFx.Json.JsonReader();
 				String message = ReadMessage(request);
 				var input = reader.Read<Dictionary<string, object>>(message);
 				Log($"message: {input}");
-				//XXX pass message on to appropriate handler.
+				//XXX what happens if message is empty or not a dict?
+				string key = input.Keys.First();
+				Log($"Calling message handlers: '{key}'");
+				CallMessageHandler(key, new SocketMessageHandlerParam {
+					param = input[key],
+				});
 			}
 			catch(Exception ex) {
 				if(ex is ObjectDisposedException
@@ -214,11 +287,14 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
+		/// <summary>
+		/// Read the raw WebSocket message from the socket.
+		/// </summary>
+		/// <returns>The message.</returns>
+		/// <param name="req">HttpRequest to read from.</param>
+		/// <exception cref="OperationCanceledException">Socket closed while reading.</exception>
+		/// <exception cref="ObjectDisposedException">Socket closed while reading.</exception>
 		private String ReadMessage(HttpRequest req) {
-			/** Read the raw WebSocket message from the socket.
-			 *  Throws OperationCanceledException or ObjectDisposedException
-			 *  if the socket was closed while reading.		 
-			 */
 			byte[] bufMsg = new byte[16384];
 			int bufMsgPos = 0;
 			String message = "";
@@ -269,11 +345,14 @@ namespace CityWebServer.RequestHandlers {
 			}
 		}
 
+		/// <summary>
+		/// Read the WebSocket frame header from the socket.
+		/// </summary>
+		/// <returns>The header.</returns>
+		/// <param name="req">HttpRequest to read from.</param>
+		/// <exception cref="OperationCanceledException">Socket closed while reading.</exception>
+		/// <exception cref="ObjectDisposedException">Socket closed while reading.</exception>
 		private SocketMessageHeader ReadHeader(HttpRequest req, byte[] buffer) {
-			/** Read the WebSocket frame header from the socket.
-			 *  Throws OperationCanceledException or ObjectDisposedException
-			 *  if the socket was closed while reading.		
-			 */
 			int idx = 0;
 			//Read the header bytes.
 			//XXX deal with messages < 14 bytes (header is variable length)
