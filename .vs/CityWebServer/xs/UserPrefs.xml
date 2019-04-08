@@ -1,15 +1,19 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/CityInfoHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
     <Files>
-      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="99" Column="7" />
+      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="96" Column="3" />
       <File FileName="CityWebServer/WebServer.cs" Line="318" Column="5" />
-      <File FileName="CityWebServer/Models/CityInfo.cs" Line="24" Column="39" />
-      <File FileName="CityWebServer/Models/CallbackParams.cs" Line="18" Column="16" />
-      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="22" Column="28" />
-      <File FileName="CityWebServer/Models/DistrictInfo.cs" Line="19" Column="52" />
-      <File FileName="CityWebServer/SocketHandlers/SocketHandlerBase.cs" Line="13" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/CityInfoHandler.cs" Line="138" Column="5" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="19" Column="24" NotebookId="1" />
+      <File FileName="CityWebServer/Models/CallbackParams.cs" Line="10" Column="30" />
+      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="20" Column="23" />
+      <File FileName="CityWebServer/SocketHandlers/NotificationRequestHandler.cs" Line="72" Column="25" />
+      <File FileName="CityWebServer/SocketHandlers/TransportHandler.cs" Line="27" Column="37" />
+      <File FileName="CityWebServer/SocketHandlers/VehicleHandler.cs" Line="9" Column="1" />
+      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="35" Column="31" />
+      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="21" Column="20" />
+      <File FileName="CityWebServer Status" />
+      <File FileName="CityWebServer/SocketHandlers/SocketHandlerBase.cs" Line="26" Column="25" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="20" Column="4" NotebookId="1" />
+      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="56" Column="5" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -19,7 +23,7 @@
               <Node name="Models" expanded="True" />
               <Node name="RequestHandlers" expanded="True" />
               <Node name="SocketHandlers" expanded="True">
-                <Node name="CityInfoHandler.cs" selected="True" />
+                <Node name="BuildingHandler.cs" selected="True" />
               </Node>
               <Node name="wwwroot" expanded="True" />
             </Node>

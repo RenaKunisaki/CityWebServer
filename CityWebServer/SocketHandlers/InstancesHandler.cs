@@ -5,22 +5,22 @@ using CityWebServer.Extensibility;
 //using CityWebServer.Extensibility.Responses;
 using CityWebServer.Model;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 
-namespace CityWebServer.RequestHandlers {
-	public class InstancesRequestHandler: RequestHandlerBase {
-		/** Handles `/Instances`.
-		 *  Returns information about the number of instances of various
-		 *  game objects, and a handful of other information that's
-		 *  stored in the same managers.
-		 */
-		public InstancesRequestHandler(IWebServer server)
-			: base(server, new Guid("d04128dd-c887-4f6c-a0f7-baf43d2777c7"),
-				"Instances", "Rena", 100, "/Instances") {
+namespace CityWebServer.SocketHandlers {
+	/// <summary>
+	/// Sends info about object instances and other runtime stats.
+	/// </summary>
+	public class InstancesHandler: SocketHandlerBase {
+		public InstancesHandler(SocketRequestHandler handler) :
+		base(handler, "Instances") {
+			Log("Sending instances...");
+			SendAll();
+			Log("Sent instances.");
 		}
 
-		public override void Handle(HttpRequest request) {
-			this.request = request;
+		protected void SendAll() {
 			Dictionary<String, Dictionary<String, float>> instances =
 			new Dictionary<String, Dictionary<String, float>> {
 				["AudioManager"] = GetAudio(),

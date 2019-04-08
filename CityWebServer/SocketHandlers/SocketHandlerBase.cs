@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using CityWebServer.RequestHandlers;
 
 namespace CityWebServer.SocketHandlers {
@@ -18,26 +19,52 @@ namespace CityWebServer.SocketHandlers {
 			this.Name = name;
 		}
 
+		/// <summary>
+		/// Encode an object as JSON and send it to the client.
+		/// </summary>
+		/// <param name="body">Object to send.</param>
+		/// <param name="name">Class name. Default is the name given
+		/// in the handler's constructor.</param>
+		/// <typeparam name="T">The object type.</typeparam>
+		/// <remarks>This method encapsulates the object in {name:object},
+		/// where the default name is the handler name.
+		/// This allows the client to know what kind of message
+		/// it's dealing with.</remarks>
 		public void SendJson<T>(T body, string name = null) {
-			/** Encode an object as JSON and send it to the client.
-			 *  This method encapsulates the object in {name:object},
-			 *  where the default name is the handler name.
-			 *  This allows the client to know what kind of message
-			 *  it's dealing with.
-			 */
 			if(name == null) name = Name;
 			SendUnencapsulatedJson(new Dictionary<string, T> {
-				{ name, body},
+				{name, body},
 			});
 		}
 
-
+		/// <summary>
+		/// Encode an object as JSON and send it to the client,
+		/// without encapsulating it in {name:object}.	
+		/// </summary>
+		/// <param name="body">Object to send.</param>
+		/// <typeparam name="T">The object type.</typeparam>
 		public void SendUnencapsulatedJson<T>(T body) {
-			/** Encode an object as JSON and send it to the client,
-			 *  without encapsulating it in {name:object}.	
-			 */
 			var writer = new JsonFx.Json.JsonWriter();
 			handler.EnqueueMessage(writer.Write(body));
+		}
+
+		/// <summary>
+		/// Send an error response.
+		/// </summary>
+		/// <param name="error">Error message.</param>
+		/// <param name="name">Class name. Default is the name given
+		/// in the handler's constructor.</param>
+		public void SendErrorResponse(string error, string name = null) {
+			if(name == null) name = Name;
+			SendUnencapsulatedJson(new Dictionary<string, Dictionary<string, string>> {
+				{"error", new Dictionary<string, string> {
+					{name, error},
+				}},
+			});
+		}
+
+		public void SendErrorResponse(HttpStatusCode code, string name = null) {
+			SendErrorResponse(code.ToString(), name);
 		}
 
 		protected void Log(string msg) {

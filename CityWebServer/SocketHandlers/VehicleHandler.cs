@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using CityWebServer.Extensibility;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using JetBrains.Annotations;
 
-namespace CityWebServer.RequestHandlers {
-	[UsedImplicitly]
-	public class VehicleRequestHandler: RequestHandlerBase {
-		/** Handles `/Vehicle`.
-		 *  Returns information about vehicles.
-		 */
-		public VehicleRequestHandler(IWebServer server)
-			: base(server, new Guid("2be6546a-d416-4939-8e08-1d0b739be835"), "Vehicle", "Rychard", 100, "/Vehicle") {
+namespace CityWebServer.SocketHandlers {
+	/// <summary>
+	/// Sends info about vehicles.
+	/// </summary>
+	public class VehicleHandler: SocketHandlerBase {
+		public VehicleHandler(SocketRequestHandler handler) :
+		base(handler, "Vehicle") {
 		}
-
+		/*
 		public override void Handle(HttpRequest request) {
 			this.request = request;
 			var vehicleManager = Singleton<VehicleManager>.instance;
@@ -52,5 +52,6 @@ namespace CityWebServer.RequestHandlers {
 
 			SendJson(grouped);
 		}
+		*/
 	}
 }

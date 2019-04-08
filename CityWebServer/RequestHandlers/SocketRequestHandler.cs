@@ -103,10 +103,14 @@ namespace CityWebServer.RequestHandlers {
 			//XXX automatically find these like WebServer does.
 			Log($"Creating socket handlers (thread: {Thread.CurrentThread.Name})");
 			BudgetHandler budgetHandler = new BudgetHandler(this);
+			BuildingHandler buildingHandler = new BuildingHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
+			InstancesHandler instancesHandler = new InstancesHandler(this);
 			LimitsHandler limitsHandler = new LimitsHandler(this);
 			TerrainHandler terrainHandler = new TerrainHandler(this);
+			TransportHandler transportHandler = new TransportHandler(this);
+			VehicleHandler vehicleHandler = new VehicleHandler(this);
 
 			Log("Waiting for messages");
 			try {

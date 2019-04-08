@@ -73,6 +73,11 @@ namespace CityWebServer.SocketHandlers {
 		public DistrictInfo GetDistrict(int districtID) {
 			var districtManager = Singleton<DistrictManager>.instance;
 			var district = districtManager.m_districts.m_buffer[districtID];
+
+			//District 0 is the entire city.
+			//It does have an auto-generated name, but this name is
+			//never shown in-game. (why not just use that to store
+			//the city name?)
 			string name = "City";
 			if(districtID != 0) name = districtManager.GetDistrictName(districtID);
 
