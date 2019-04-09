@@ -29,9 +29,20 @@ class App {
 
         jQuery.fn.extend({
             //add $(...).money(num) => display a money amount
+            //it's the same as number() but divides by 100
             money: function(num) {
                 $(this).number(num / 100);
             },
+            percent: function(num) {
+                $(this).text(num.toFixed(0)+'%');
+            },
+            //permyriad: percent of a percent
+            //used because the game gives some percentages this way
+            //eg 15% = 1500
+            permyriad: function(num) {
+                $(this).text((num / 100).toFixed(2)+'%');
+            },
+            //there's also number() from jquery.number.min.js
         });
     }
 

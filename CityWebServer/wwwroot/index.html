@@ -56,13 +56,13 @@
             <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span id="net-income" class="money net"></span>/wk)</h1>
             <div class="charts">
                 <div class="chart" id="income-chart">
-                    <h2>Weekly Income: <span class="money total"></span></h2>
+                    <h2>Weekly Income: <span class="money total" data-bind="money:Budget.totalIncome"></span></h2>
                     <div class="canvas">
                         <canvas></canvas>
                     </div>
                 </div>
                 <div class="chart" id="expense-chart">
-                    <h2>Weekly Expenses: <span class="money total"></span></h2>
+                    <h2>Weekly Expenses: <span class="money total"data-bind="money:Budget.totalExpenses"></span></h2>
                     <div class="canvas">
                         <canvas></canvas>
                     </div>
@@ -76,20 +76,21 @@
                         <th title="Low Density">Low</th>
                         <th title="High Density">High</th>
                     </tr>
+                    <!-- not using `percent` here because it adds a % -->
                     <tr>
                         <td>Residential</td>
-                        <td id="tax-ResidentialLow"></td>
-                        <td id="tax-ResidentialHigh"></td>
+                        <td data-bind="number:Budget.economy.taxRates.ResidentialLow"></td>
+                        <td data-bind="number:Budget.economy.taxRates.ResidentialHigh"></td>
                     </tr>
                     <tr>
                         <td>Commercial</td>
-                        <td id="tax-CommercialLow"></td>
-                        <td id="tax-CommercialHigh"></td>
+                        <td data-bind="number:Budget.economy.taxRates.CommercialLow"></td>
+                        <td data-bind="number:Budget.economy.taxRates.CommercialHigh"></td>
                     </tr>
                     <tr>
                         <td>Industry/Office</td>
-                        <td id="tax-Industrial"></td>
-                        <td id="tax-Office"></td>
+                        <td data-bind="number:Budget.economy.taxRates.Industrial"></td>
+                        <td data-bind="number:Budget.economy.taxRates.Office"></td>
                     </tr>
                 </table>
             </div>
@@ -102,9 +103,27 @@
                         <th title="Interest rate">Intrst</th>
                         <th title="Weekly payment">₡/Week</th>
                     </tr>
-                    <tr id="loan0"></tr>
-                    <tr id="loan1"></tr>
-                    <tr id="loan2"></tr>
+                    <tr id="loan0">
+                        <td data-bind="text:Budget.loans.0.BankName"></td>
+                        <td data-bind="money:Budget.loans.0.PaymentLeft"></td>
+                        <td>XXX</td>
+                        <td data-bind="permyriad:Budget.loans.0.InterestRate"></td>
+                        <td>XXX</td>
+                    </tr>
+                    <tr id="loan1">
+                        <td data-bind="text:Budget.loans.1.BankName"></td>
+                        <td data-bind="money:Budget.loans.1.PaymentLeft"></td>
+                        <td>XXX</td>
+                        <td data-bind="permyriad:Budget.loans.1.InterestRate"></td>
+                        <td>XXX</td>
+                    </tr>
+                    <tr id="loan2">
+                        <td data-bind="text:Budget.loans.2.BankName"></td>
+                        <td data-bind="money:Budget.loans.2.PaymentLeft"></td>
+                        <td>XXX</td>
+                        <td data-bind="permyriad:Budget.loans.2.InterestRate"></td>
+                        <td>XXX</td>
+                    </tr>
                 </table>
             </div>
         </div></div>
