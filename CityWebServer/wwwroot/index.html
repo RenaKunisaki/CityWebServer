@@ -19,8 +19,6 @@
     <script src='/r/js/jquery.number.min.js'></script>
     <script src='/r/js/masonry.pkgd.min.js'></script>
     <script src='/r/js/bootstrap.min.js'></script>
-    <script src='/r/js/knockout-3.3.0.js'></script>
-    <script src='/r/js/knockout.mapping-latest.js'></script>
     <script src='/r/js/Chart.min.js'></script>
     <script src="/r/js/budget.js"></script>
     <script src="/r/js/chirper.js"></script>
@@ -34,10 +32,10 @@
 <body>
     <!-- Fixed navbar -->
     <nav id="navbar">
-        <span id="city-name" data-bind="text: CityInfo.Name"></span>
-        <span id="navbar-population" class="population number"></span>
+        <span id="city-name" data-bind="text:CityInfo.Name"></span>
+        <span id="navbar-population" class="population number" data-bind="number:District.Population"></span>
         <span id="navbar-error"></span>
-        <div id="clock" data-bind="text: friendlyDate"></div>
+        <div id="clock" data-bind="text:friendlyDate"></div>
     </nav>
     <div class="container" id="main">
         <div class="grid-sizer"></div>
@@ -55,7 +53,7 @@
         </div></div>
 
         <div id="budget" class="list box"><div class="wrapper">
-            <h1>Budget: <span id="current-cash" class="money cash"></span> (<span id="net-income" class="money net"></span>/wk)</h1>
+            <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span id="net-income" class="money net"></span>/wk)</h1>
             <div class="charts">
                 <div class="chart" id="income-chart">
                     <h2>Weekly Income: <span class="money total"></span></h2>

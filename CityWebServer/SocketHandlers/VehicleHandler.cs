@@ -14,6 +14,7 @@ namespace CityWebServer.SocketHandlers {
 	public class VehicleHandler: SocketHandlerBase {
 		public VehicleHandler(SocketRequestHandler handler) :
 		base(handler, "Vehicle") {
+			//TODO
 		}
 		/*
 		public override void Handle(HttpRequest request) {

@@ -26,6 +26,13 @@ class App {
         ];
         this.messageHandlers = {};
         this.data = {};
+
+        jQuery.fn.extend({
+            //add $(...).money(num) => display a money amount
+            money: function(num) {
+                $(this).number(num / 100);
+            },
+        });
     }
 
     run() {
@@ -151,14 +158,14 @@ class App {
         //$('.population.number').number(Tick.cityInfo.population);
 
         //Init/update KO
-        if(this._isInit) {
+        /* if(this._isInit) {
             ko.mapping.fromJS(this.data, this.viewModel);
         }
         else {
             this.viewModel = ko.mapping.fromJS(this.data);
             ko.applyBindings(this.viewModel);
             this._isInit = true;
-        }
+        } */
 
         //Update layout
         $('#main').masonry('layout');
@@ -168,9 +175,9 @@ class App {
         /** Callback for CityInfo message.
          */
         document.title = CityInfo.Name;
-        $('#city-name').attr('title',
+        /* $('#city-name').attr('title',
             `Map: ${CityInfo.mapName}\n` +
-            `Climate: ${CityInfo.environment}`);
+            `Climate: ${CityInfo.environment}`); */
     }
 
     _onMessage(message) {
@@ -196,6 +203,19 @@ class App {
                 }
             }
         }
+
+        //Update bound elements
+        $("[data-bind]").each((idx, elem) => {
+            const binding = $(elem).attr('data-bind').split(':');
+            const prop = binding[0];
+            const fields = binding[1].split('.');
+            let value = this.data;
+            for(const field of fields) {
+                value = value[field];
+                if(value == undefined) break;
+            }
+            $(elem)[prop](value);
+        });
     }
 
     _refresh() {
