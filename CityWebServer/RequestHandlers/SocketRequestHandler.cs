@@ -165,9 +165,11 @@ namespace CityWebServer.RequestHandlers {
 			BudgetHandler budgetHandler = new BudgetHandler(this);
 			BuildingHandler buildingHandler = new BuildingHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
+			DistrictHandler districtHandler = new DistrictHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
 			InstancesHandler instancesHandler = new InstancesHandler(this);
 			LimitsHandler limitsHandler = new LimitsHandler(this);
+			ReflectionHandler reflectionHandler = new ReflectionHandler(this);
 			TerrainHandler terrainHandler = new TerrainHandler(this);
 			TransportHandler transportHandler = new TransportHandler(this);
 			VehicleHandler vehicleHandler = new VehicleHandler(this);
@@ -210,19 +212,21 @@ namespace CityWebServer.RequestHandlers {
 				header[1] = (byte)data.Length;
 			}
 			else if(data.Length < 65535) {
-				//XXX verify byte order
 				header[1] = 126;
 				header[2] = (byte)(data.Length >> 8);
 				header[3] = (byte)(data.Length & 0xFF);
 				idx = 4;
 			}
 			else {
-				//XXX verify byte order
+				//data.Length is `int` and apparently C#'s idea of sanity
+				//is for the shift amount to be mod 32, so trying to
+				//include the higher bytes here actually gives you the lower
+				//bytes again, giving an insane length.
 				header[1] = 127;
-				header[2] = (byte)((data.Length >> 56) & 0xFF);
-				header[3] = (byte)((data.Length >> 48) & 0xFF);
-				header[4] = (byte)((data.Length >> 40) & 0xFF);
-				header[5] = (byte)((data.Length >> 32) & 0xFF);
+				header[2] = 0; //(byte)((data.Length >> 56) & 0xFF);
+				header[3] = 0; //(byte)((data.Length >> 48) & 0xFF);
+				header[4] = 0; //(byte)((data.Length >> 40) & 0xFF);
+				header[5] = 0; //(byte)((data.Length >> 32) & 0xFF);
 				header[6] = (byte)((data.Length >> 24) & 0xFF);
 				header[7] = (byte)((data.Length >> 16) & 0xFF);
 				header[8] = (byte)((data.Length >> 8) & 0xFF);
