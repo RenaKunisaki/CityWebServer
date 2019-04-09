@@ -13,6 +13,14 @@
     text-shadow: 1px 1px 0px #000;
 }
 
+#chirper .time {
+    color: #888;
+}
+
+#chirper .text {
+    display: block;
+}
+
 .chirp {
     margin-bottom: 0.5em;
 }

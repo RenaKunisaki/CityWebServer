@@ -12,9 +12,9 @@ class App {
         this._isInit        = false;
         this.viewModel      = null;
         this.currentDate    = null;
+        this.chirper        = new Chirper(this);
         this.heightMap      = new HeightMap(this);
         /* this.budget         = new Budget(this);
-        this.chirper        = new Chirper(this);
         this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
@@ -53,13 +53,13 @@ class App {
         this.registerMessageHandler("Tick", data => this._onTick(data));
         this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
 
+        $('#chirper').append(this.chirper.element);
         this.heightMap.run();
+        this.chirper.run();
 
-        /* $('#chirper').append(this.chirper.element);
-        $('#transit').append(this.transit.element);
+        /* $('#transit').append(this.transit.element);
 
         this.budget.run();
-        this.chirper.run();
         this.limits.run();
         //this.population.run();
         this.problems.run();
@@ -88,6 +88,24 @@ class App {
         this.messageHandlers[name].push(handler);
     }
 
+    unregisterMessageHandler(name, handler) {
+        if(this.messageHandlers[name] == undefined) return;
+        this.messageHandlers[name].splice(
+            this.messageHandlers[name].indexOf(handler, 1));
+    }
+
+    query(message, response) {
+        const promise = new Promise();
+        const self = this;
+        function handler(data) {
+            self.unregisterMessageHandler(message, handler);
+            promise.resolve(data);
+        }
+        this.registerMessageHandler(response, handler);
+        this.socket.send(JSON.stringify(message));
+        return promise;
+    }
+
     makeNameColor(name) {
         /** Generate a color based on a string.
          */
@@ -111,22 +129,24 @@ class App {
         return `hsl(${hue}, ${sat}%, ${light}%)`;
     }
 
+    formatTimestamp(time) {
+        let year   = time.getFullYear();
+        let month  = this.monthNames[time.getMonth()];
+        let day    = String(time.getDate()).padStart(2, '0');
+        let hour   = String(time.getHours()).padStart(2, '0');
+        let minute = String(time.getMinutes()).padStart(2, '0');
+        let second = String(time.getSeconds()).padStart(2, '0');
+        return `${year} ${month} ${day} · ${hour}:${minute}:${second}`
+    }
+
     _onTick(Tick) {
         /** Callback for Tick message.
          */
-        this.currentDate = new Date(Tick.Time);
-
         //build displayed date string
-        let year   = this.currentDate.getFullYear();
-        let month  = this.monthNames[this.currentDate.getMonth()];
-        let day    = String(this.currentDate.getDate()).padStart(2, '0');
-        let hour   = String(this.currentDate.getHours()).padStart(2, '0');
-        let minute = String(this.currentDate.getMinutes()).padStart(2, '0');
-        let second = String(this.currentDate.getSeconds()).padStart(2, '0');
-        let night  = Tick.isNight ? '☽' : '☀';
+        this.currentDate = new Date(Tick.Time);
+        let night = Tick.isNight ? ' ☽' : ' ☀';
 
-        this.data.friendlyDate =
-            `${year} ${month} ${day} · ${hour}:${minute}:${second} ${night}`;
+        this.data.friendlyDate = this.formatTimestamp(this.currentDate) + night;
         $('#clock').toggleClass('game-paused', Tick.isPaused)
         $('.population.number').number(Tick.cityInfo.population);
 
