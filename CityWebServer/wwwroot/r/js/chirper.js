@@ -6,6 +6,7 @@ class Chirper {
     }
 
     run() {
+        $('#chirper').append(this.element);
         this.app.registerMessageHandler("Chirper", data => this.update(data));
         console.log("Chirper online.")
     }

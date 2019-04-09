@@ -1,5 +1,5 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/ChirperHandler.cs">
     <Files>
       <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="80" Column="34" />
       <File FileName="CityWebServer/WebServer.cs" Line="206" Column="4" />
@@ -12,8 +12,7 @@
       <File FileName="CityWebServer/RequestHandlers/HeightMapRequestHandler.cs" Line="17" Column="60" />
       <File FileName="CityWebServer/RequestProcessor.cs" Line="45" Column="42" />
       <File FileName="CityWebServer/RequestHandlers/DefaultRequestHandler.cs" Line="25" Column="34" />
-      <File FileName="CityWebServer/SocketHandlers/ChirperHandler.cs" Line="31" Column="43" />
-      <File FileName="CityWebServer Status" />
+      <File FileName="CityWebServer/SocketHandlers/ChirperHandler.cs" Line="35" Column="3" />
       <File FileName="CityWebServer/SocketHandlers/SocketHandlerBase.cs" Line="68" Column="4" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="13" Column="3" NotebookId="1" />
     </Files>

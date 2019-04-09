@@ -53,7 +53,7 @@ class App {
         this.registerMessageHandler("Tick", data => this._onTick(data));
         this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
 
-        $('#chirper').append(this.chirper.element);
+
         this.heightMap.run();
         this.chirper.run();
 
