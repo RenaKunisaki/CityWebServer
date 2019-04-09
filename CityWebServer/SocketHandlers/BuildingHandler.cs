@@ -45,7 +45,7 @@ namespace CityWebServer.SocketHandlers {
 					SendList();
 					break;
 				default:
-					SendErrorResponse("Building has no method '{key}'");
+					SendErrorResponse($"Building has no method '{key}'");
 					break;
 			}
 		}

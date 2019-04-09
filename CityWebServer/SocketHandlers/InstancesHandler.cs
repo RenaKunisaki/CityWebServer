@@ -15,9 +15,7 @@ namespace CityWebServer.SocketHandlers {
 	public class InstancesHandler: SocketHandlerBase {
 		public InstancesHandler(SocketRequestHandler handler) :
 		base(handler, "Instances") {
-			Log("Sending instances...");
 			SendAll();
-			Log("Sent instances.");
 		}
 
 		protected void SendAll() {

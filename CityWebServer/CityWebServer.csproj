@@ -104,6 +104,8 @@
     <Compile Include="SocketHandlers\TransportHandler.cs" />
     <Compile Include="SocketHandlers\VehicleHandler.cs" />
     <Compile Include="Models\BuildingInfo.cs" />
+    <Compile Include="SocketHandlers\DistrictHandler.cs" />
+    <Compile Include="SocketHandlers\ReflectionHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

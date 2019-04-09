@@ -148,7 +148,7 @@ class App {
 
         this.data.friendlyDate = this.formatTimestamp(this.currentDate) + night;
         $('#clock').toggleClass('game-paused', Tick.isPaused)
-        $('.population.number').number(Tick.cityInfo.population);
+        //$('.population.number').number(Tick.cityInfo.population);
 
         //Init/update KO
         if(this._isInit) {

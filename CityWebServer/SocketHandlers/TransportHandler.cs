@@ -47,7 +47,7 @@ namespace CityWebServer.SocketHandlers {
 					SendList();
 					break;
 				default:
-					SendErrorResponse("Transport has no method '{key}'");
+					SendErrorResponse($"Transport has no method '{key}'");
 					break;
 			}
 		}

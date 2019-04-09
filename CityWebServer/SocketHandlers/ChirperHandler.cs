@@ -30,7 +30,8 @@ namespace CityWebServer.SocketHandlers {
 			messageManager.m_messagesUpdated += OnMessagesUpdated;
 			messageManager.m_newMessages += OnNewMessage;
 			messages = new List<ChirperMessage>();
-			OnMessagesUpdated(); //XXX only do for new connections after handler was called
+			OnMessagesUpdated(); //Ensure new client gets recent messages
+								 //XXX get them from another handler so they have correct times.
 		}
 
 		#region MessageManager callbacks

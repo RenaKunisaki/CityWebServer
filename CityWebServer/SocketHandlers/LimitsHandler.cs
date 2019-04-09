@@ -16,9 +16,7 @@ namespace CityWebServer.SocketHandlers {
 
 		public LimitsHandler(SocketRequestHandler handler) :
 		base(handler, "Limits") {
-			Log("Sending limits...");
 			Update();
-			Log("Sent limits.");
 		}
 
 		protected void Update() {

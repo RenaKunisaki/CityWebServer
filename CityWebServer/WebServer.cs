@@ -16,7 +16,7 @@ using JetBrains.Annotations;
 namespace CityWebServer {
 	[UsedImplicitly]
 	public class WebServer: ThreadingExtensionBase, IWebServer, IAreasExtension,
-	IDemandExtension, ITerrainExtension {
+	ITerrainExtension {
 		protected static Stream logFile = null;
 		protected static TextWriterTraceListener logListener;
 		protected static String wwwRoot = null;
@@ -48,7 +48,6 @@ namespace CityWebServer {
 		public IThreading threading;
 		public CallbackList<FrameCallbackParam> frameCallbacks;
 		public CallbackList<UnlockAreaCallbackParam> unlockAreaCallbacks;
-		public CallbackList<UpdateDemandParam> updateDemandCallbacks;
 		public CallbackList<TerrainCallbackParam> terrainCallbacks;
 
 
@@ -78,7 +77,6 @@ namespace CityWebServer {
 			_requestHandlers = new List<IRequestHandler>();
 			frameCallbacks = new CallbackList<FrameCallbackParam>("Frame");
 			unlockAreaCallbacks = new CallbackList<UnlockAreaCallbackParam>("UnlockArea");
-			updateDemandCallbacks = new CallbackList<UpdateDemandParam>("updateDemand");
 			terrainCallbacks = new CallbackList<TerrainCallbackParam>("Terrain");
 
 			IPAddress address = IPAddress.Parse("127.0.0.1");
@@ -449,36 +447,6 @@ namespace CityWebServer {
 		}
 
 		#endregion IAreasExtension
-
-		#region IDemandExtension
-
-		public void OnCreated(IDemand demand) { }
-
-		public int OnCalculateResidentialDemand(int originalDemand) {
-			updateDemandCallbacks.Call(new UpdateDemandParam {
-				demand = originalDemand, which = 'R'
-			});
-			return originalDemand;
-		}
-
-		public int OnCalculateCommercialDemand(int originalDemand) {
-			updateDemandCallbacks.Call(new UpdateDemandParam {
-				demand = originalDemand, which = 'C'
-			});
-			return originalDemand;
-		}
-
-		public int OnCalculateWorkplaceDemand(int originalDemand) {
-			updateDemandCallbacks.Call(new UpdateDemandParam {
-				demand = originalDemand, which = 'W'
-			});
-			return originalDemand;
-		}
-
-		public int OnUpdateDemand(int lastDemand, int nextDemand, int targetDemand) { return lastDemand; }
-
-		#endregion IDemandExtension
-
 
 		#region ITerrainExtension
 

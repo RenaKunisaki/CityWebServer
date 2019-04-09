@@ -56,7 +56,7 @@ namespace CityWebServer {
 					catch(Exception ex) {
 						if(ex is System.IO.IOException) {
 							//probably the client closed the socket
-							Log($"IO error (probably harmless) in handler {handler.Name} for {req.method} {req.path}: {ex.Message}");
+							Log($"I/O error (probably harmless) in handler {handler.Name} for {req.method} {req.path}: {ex}");
 						}
 						else {
 							Log($"Error in handler {handler.Name} for {req.method} {req.path} with client {client.Client.RemoteEndPoint}: {ex}");

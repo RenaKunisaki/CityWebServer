@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using CityWebServer.Callbacks;
 using CityWebServer.Models;
 using CityWebServer.RequestHandlers;
@@ -13,14 +14,12 @@ namespace CityWebServer.SocketHandlers {
 	/// </summary>
 	public class CityInfoHandler: SocketHandlerBase {
 		protected float totalTimeDelta;
-		protected int demandR, demandC, demandW;
 
 		public CityInfoHandler(SocketRequestHandler handler) :
 		base(handler, "CityInfo") {
 			totalTimeDelta = 0;
 			server.frameCallbacks.Register(Update);
 			server.unlockAreaCallbacks.Register(OnAreaUnlocked);
-			server.updateDemandCallbacks.Register(OnUpdateDemand);
 			SendInitialInfo();
 		}
 
@@ -58,78 +57,11 @@ namespace CityWebServer.SocketHandlers {
 				isNight = simulationManager.m_isNightTime,
 				simSpeed = simulationManager.SelectedSimulationSpeed,
 				isPaused = simulationManager.SimulationPaused,
-				demandR = demandR,
-				demandC = demandC,
-				demandW = demandW,
 				citizenCount = citizenManager.m_citizenCount,
 				trafficFlow = vehicleManager.m_lastTrafficFlow,
 				vehicleCount = vehicleManager.m_vehicleCount,
 				parkedCount = vehicleManager.m_parkedCount,
-				cityInfo = GetDistrict(0),
 			}, "Tick");
-		}
-
-
-		public DistrictInfo GetDistrict(int districtID) {
-			var districtManager = Singleton<DistrictManager>.instance;
-			var district = districtManager.m_districts.m_buffer[districtID];
-
-			//District 0 is the entire city.
-			//It does have an auto-generated name, but this name is
-			//never shown in-game. (why not just use that to store
-			//the city name?)
-			string name = "City";
-			if(districtID != 0) name = districtManager.GetDistrictName(districtID);
-
-			return new DistrictInfo {
-				name = name,
-				population = district.m_populationData.m_finalCount,
-				popDelta = district.m_populationData.GetWeeklyDelta(),
-				CremateCapacity = district.GetCremateCapacity(),
-				CriminalAmount = district.GetCriminalAmount(),
-				CriminalCapacity = district.GetCriminalCapacity(),
-				DeadAmount = district.GetDeadAmount(),
-				DeadCapacity = district.GetDeadCapacity(),
-				DeadCount = district.GetDeadCount(),
-				Education1Capacity = district.GetEducation1Capacity(),
-				Education1Need = district.GetEducation1Need(),
-				Education1Rate = district.GetEducation1Rate(),
-				Education2Capacity = district.GetEducation2Capacity(),
-				Education2Need = district.GetEducation2Need(),
-				Education2Rate = district.GetEducation2Rate(),
-				Education3Capacity = district.GetEducation3Capacity(),
-				Education3Need = district.GetEducation3Need(),
-				Education3Rate = district.GetEducation3Rate(),
-				ElectricityCapacity = district.GetElectricityCapacity(),
-				ElectricityConsumption = district.GetElectricityConsumption(),
-				ExportAmount = district.GetExportAmount(),
-				ExtraCriminals = district.GetExtraCriminals(),
-				GarbageAccumulation = district.GetGarbageAccumulation(),
-				GarbageAmount = district.GetGarbageAmount(),
-				GarbageCapacity = district.GetGarbageCapacity(),
-				GarbagePiles = district.GetGarbagePiles(),
-				GroundPollution = district.GetGroundPollution(),
-				HealCapacity = district.GetHealCapacity(),
-				HeatingCapacity = district.GetHeatingCapacity(),
-				HeatingConsumption = district.GetHeatingConsumption(),
-				ImportAmount = district.GetImportAmount(),
-				IncinerationCapacity = district.GetIncinerationCapacity(),
-				IncomeAccumulation = district.GetIncomeAccumulation(),
-				LandValue = district.GetLandValue(),
-				SewageAccumulation = district.GetSewageAccumulation(),
-				SewageCapacity = district.GetSewageCapacity(),
-				ShelterCitizenCapacity = district.GetShelterCitizenCapacity(),
-				ShelterCitizenNumber = district.GetShelterCitizenNumber(),
-				SickCount = district.GetSickCount(),
-				Unemployment = district.GetUnemployment(),
-				WaterCapacity = district.GetWaterCapacity(),
-				WaterConsumption = district.GetWaterConsumption(),
-				WaterPollution = district.GetWaterPollution(),
-				WaterStorageAmount = district.GetWaterStorageAmount(),
-				WaterStorageCapacity = district.GetWaterStorageCapacity(),
-				WorkerCount = district.GetWorkerCount(),
-				WorkplaceCount = district.GetWorkplaceCount(),
-			};
 		}
 
 		/// <summary>
@@ -150,15 +82,6 @@ namespace CityWebServer.SocketHandlers {
 		/// <param name="param">Parameter.</param>
 		protected void OnAreaUnlocked(UnlockAreaCallbackParam param) {
 			SendJson(param, "UnlockArea");
-		}
-
-		protected void OnUpdateDemand(UpdateDemandParam param) {
-			switch(param.which) {
-				case 'R': demandR = param.demand; break;
-				case 'C': demandC = param.demand; break;
-				case 'W': demandW = param.demand; break;
-				default: Log($"Unknown demand type '{param.which}'"); break;
-			}
 		}
 
 		/// <summary>

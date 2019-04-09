@@ -5,6 +5,57 @@ using CityWebServer.Helpers;
 using ColossalFramework;
 
 namespace CityWebServer.Models {
+	public class DistrictInfo {
+		public uint ID;
+		public string Name;
+		public uint Population;
+		public int PopDelta;
+		public int CremateCapacity;
+		public int CriminalAmount;
+		public int CriminalCapacity;
+		public int DeadAmount;
+		public int DeadCapacity;
+		public int DeadCount;
+		public int Education1Capacity;
+		public int Education1Need;
+		public int Education1Rate;
+		public int Education2Capacity;
+		public int Education2Need;
+		public int Education2Rate;
+		public int Education3Capacity;
+		public int Education3Need;
+		public int Education3Rate;
+		public int ElectricityCapacity;
+		public int ElectricityConsumption;
+		public int ExportAmount;
+		public int ExtraCriminals;
+		public int GarbageAccumulation;
+		public int GarbageAmount;
+		public int GarbageCapacity;
+		public int GarbagePiles;
+		public int GroundPollution;
+		public int HealCapacity;
+		public int HeatingCapacity;
+		public int HeatingConsumption;
+		public int ImportAmount;
+		public int IncinerationCapacity;
+		public int IncomeAccumulation;
+		public int LandValue;
+		public int SewageAccumulation;
+		public int SewageCapacity;
+		public int ShelterCitizenCapacity;
+		public int ShelterCitizenNumber;
+		public int SickCount;
+		public int Unemployment;
+		public int WaterCapacity;
+		public int WaterConsumption;
+		public int WaterPollution;
+		public int WaterStorageAmount;
+		public int WaterStorageCapacity;
+		public int WorkerCount;
+		public int WorkplaceCount;
+	}
+
 	public class OldDistrictInfo {
 		public int DistrictID { get; set; }
 
