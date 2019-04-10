@@ -400,6 +400,7 @@ namespace CityWebServer.SocketHandlers {
 			updateInterval = 5; //seconds
 			economyManager = Singleton<EconomyManager>.instance;
 			server.frameCallbacks.Register(Update);
+			SendAll();
 		}
 
 		/// <summary>
@@ -413,7 +414,13 @@ namespace CityWebServer.SocketHandlers {
 				return;
 			}
 			totalTimeDelta = 0;
+			SendAll();
+		}
 
+		/// <summary>
+		/// Send all budget info to client.
+		/// </summary>
+		protected void SendAll() {
 			BudgetInfo budget = this.GetOverview();
 			budget.loans = this.GetLoans().ToArray();
 			budget.economy = new Economy {
