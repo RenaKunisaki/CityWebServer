@@ -107,6 +107,7 @@ namespace CityWebServer.SocketHandlers {
 			}
 			if(building.Info == null) return null;
 			return new CityWebServer.Models.BuildingInfo {
+				ID = id,
 				category = building.Info.category,
 				title = building.Info.GetUncheckedLocalizedTitle(),
 				thumbnail = building.Info.m_Thumbnail,

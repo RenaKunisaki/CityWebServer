@@ -113,7 +113,7 @@ namespace CityWebServer.SocketHandlers {
 			var color = line.GetColor();
 
 			return new PublicTransportLine {
-				//name = line.Info.name,
+				ID = id,
 				name = transportManager.GetLineName((ushort)id),
 				type = line.Info.name,
 				lineNumber = line.m_lineNumber,

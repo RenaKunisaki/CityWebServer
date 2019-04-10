@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using CityWebServer.Extensibility;
+using CityWebServer.Callbacks;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
-using JetBrains.Annotations;
 
 namespace CityWebServer.SocketHandlers {
 	/// <summary>
@@ -14,45 +13,136 @@ namespace CityWebServer.SocketHandlers {
 	public class VehicleHandler: SocketHandlerBase {
 		public VehicleHandler(SocketRequestHandler handler) :
 		base(handler, "Vehicle") {
-			//TODO
+			handler.RegisterMessageHandler("Vehicle", OnClientMessage);
 		}
-		/*
-		public override void Handle(HttpRequest request) {
-			this.request = request;
+
+		/// <summary>
+		/// Handle "Transport" message from client.
+		/// </summary>
+		/// <param name="_param">Parameter.</param>
+		/// <remarks>Expects a dict with one of the keys:
+		/// <c>get</c>: line ID => get info about specified line
+		/// <c>list</c>: (anything) => get list of valid IDs
+		/// </remarks>
+		public void OnClientMessage(SocketMessageHandlerParam _param) {
+			var param = _param.param as Dictionary<string, object>;
+			var key = param.Keys.First();
+			switch(key) {
+				case null:
+					SendErrorResponse(HttpStatusCode.BadRequest);
+					break;
+				case "get":
+					int? id = param["get"] as int?;
+					if(id == null) {
+						SendErrorResponse("Invalid vehicle ID");
+						return;
+					}
+					SendVehicle((int)id);
+					break;
+				case "list":
+					SendList();
+					break;
+				default:
+					SendErrorResponse($"Vehicle has no method '{key}'");
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Send a list of valid vehicle IDs.
+		/// </summary>
+		protected void SendList() {
 			var vehicleManager = Singleton<VehicleManager>.instance;
-
-			if(request.path.StartsWith("/Vehicle/List")) {
-				List<ushort> vehicleIds = new List<ushort>();
-
-				var len = vehicleManager.m_vehicles.m_buffer.Length;
-				for(ushort i = 0; i < len; i++) {
-					if(vehicleManager.m_vehicles.m_buffer[i].m_flags == 0) { continue; }
-
-					vehicleIds.Add(i);
-				}
-
-				SendJson(vehicleIds);
+			if(vehicleManager == null) {
+				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
 				return;
 			}
-
-			List<ushort> s = new List<ushort>();
-
-			foreach(var vehicle in vehicleManager.m_vehicles.m_buffer) {
-				if(vehicle.m_flags == 0) { continue; }
-
-				if((vehicle.m_flags & Vehicle.Flags.Spawned) == Vehicle.Flags.Spawned && (vehicle.m_flags & Vehicle.Flags.Created) == Vehicle.Flags.Created) {
-					var origin = (vehicle.m_sourceBuilding);
-					var target = (vehicle.m_targetBuilding);
-
-					if(origin > 0) { s.Add(origin); }
-					if(target > 0) { s.Add(target); }
-				}
+			List<int> ids = new List<int>();
+			Vehicle[] vehicles;
+			try {
+				vehicles = vehicleManager.m_vehicles.m_buffer;
+			}
+			catch(Exception ex) {
+				Log($"Error getting vehicles buffer: {ex}");
+				throw;
 			}
 
-			var grouped = s.GroupBy(obj => obj).Select(group => new { BuildingID = group.Key, Count = group.Count() }).OrderByDescending(obj => obj.Count).Select(obj => new { Building = BuildingManager.instance.GetBuildingName(obj.BuildingID, new InstanceID()), obj.Count }).ToList();
+			for(int i = 0; i < vehicles.Length; i++) {
+				var vehicle = vehicles[i];
+				//for some reason there's no Vehicle.Flags.None
+				if(vehicle.m_flags == 0) continue;
+				ids.Add(i);
+			}
 
-			SendJson(grouped);
+			SendJson(ids, "VehicleIDs");
 		}
-		*/
+
+		/// <summary>
+		/// Send info about a transport line.
+		/// </summary>
+		/// <param name="id">Line ID.</param>
+		protected void SendVehicle(int id) {
+			SendJson(GetVehicle(id));
+		}
+
+		/// <summary>
+		/// Get info about specified line by ID.
+		/// </summary>
+		/// <returns>The line.</returns>
+		/// <param name="id">Line ID.</param>
+		protected CityWebServer.Models.Vehicle GetVehicle(int id) {
+			var vehicleManager = Singleton<VehicleManager>.instance;
+			if(vehicleManager == null) {
+				//SendErrorResponse(HttpStatusCode.ServiceUnavailable);
+				return null;
+			}
+
+			var vehicle = vehicleManager.m_vehicles.m_buffer[id];
+			if(vehicle.m_flags == 0) return null;
+
+			return new CityWebServer.Models.Vehicle {
+				ID = id,
+				name = vehicle.Info.name,
+				citizenUnits = vehicle.m_citizenUnits,
+				firstCargo = vehicle.m_firstCargo,
+				flags = (uint)vehicle.m_flags,
+				flags2 = (uint)vehicle.m_flags2,
+				gateIndex = vehicle.m_gateIndex,
+				infoIndex = vehicle.m_infoIndex,
+				lastPathOffset = vehicle.m_lastPathOffset,
+				leadingVehicle = vehicle.m_leadingVehicle,
+				nextCargo = vehicle.m_nextCargo,
+				nextGridVehicle = vehicle.m_nextGridVehicle,
+				nextGuestVehicle = vehicle.m_nextGuestVehicle,
+				nextLineVehicle = vehicle.m_nextLineVehicle,
+				nextOwnVehicle = vehicle.m_nextOwnVehicle,
+				path = vehicle.m_path,
+				pathPositionIndex = vehicle.m_pathPositionIndex,
+				segmentA = vehicle.m_segment.a,
+				segmentB = vehicle.m_segment.b,
+				sourceBuilding = vehicle.m_sourceBuilding,
+				targetBuilding = vehicle.m_targetBuilding,
+				targetPos0 = vehicle.m_targetPos0,
+				targetPos1 = vehicle.m_targetPos1,
+				targetPos2 = vehicle.m_targetPos2,
+				targetPos3 = vehicle.m_targetPos3,
+				touristCount = vehicle.m_touristCount,
+				trailingVehicle = vehicle.m_trailingVehicle,
+				transferSize = vehicle.m_transferSize,
+				transferType = vehicle.m_transferType,
+				transportLine = vehicle.m_transportLine,
+				waitCounter = vehicle.m_waitCounter,
+				waterSource = vehicle.m_waterSource,
+				title = vehicle.Info.GetUncheckedLocalizedTitle(),
+				acceleration = vehicle.Info.m_acceleration,
+				braking = vehicle.Info.m_braking,
+				maxSpeed = vehicle.Info.m_maxSpeed,
+				springs = vehicle.Info.m_springs,
+				turning = vehicle.Info.m_turning,
+				isLargeVehicle = vehicle.Info.m_isLargeVehicle,
+				maxTrailerCount = vehicle.Info.m_maxTrailerCount,
+				thumbnail = vehicle.Info.m_Thumbnail,
+			};
+		}
 	}
 }

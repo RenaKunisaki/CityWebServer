@@ -1,0 +1,47 @@
+﻿namespace CityWebServer.Models {
+	public class Vehicle {
+		public int ID;
+		public string name;
+		public byte blockCounter;
+		public ushort cargoParent;
+		public uint citizenUnits;
+		public ushort firstCargo;
+		public uint flags;
+		public uint flags2;
+		public byte gateIndex;
+		public ushort infoIndex;
+		public byte lastPathOffset;
+		public ushort leadingVehicle;
+		public ushort nextCargo;
+		public ushort nextGridVehicle;
+		public ushort nextGuestVehicle;
+		public ushort nextLineVehicle;
+		public ushort nextOwnVehicle;
+		public uint path;
+		public byte pathPositionIndex;
+		public UnityEngine.Vector3 segmentA;
+		public UnityEngine.Vector3 segmentB;
+		public ushort sourceBuilding;
+		public ushort targetBuilding;
+		public UnityEngine.Vector4 targetPos0;
+		public UnityEngine.Vector4 targetPos1;
+		public UnityEngine.Vector4 targetPos2;
+		public UnityEngine.Vector4 targetPos3;
+		public ushort touristCount;
+		public ushort trailingVehicle;
+		public ushort transferSize;
+		public byte transferType;
+		public ushort transportLine;
+		public byte waitCounter;
+		public ushort waterSource;
+		public string title;
+		public float acceleration;
+		public float braking;
+		public float maxSpeed;
+		public float springs;
+		public float turning;
+		public bool isLargeVehicle;
+		public int maxTrailerCount;
+		public string thumbnail;
+	}
+}

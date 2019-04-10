@@ -2,6 +2,7 @@
 
 namespace CityWebServer.Models {
 	public class BuildingInfo {
+		public int ID;
 		public string category;
 		public string title;
 		public string thumbnail;

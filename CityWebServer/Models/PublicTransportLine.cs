@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace CityWebServer.Models {
 	public class PublicTransportLine {
+		public int ID;
 		public string name;
 		public string type;
 		public int lineNumber;
