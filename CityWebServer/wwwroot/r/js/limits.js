@@ -7,7 +7,8 @@ class Limits {
         const limits = await this.app.query("Limits", "Limits");
         const options = {
             layout: {
-                padding: { left: 0, right: 0, bottom: 0, top: 0 },
+                //adding padding here helps it not make the bars wider
+                padding: { left: 0, right: 0, bottom: 60, top: 0 },
             },
             legend: { display: false },
             scales: {
@@ -16,6 +17,7 @@ class Limits {
                     categoryPercentage: 1.0,
                     min: 0, max: 100,
                     suggestedMin: 0, suggestedMax: 100,
+                    //maxBarThickness: 12,
                 }],
             },
             tooltips: {

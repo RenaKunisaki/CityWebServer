@@ -3,6 +3,7 @@ class HeightMap {
         this.app = app;
         this.scale = 1.0;
         this.position = [200, 0];
+        this._isFirstRefresh = true;
     }
 
     run() {
@@ -136,6 +137,11 @@ class HeightMap {
 
         this.ctx.drawImage(this.bitmap, 0, 0);
         if(this.app.data.CityInfo) this.updateLockedTiles(this.app.data.CityInfo);
+
+        if(this._isFirstRefresh) {
+            this._isFirstRefresh = false;
+            this.zoomToUnlockedRegion();
+        }
     }
 
     updateLockedTiles(cityInfo) {

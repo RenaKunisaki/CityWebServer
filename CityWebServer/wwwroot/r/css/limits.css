@@ -1,8 +1,9 @@
 #limits {
-    max-width: 24em;
+    max-width: 32em;
+    overflow: hidden;
 }
 
 #limits .canvas {
     height: 12em;
-    width: 24em;
+    width: 32em;
 }
