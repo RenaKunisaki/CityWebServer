@@ -15,7 +15,7 @@ class App {
         this.chirper        = new Chirper(this);
         this.heightMap      = new HeightMap(this);
         this.budget         = new Budget(this);
-        //this.population     = new Population(this);
+        this.population     = new Population(this);
         this.limits         = new Limits(this);
         //this.problems       = new Problems(this);
         //this.transit        = new Transit(this);
@@ -164,7 +164,6 @@ class App {
 
         this.data.friendlyDate = this.formatTimestamp(this.currentDate) + night;
         $('#clock').toggleClass('game-paused', Tick.isPaused)
-        //$('.population.number').number(Tick.cityInfo.population);
 
         //Update layout
         $('#main').masonry('layout');
@@ -183,7 +182,7 @@ class App {
         this.heightMap.run();
         this.chirper.run();
         this.budget.run();
-        //this.population.run();
+        this.population.run();
         this.limits.run();
         //this.problems.run();
         //this.transit.run();

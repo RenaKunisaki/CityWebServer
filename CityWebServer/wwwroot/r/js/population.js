@@ -2,13 +2,18 @@ class Population {
     constructor(app) {
         this.app = app;
         this.colors = {
-            Children:   "#0040FF",
-            Teen:       "#00FF00",
-            YoungAdult: "#FF4040",
-            Adult:      "#FFC000",
-            Senior:     "#800080",
+            Children:    "#0040FF",
+            Teens:       "#00FF00",
+            YoungAdults: "#FF4040",
+            Adults:      "#FFC000",
+            Seniors:     "#800080",
         };
         this._makeCharts();
+    }
+
+    run() {
+        this.app.registerMessageHandler("District", (data) => this._update(data));
+        console.log("Population online.")
     }
 
     _makeCharts() {
@@ -21,11 +26,10 @@ class Population {
             },
             legend: { display: false },
         };
-        const labels = ["Children", "Teen", "YoungAdult", "Adult", "Senior"];
+        const labels = [];
         const bgColors = [];
-
-        for(const name of labels) {
-            const color = this.colors[name];
+        for(const [name, color] of Object.entries(this.colors)) {
+            labels.push(name);
             bgColors.push(color);
 
             const td  = $('<td>');
@@ -58,12 +62,12 @@ class Population {
         });
     }
 
-    //This class updates when called from App, since all the data is there.
-    update(data) {
+    _update(district) {
+        if(district.ID != 0) return;
         const dataSet = [];
-        for(let item of data.GlobalDistrict.PopulationData) {
-            this.rows[item.Name].number(item.Amount);
-            dataSet.push(item.Amount);
+        for(const [name, color] of Object.entries(this.colors)) {
+            this.rows[name].number(district[name]);
+            dataSet.push(district[name]);
         }
 
         this.chart.data.datasets[0].data = dataSet;
