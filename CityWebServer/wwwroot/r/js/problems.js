@@ -53,7 +53,6 @@ const problemTypes = [
 
 class Problems {
     constructor(app) {
-        this.updateInterval = 10000; //msec
         this.app = app;
         this._makeIcons();
     }
@@ -74,19 +73,16 @@ class Problems {
     }
 
     run() {
-        window.setInterval(() => {this._refresh()}, this.updateInterval);
+        this.app.registerMessageHandler("ProblemCounts", (data) => this._update(data));
         console.log("Problems online.")
-        this._refresh();
     }
 
-    _refresh() {
-        $.getJSON('/Notifications', (data) => {
-            for(const type of problemTypes) {
-                let count = data.problemCount[type];
-                if(count == undefined) count = 0;
-                $(`#problem-label-${type}`).number(count);
-                $(`#problem-icon-${type}`).toggleClass('zero', count == 0);
-            }
-        });
+    _update(ProblemCounts) {
+        for(const type of problemTypes) {
+            let count = ProblemCounts[type];
+            if(count == undefined) count = 0;
+            $(`#problem-label-${type}`).number(count);
+            $(`#problem-icon-${type}`).toggleClass('zero', count == 0);
+        }
     }
 }

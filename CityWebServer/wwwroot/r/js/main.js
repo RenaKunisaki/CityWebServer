@@ -17,7 +17,7 @@ class App {
         this.budget         = new Budget(this);
         this.population     = new Population(this);
         this.limits         = new Limits(this);
-        //this.problems       = new Problems(this);
+        this.problems       = new Problems(this);
         //this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
@@ -188,7 +188,7 @@ class App {
         this.budget.run();
         this.population.run();
         this.limits.run();
-        //this.problems.run();
+        this.problems.run();
         //this.transit.run();
         //$('#transit').append(this.transit.element);
         this._isInit = true;
