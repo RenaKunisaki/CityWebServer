@@ -1,10 +1,10 @@
 class Limits {
     constructor(app) {
         this.app = app;
-        this.updateInterval = 10000; //msec
     }
 
-    _makeCharts(data) {
+    async _makeCharts() {
+        const limits = await this.app.query("Limits", "Limits");
         const options = {
             layout: {
                 padding: { left: 0, right: 0, bottom: 0, top: 0 },
@@ -31,7 +31,7 @@ class Limits {
             },
         };
 
-        const L = data;
+        const L = limits;
         this.fields = {
             "Buildings": {
                 max: L.BuildingManager.MAX_BUILDING_COUNT,
@@ -115,25 +115,20 @@ class Limits {
         });
     }
 
-    run() {
-        $.getJSON('/Limits', (data) => {
-            this._makeCharts(data);
-            window.setInterval(() => {this._refresh()}, this.updateInterval);
-            console.log("Transit online.")
-            this._refresh();
-        });
+    async run() {
+        await this._makeCharts();
+        this.app.registerMessageHandler("Instances", (data) => this._update(data));
+        console.log("Limits online.")
     }
 
-    _refresh() {
-        $.getJSON('/Instances', (data) => {
-            this._lastData = data;
-            const dataSet = [];
-            for(const [name, field] of Object.entries(this.fields)) {
-                let val = field.get(data);
-                dataSet.push((val / field.max) * 100);
-            }
-            this.chart.data.datasets[0].data = dataSet;
-            this.chart.update();
-        });
+    _update(instances) {
+        this._lastData = instances;
+        const dataSet = [];
+        for(const [name, field] of Object.entries(this.fields)) {
+            let val = field.get(instances);
+            dataSet.push((val / field.max) * 100);
+        }
+        this.chart.data.datasets[0].data = dataSet;
+        this.chart.update();
     }
 }

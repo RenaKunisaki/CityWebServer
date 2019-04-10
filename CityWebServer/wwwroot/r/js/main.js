@@ -15,10 +15,10 @@ class App {
         this.chirper        = new Chirper(this);
         this.heightMap      = new HeightMap(this);
         this.budget         = new Budget(this);
-        /* this.limits         = new Limits(this);
-        this.population     = new Population(this);
-        this.problems       = new Problems(this);
-        this.transit        = new Transit(this); */
+        //this.population     = new Population(this);
+        this.limits         = new Limits(this);
+        //this.problems       = new Problems(this);
+        //this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -78,17 +78,6 @@ class App {
         this.registerMessageHandler("CityInfo", data => this._updateCityInfo(data));
 
 
-        this.heightMap.run();
-        this.chirper.run();
-        this.budget.run();
-
-        /* $('#transit').append(this.transit.element);
-
-        this.limits.run();
-        //this.population.run();
-        this.problems.run();
-        this.transit.run(); */
-
         //Set up layout.
         $('#main').masonry({
             itemSelector: '.box',
@@ -119,11 +108,14 @@ class App {
     }
 
     query(message, response) {
-        const promise = new Promise();
         const self = this;
+        let _resolve = null;
+        const promise = new Promise(resolve => {
+            _resolve = resolve;
+        });
         function handler(data) {
             self.unregisterMessageHandler(message, handler);
-            promise.resolve(data);
+            _resolve(data);
         }
         this.registerMessageHandler(response, handler);
         this.socket.send(JSON.stringify(message));
@@ -174,16 +166,6 @@ class App {
         $('#clock').toggleClass('game-paused', Tick.isPaused)
         //$('.population.number').number(Tick.cityInfo.population);
 
-        //Init/update KO
-        /* if(this._isInit) {
-            ko.mapping.fromJS(this.data, this.viewModel);
-        }
-        else {
-            this.viewModel = ko.mapping.fromJS(this.data);
-            ko.applyBindings(this.viewModel);
-            this._isInit = true;
-        } */
-
         //Update layout
         $('#main').masonry('layout');
     }
@@ -197,9 +179,22 @@ class App {
             `Climate: ${CityInfo.environment}`); */
     }
 
+    _init() {
+        this.heightMap.run();
+        this.chirper.run();
+        this.budget.run();
+        //this.population.run();
+        this.limits.run();
+        //this.problems.run();
+        //this.transit.run();
+        //$('#transit').append(this.transit.element);
+        this._isInit = true;
+    }
+
     _onMessage(message) {
         /** Called when a new message arrives on the socket.
          */
+        if(!this._isInit) this._init();
         $('#navbar-error').hide();
         message = JSON.parse(message);
 
