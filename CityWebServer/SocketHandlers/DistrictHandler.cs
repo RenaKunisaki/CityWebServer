@@ -6,6 +6,7 @@ using CityWebServer.Callbacks;
 using CityWebServer.Models;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
+using ICities;
 
 namespace CityWebServer.SocketHandlers {
 	/// <summary>

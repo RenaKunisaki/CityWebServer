@@ -5,14 +5,14 @@ using CityWebServer.Extensibility;
 //using CityWebServer.Extensibility.Responses;
 using CityWebServer.Model;
 using CityWebServer.Models;
+using CityWebServer.RequestHandlers;
 using ColossalFramework;
 
-namespace CityWebServer.RequestHandlers {
-	public class NotificationRequestHandler: RequestHandlerBase {
-		/** Handles `/Notifications`.
-		 *  Returns list of active problem notifications.
-		 */
-
+namespace CityWebServer.SocketHandlers {
+	/// <summary>
+	/// Sends problem notifications to client.
+	/// </summary>
+	public class NotificationHandler: SocketHandlerBase {
 		private static Dictionary<Notification.Problem, String> problemFlags =
 		new Dictionary<Notification.Problem, String>() {
 			{Notification.Problem.Crime, "Crime"},
@@ -67,40 +67,40 @@ namespace CityWebServer.RequestHandlers {
 			{Notification.Problem.WrongAreaType, "WrongAreaType"},
 		};
 
-		public NotificationRequestHandler(IWebServer server)
-			: base(server, new Guid("757d3b12-395b-4cb7-930a-81fd854afe24"),
-				"Notifications", "Rena", 100, "/Notifications") {
+		public NotificationHandler(SocketRequestHandler handler) :
+		base(handler, "Notifications") {
+			SendCounts();
 		}
 
-		public static Dictionary<Notification.Problem, string> ProblemFlags { get => problemFlags; set => problemFlags = value; }
+		public static Dictionary<Notification.Problem, string> ProblemFlags {
+			get => problemFlags;
+			set => problemFlags = value;
+		}
 
-		public override void Handle(HttpRequest request) {
-			this.request = request;
-			// TODO: Expand upon this to expose substantially more information.
-			var buildingManager = Singleton<BuildingManager>.instance;
-			if(buildingManager == null) {
+		/// <summary>
+		/// Send count of each problem type.
+		/// </summary>
+		protected void SendCounts() {
+			if(NotificationManager.instance == null) {
 				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
 				return;
 			}
 
-			NotificationInfo info = new NotificationInfo {
-				problemCount = new Dictionary<string, int>(),
-			};
-			foreach(var building in buildingManager.m_buildings.m_buffer) {
-				if(building.m_flags == Building.Flags.None) continue;
-				if(building.m_problems == Notification.Problem.None) continue;
-				//IntegratedWebServer.LogMessage($"Building problems: {building.m_problems}");
+			var problemCount = new Dictionary<string, int>();
+			var groups = NotificationManager.instance.m_groupData;
+			for(int i = 0; i < groups.Length; i++) {
+				var problems = groups[i].m_problems;
+				if(problems == Notification.Problem.None) continue;
 				foreach(KeyValuePair<Notification.Problem, String> flag in problemFlags) {
-					if(((long)building.m_problems & (long)flag.Key) != 0) {
-						if(!info.problemCount.ContainsKey(flag.Value)) {
-							info.problemCount[flag.Value] = 1;
+					if(((long)problems & (long)flag.Key) != 0) {
+						if(!problemCount.ContainsKey(flag.Value)) {
+							problemCount[flag.Value] = 1;
 						}
-						else info.problemCount[flag.Value]++;
+						else problemCount[flag.Value]++;
 					}
 				}
 			}
-
-			SendJson(info);
+			SendJson(problemCount, "ProblemCounts");
 		}
 	}
 }

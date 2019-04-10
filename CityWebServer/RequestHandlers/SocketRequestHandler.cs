@@ -169,6 +169,7 @@ namespace CityWebServer.RequestHandlers {
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
 			InstancesHandler instancesHandler = new InstancesHandler(this);
 			LimitsHandler limitsHandler = new LimitsHandler(this);
+			NotificationHandler notificationHandler = new NotificationHandler(this);
 			ReflectionHandler reflectionHandler = new ReflectionHandler(this);
 			TerrainHandler terrainHandler = new TerrainHandler(this);
 			TransportHandler transportHandler = new TransportHandler(this);
@@ -270,11 +271,23 @@ namespace CityWebServer.RequestHandlers {
 		/// </summary>
 		/// <remarks>This is called once we know a message is available.</remarks>
 		protected void HandleNextMessage() {
+			String message;
+			var reader = new JsonFx.Json.JsonReader();
 			try {
-				var reader = new JsonFx.Json.JsonReader();
-				String message = ReadMessage(request);
+				message = ReadMessage(request);
+			}
+			catch(Exception ex) {
+				if(ex is ObjectDisposedException
+				|| ex is OperationCanceledException) {
+					throw;
+				}
+				Log($"Error decoding socket msg: {ex}");
+				return;
+			}
+
+			try {
 				var input = reader.Read<Dictionary<string, object>>(message);
-				Log($"message: {input}");
+				//Log($"message: {input}");
 				//XXX what happens if message is empty or not a dict?
 				string key = input.Keys.First();
 				Log($"Calling message handlers: '{key}'");
@@ -287,7 +300,7 @@ namespace CityWebServer.RequestHandlers {
 				|| ex is OperationCanceledException) {
 					throw;
 				}
-				Log($"Error handling socket msg: {ex}");
+				Log($"Error handling socket msg: {message}: {ex}");
 			}
 		}
 
