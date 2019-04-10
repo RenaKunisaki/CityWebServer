@@ -46,6 +46,10 @@ body {
     border-bottom: 1px #FFF solid;
 }
 
+.box h1 .buttons {
+    float: right;
+}
+
 .box h2 {
     font-size: 1.1em;
     margin: 0;

@@ -1,11 +1,64 @@
 class HeightMap {
     constructor(app) {
         this.app = app;
+        this.scale = 1.0;
+        this.position = [200, 0];
     }
 
     run() {
-        this.app.registerMessageHandler("CityInfo", (data) => { this.refresh() });
+        this.app.registerMessageHandler("CityInfo",
+            (data) => { this.refresh() });
+
+        this._isDragging = false;
+        this._dragStart  = [0, 0];
+        $("#map").on({
+            "mousewheel DOMMouseScroll": event => {
+                let x = event.originalEvent.deltaX;
+                let y = event.originalEvent.deltaY;
+                this.scale -= y / 3000;
+                console.log("Scrolling", x, y, "Scale", this.scale);
+                event.preventDefault();
+                this._redraw();
+            },
+            "mousedown": event => {
+                if(event.button != 0) return; //only left button
+                this._isDragging = true;
+                this._dragStart  = [
+                    this.position[0] + event.pageX,
+                    this.position[1] + event.pageY,
+                ];
+                event.preventDefault();
+            },
+            "mouseup": event => {
+                if(event.button != 0) return;
+                this._isDragging = false;
+                event.preventDefault();
+            },
+            "mousemove": event => {
+                if(!this._isDragging) return;
+                this.position[0] = this._dragStart[0] - event.pageX;
+                this.position[1] = this._dragStart[1] - event.pageY;
+                event.preventDefault();
+                this._redraw();
+            },
+        });
+        $('#map-zoom-to-unlocked').on('click', event => {
+            this.zoomToUnlockedRegion();
+        })
         this.refresh();
+    }
+
+    zoomToUnlockedRegion() {
+        const width  = this._maxUnlockedX - this._minUnlockedX;
+        const height = this._maxUnlockedY - this._minUnlockedY;
+        const bodyW  = this.body.width();
+        const bodyH =  this.body.height()
+        //XXX double check this.
+        if(width > height) this.scale = bodyW / width;
+        else this.scale = bodyH / height;
+        this.position[0] = this._minUnlockedX * this.scale;
+        this.position[1] = this._minUnlockedY * this.scale;
+        this._redraw();
     }
 
     refresh() {
@@ -28,7 +81,7 @@ class HeightMap {
             setTimeout(() => {this.update(bytes)}, 500);
             return;
         }
-        const resolution = limits.TerrainManager.RAW_RESOLUTION + 1; //XXX why?
+        const resolution = limits.TerrainManager.RAW_RESOLUTION + 1; //XXX why +1?
         const canvas = $('#map canvas')[0];
         const ctx    = canvas.getContext('2d');
         ctx.canvas.width  = resolution;
@@ -42,54 +95,81 @@ class HeightMap {
                 //let pixel = (bytes[offset+1] << 8) | bytes[offset];
                 let pixel = bytes[offset+1];
                 offset += 2;
-                //Y flip image
-                let dest = (((resolution-y)*resolution)+x)*4;
+                let dest = ((y*resolution)+x)*4;
                 image.data[dest  ] = 0; //red
                 image.data[dest+1] = pixel; //green
                 image.data[dest+2] = 0; //blue
                 image.data[dest+3] = 255; //alpha
             }
         }
-        ctx.putImageData(image, 0, 0);
-        this.image = image;
-        this.ctx   = ctx;
+
+        this.body = $("#map .body");
+        this.canvas = canvas;
+        this.ctx = ctx;
         this.resolution = resolution;
 
-        if(this.app.data.CityInfo) this.updateLockedTiles(this.app.data.CityInfo);
+        //Create the bitmap, and when it's ready, draw it.
+        createImageBitmap(image).then(bitmap => {
+            this.bitmap = bitmap;
+            this._redraw();
+        })
     }
 
-    _showTileLocked(xpos, ypos, tileSize, locked) {
-        xpos *= tileSize;
-        ypos *= tileSize;
-        for(let y=0; y<tileSize; y++) {
-            for(let x=0; x<tileSize; x++) {
-                let offs = (((y+ypos)*this.image.width)+x+xpos)*4;
-                this.image.data[offs] = locked ? 64 : 0; //change red
-            }
-        }
+    _redraw() {
+        /** Set transformation matrix to:
+         *  a c e
+         *  b d f
+         *  0 0 1
+         *  by setTransform(a, b, c, d, e, f)
+         *  a = horizontal scale, d = vertical scale
+         *  e = horizontal translate, f = vertical translate
+         *  We scale the Y axis negative to flip the image.
+         */
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0); //clear first...
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.setTransform(
+            this.scale, 0, 0,
+            -this.scale, -this.position[0],
+            -this.position[1] + (this.bitmap.height * this.scale));
+        console.log("Bitmap size:", this.bitmap.width, this.bitmap.height);
+
+        this.ctx.drawImage(this.bitmap, 0, 0);
+        if(this.app.data.CityInfo) this.updateLockedTiles(this.app.data.CityInfo);
     }
 
     updateLockedTiles(cityInfo) {
         if(!this.ctx) return;
+        this._minUnlockedX =  99999999;
+        this._maxUnlockedX = -99999999;
+        this._minUnlockedY =  99999999;
+        this._maxUnlockedY = -99999999;
+
         let numTiles = cityInfo.isTileUnlocked.length;
         let gridSize = Math.sqrt(numTiles);
         let tileSize = Math.floor(this.resolution / gridSize);
         //console.log("grid size", gridSize, "tile size", tileSize);
-        //this.ctx.fillStyle = 'red';  //'rgba(255, 0, 0, 0.25)';
+        this.ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
+        this.ctx.strokeStyle = "#FFF";
         let tile = 0;
         for(let y=0; y<gridSize; y++) {
-            //let msg = '';
             for(let x=0; x<gridSize; x++) {
-                //msg += cityInfo.isTileUnlocked[tile] ? 'O ' : 'X ';
-                this._showTileLocked(x, gridSize-(y+1), tileSize,
-                    !cityInfo.isTileUnlocked[tile]);
-                //lol too fucking easy
-                //this.ctx.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
+                const tx = x * tileSize, ty = y * tileSize;
+                const tx2 = tx+tileSize, ty2 = ty+tileSize;
+                if(!cityInfo.isTileUnlocked[tile]) {
+                    this.ctx.fillRect(tx, ty, tileSize, tileSize);
+                }
+                else {
+                    if(tx  < this._minUnlockedX) this._minUnlockedX = tx;
+                    if(tx2 > this._maxUnlockedX) this._maxUnlockedX = tx2;
+                    if(ty  < this._minUnlockedY) this._minUnlockedY = ty;
+                    if(ty2 > this._maxUnlockedY) this._maxUnlockedY = ty2;
+                }
                 tile++;
             }
-            //console.log(msg);
         }
-        this.ctx.putImageData(this.image, 0, 0);
-
+        //this.ctx.strokeRect(this._minUnlockedX, this._minUnlockedY,
+        //    this._maxUnlockedX - this._minUnlockedX,
+        //    this._maxUnlockedY - this._minUnlockedY);
     }
 }
