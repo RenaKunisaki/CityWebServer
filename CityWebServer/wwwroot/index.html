@@ -128,11 +128,18 @@
             </div>
         </div></div>
 
-        <div id="population" class="list box"><div class="wrapper">
-            <h1>Population: <span class="population number"></span></h1>
+        <div id="population" class="box"><div class="wrapper">
+            <h1>Population Breakdown</h1>
             <div class="body">
-                <div class="canvas">
-                    <canvas></canvas>
+                <div class="chart"><!-- pie chart -->
+                    <div class="canvas" id="population-chart">
+                        <canvas></canvas>
+                    </div>
+                </div>
+                <div class="graph"><!-- line graph -->
+                    <div class="canvas" id="population-graph">
+                        <canvas></canvas>
+                    </div>
                 </div>
             </div>
         </div></div>

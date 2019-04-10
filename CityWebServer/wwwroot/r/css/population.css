@@ -6,16 +6,24 @@
 }
 
 #population {
-    width: 20em;
+    overflow-x: hidden;
+    width: 25em;
+}
+
+#population .chart {
     overflow: visible;
 }
 
-#population .canvas {
+#population-chart {
     /* stupid hack to line chart up nicely
      * without being surrounded by empty space
      */
     position: absolute;
-    right: -20%;
+    right: -15%;
     top:    1.45em;
-    width:  80%;
+    width:  70%;
+}
+
+#population-graph {
+    width: 100%;
 }
