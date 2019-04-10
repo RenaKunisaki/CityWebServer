@@ -3,6 +3,7 @@
 }
 .money:before { content: '₡' }
 .money.negative { color: #F00 !important }
+.money.zero { color: #888 !important }
 
 #budget {
     max-width: 36em;

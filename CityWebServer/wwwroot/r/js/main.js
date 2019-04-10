@@ -37,16 +37,20 @@ class App {
                 //doesn't add currency symbol, does toggle "negative" class
 
                 $(this).text(Math.round(num / 100).toLocaleString());
-                $(this).toggleClass('negative', num <= 0);
+                $(this).toggleClass('negative', num < 0);
+                $(this).toggleClass('zero', Math.round(num/100) == 0);
+                return this;
             },
             percent: function(num) {
                 $(this).text(num.toFixed(0)+'%');
+                return this;
             },
             //permyriad: percent of a percent
             //used because the game gives some percentages this way
             //eg 15% = 1500
             permyriad: function(num) {
                 $(this).text((num / 100).toFixed(2)+'%');
+                return this;
             },
             //there's also number() from jquery.number.min.js
         });

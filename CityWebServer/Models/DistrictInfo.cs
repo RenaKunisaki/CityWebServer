@@ -10,6 +10,13 @@ namespace CityWebServer.Models {
 		public string Name;
 		public uint Population;
 		public int PopDelta;
+		public uint Children;
+		public uint Teens;
+		public uint YoungAdults;
+		public uint Adults;
+		public uint Seniors;
+		public uint Births;
+		public uint Deaths;
 		public int CremateCapacity;
 		public int CriminalAmount;
 		public int CriminalCapacity;
@@ -29,6 +36,7 @@ namespace CityWebServer.Models {
 		public int ElectricityConsumption;
 		public int ExportAmount;
 		public int ExtraCriminals;
+		public int Flags;
 		public int GarbageAccumulation;
 		public int GarbageAmount;
 		public int GarbageCapacity;

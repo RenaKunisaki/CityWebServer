@@ -122,10 +122,13 @@
             const cellIncome = $(`<td id="income-${name}" class="money income">`);
             const cellCost = $(`<td id="cost-${name}" class="money expense">`);
             const cellNet = $(`<td id="net-${name}" class="money net">`);
-            cellIncome.number(group.income / 100);
-            cellCost.number(group.expense / 100);
-            cellNet.number((group.income - group.expense) / 100);
-            cellNet.toggleClass('negative', group.income < group.expense);
+            cellIncome.money(group.income);
+            cellCost.money(group.expense);
+            const dispIn = Math.round(group.income/100).toLocaleString();
+            const dispEx = Math.round(group.expense/100).toLocaleString();
+            cellNet.money(group.income - group.expense).attr(
+                'title', `Income: ₡${dispIn}\nExpense: ₡${dispEx}`
+            );
 
             let row = $(`<tr id="legend-row-${name}">`).append(
                 $('<td>').append(
