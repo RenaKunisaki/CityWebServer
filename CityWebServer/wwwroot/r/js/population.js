@@ -92,6 +92,13 @@ class Population {
             app: this.app,
             element: $('#population-graph canvas')[0],
             datasets: datasets,
+            options: {
+                scales: {
+                    yAxes: [{
+                        stacked: true,
+                    }],
+                },
+            },
         });
     }
 

@@ -32,6 +32,10 @@
             Policies:        {},
             Unknown:         {color: '#FF0000'},
         };
+
+        this.prevYear  = null;
+        this.prevMonth = null;
+        this.prevDay   = null;
     }
 
     run() {
@@ -177,9 +181,46 @@
             },
         });
         $('#budget-legend').append(legend);
+
+        //Make graph
+        const datasets = [];
+        for(let i=0; i<labels.length; i++) {
+            const dataSet = {
+                color: bgColors[i],
+                label: labels[i],
+            }
+            datasets.push(dataSet);
+        }
+        this.graph = new TimeChart({
+            app: this.app,
+            element: $('#budget-graph canvas')[0],
+            datasets: datasets,
+        });
     }
 
-    _updateCharts(data) {
+    _updateGraph(groups) {
+        if(!this.app.data.Tick) return;
+        const time = new Date(this.app.data.Tick.Time);
+        let year   = time.getFullYear();
+        let month  = time.getMonth();
+        let day    = time.getDate();
+        if(day    == this.prevDay
+        && month  == this.prevMonth
+        && year   == this.prevYear) return;
+
+        let data = {};
+        for(const [name, group] of Object.entries(groups)) {
+            data[name] = (group.income - group.expense) / 100;
+        }
+        this.graph.add(time, data);
+
+        this.graph.update();
+        this.prevYear  = year;
+        this.prevMonth = month;
+        this.prevDay   = day;
+    }
+
+    _updateCharts(data) {;
         const incomeData  = [];
         const expenseData = [];
         data.groups = {};
@@ -214,6 +255,7 @@
         this.chartExpenses.data.datasets[0].data = expenseData;
         this.chartIncome.update();
         this.chartExpenses.update();
+        this._updateGraph(data.groups)
     }
 
     _update(data) {

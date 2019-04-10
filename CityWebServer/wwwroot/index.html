@@ -58,7 +58,7 @@
             </div>
         </div></div>
 
-        <div id="budget" class="list box"><div class="wrapper">
+        <div id="budget" class="box"><div class="wrapper">
             <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span data-bind="money:Budget.netIncome" class="money net"></span>/wk)</h1>
             <div class="charts">
                 <div class="chart" id="income-chart">
@@ -131,6 +131,11 @@
                         <td>XXX</td>
                     </tr>
                 </table>
+            </div>
+            <div class="graph">
+                <div class="canvas" id="budget-graph">
+                    <canvas></canvas>
+                </div>
             </div>
         </div></div>
 
