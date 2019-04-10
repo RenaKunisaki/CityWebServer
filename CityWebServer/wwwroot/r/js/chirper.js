@@ -12,6 +12,7 @@ class Chirper {
     }
 
     update(messages) {
+        if(!Array.isArray(messages)) messages = [messages];
         for(const msg of messages) {
             let key = `${msg.SenderID}:${msg.Time}:${msg.Text}`;
             if(this.messages[key] == undefined) {
