@@ -53,7 +53,7 @@
         </div></div>
 
         <div id="budget" class="list box"><div class="wrapper">
-            <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span id="net-income" class="money net"></span>/wk)</h1>
+            <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span data-bind="money:Budget.netIncome" class="money net"></span>/wk)</h1>
             <div class="charts">
                 <div class="chart" id="income-chart">
                     <h2>Weekly Income: <span class="money total" data-bind="money:Budget.totalIncome"></span></h2>
@@ -76,7 +76,7 @@
                         <th title="Low Density">Low</th>
                         <th title="High Density">High</th>
                     </tr>
-                    <!-- not using `percent` here because it adds a % -->
+                    <!-- not using `percent` here because it adds a '%' -->
                     <tr>
                         <td>Residential</td>
                         <td data-bind="number:Budget.economy.taxRates.ResidentialLow"></td>

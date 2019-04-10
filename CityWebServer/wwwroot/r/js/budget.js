@@ -1,7 +1,6 @@
 ﻿class Budget {
     constructor(app) {
         this.app = app;
-        this.updateInterval = 5000; //msec
         this._isInit = false;
 
         //for some reason the in-game bank names
@@ -33,6 +32,11 @@
             Policies:        {},
             Unknown:         {color: '#FF0000'},
         };
+    }
+
+    run() {
+        this.app.registerMessageHandler("Budget", (data) => this._update(data));
+        console.log("Budget online.")
     }
 
     _init(data) {
@@ -70,7 +74,7 @@
                         const label = data.labels[item.index];
                         const dset  = data.datasets[item.datasetIndex];
                         const value = dset.data[item.index];
-                        const amount = (value / 100).toFixed(0);
+                        const amount = Math.round(value / 100).toLocaleString();
                         //XXX format amount as number (commas)
                         return `${label}: ₡${amount}`;
                     },
@@ -210,58 +214,13 @@
         this.chartExpenses.update();
     }
 
-    run() {
-        window.setInterval(() => {this._refresh()}, this.updateInterval);
-        console.log("Budget online.")
-        this._refresh();
-    }
+    _update(data) {
+        if(!this._isInit) {
+            this._init(data);
+            this._isInit = true;
+        }
 
-    _refresh() {
-        $.getJSON('/Budget', (data) => {
-            //console.log("Budget data:", data);
-            if(!this._isInit) {
-                this._init(data);
-                this._isInit = true;
-            }
-
-            const net = data.totalIncome - data.totalExpenses;
-
-            $('#income-chart .total').number(data.totalIncome / 100)
-                .toggleClass('negative', data.totalIncome <= 0);
-
-            $('#expense-chart .total').number(data.totalExpenses / 100)
-                .toggleClass('negative', data.totalExpenses <= 0);
-
-            $('#net-income').number(net / 100)
-                .toggleClass('negative', net <= 0);
-
-            $('#current-cash').number(data.currentCash / 100)
-                .toggleClass('negative', data.currentCash <= 0);
-
-            const taxes = Object.entries(data.economy.taxRates);
-            for(const [name, rate] of taxes) {
-                $(`#tax-${name}`).number(rate);
-            }
-
-            for(let i=0; i < data.loans.length; i++) {
-                const loan = data.loans[i];
-                $(`#loan${i}`).empty().append(
-                    //$('<td>').text(loan.BankName),
-                    $('<td>').text(this.bankNames[i]),
-                    $('<td class="money">').number(loan.PaymentLeft / 100),
-                    $('<td class="number">').text('XXX'), //time left
-                    $('<td class="number">').text(
-                        (loan.InterestRate / 100).toFixed(0) + '%'),
-                    $('<td class="money">').text('XXX'), //weekly cost
-
-                    //Length: number of weeks of repayment total
-                    //No idea how to get number of weeks left or start date,
-                    //or cost per week
-                    //Should be 408 and 442.31
-                );
-            }
-
-            this._updateCharts(data);
-        });
+        data.netIncome = data.totalIncome - data.totalExpenses;
+        this._updateCharts(data);
     }
 }

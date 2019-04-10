@@ -14,8 +14,8 @@ class App {
         this.currentDate    = null;
         this.chirper        = new Chirper(this);
         this.heightMap      = new HeightMap(this);
-        /* this.budget         = new Budget(this);
-        this.limits         = new Limits(this);
+        this.budget         = new Budget(this);
+        /* this.limits         = new Limits(this);
         this.population     = new Population(this);
         this.problems       = new Problems(this);
         this.transit        = new Transit(this); */
@@ -26,12 +26,18 @@ class App {
         ];
         this.messageHandlers = {};
         this.data = {};
+        this._registerjQueryExtensions();
+    }
 
+    _registerjQueryExtensions() {
         jQuery.fn.extend({
-            //add $(...).money(num) => display a money amount
-            //it's the same as number() but divides by 100
             money: function(num) {
-                $(this).number(num / 100);
+                //$(...).money(num)
+                //formats num (in cents) as amount of money
+                //doesn't add currency symbol, does toggle "negative" class
+
+                $(this).text(Math.round(num / 100).toLocaleString());
+                $(this).toggleClass('negative', num <= 0);
             },
             percent: function(num) {
                 $(this).text(num.toFixed(0)+'%');
@@ -74,10 +80,10 @@ class App {
 
         this.heightMap.run();
         this.chirper.run();
+        this.budget.run();
 
         /* $('#transit').append(this.transit.element);
 
-        this.budget.run();
         this.limits.run();
         //this.population.run();
         this.problems.run();
@@ -201,9 +207,13 @@ class App {
             //Merge new data into existing data
             this.data[name] = field;
         }
+        this._callMessageHandlers(message);
+        this._updateBoundElements();
 
+    }
+
+    _callMessageHandlers(message) {
         for(const [name, field] of Object.entries(message)) {
-            //Call handlers
             const handlers = this.messageHandlers[name];
             if(handlers) {
                 for(const handler of handlers) {
@@ -214,8 +224,9 @@ class App {
                 }
             }
         }
+    }
 
-        //Update bound elements
+    _updateBoundElements() {
         $("[data-bind]").each((idx, elem) => {
             const binding = $(elem).attr('data-bind').split(':');
             const prop = binding[0];

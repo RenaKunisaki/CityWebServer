@@ -1,0 +1,170 @@
+{
+    "AudioManager": {
+        "BYTES_PER_CHANNEL": 2,
+        "MAX_RADIO_CHANNEL_COUNT": 256,
+        "MAX_RADIO_CONTENT_COUNT": 256,
+        "STREAM_BUFFER_LIMIT": 8192,
+        "STREAM_BUFFER_SIZE": 65536
+    },
+    "BuildingManager": {
+        "MAX_ASSET_BUILDINGS": 1024,
+        "MAX_BUILDING_COUNT": 49152,
+        "MAX_MAP_BUILDINGS": 8192,
+        "MAX_OUTSIDE_CONNECTIONS": 4
+    },
+    "CitizenManager": {
+        "CITIZENGRID_CELL_SIZE": 8,
+        "CITIZENGRID_RESOLUTION": 2160,
+        "MAX_CITIZEN_COUNT": 1048576,
+        "MAX_INSTANCE_COUNT": 65536,
+        "MAX_UNIT_COUNT": 524288
+    },
+    "DisasterManager": {
+        "EVACUATIONMAP_CELL_SIZE": 38.4,
+        "EVACUATIONMAP_RESOLUTION": 256,
+        "HAZARDMAP_CELL_SIZE": 38.4,
+        "HAZARDMAP_RESOLUTION": 256,
+        "MAX_DISASTER_COUNT": 256,
+        "MAX_SCENARIO_DISASTERS": 200
+    },
+    "DistrictManager": {
+        "CELL_AREA_TO_SQUARE": 5.76,
+        "DISTRICTGRID_CELL_SIZE": 19.2,
+        "DISTRICTGRID_RESOLUTION": 512,
+        "MAX_DISTRICT_COUNT": 128
+    },
+    "EconomyManager": {
+        "MAX_LOANS": 3
+    },
+    "ElectricityManager": {
+        "CONDUCTIVITY_LIMIT": 64,
+        "ELECTRICITYGRID_CELL_SIZE": 38.25,
+        "ELECTRICITYGRID_RESOLUTION": 256,
+        "MAX_PULSE_GROUPS": 1024
+    },
+    "EventManager": {
+        "MAX_EVENT_COUNT": 256
+    },
+    "GameAreaManager": {
+        "AREAGRID_CELL_SIZE": 1920,
+        "AREAGRID_RESOLUTION": 5,
+        "AREA_MAP_RESOLUTION": 8,
+        "DEFAULT_START_X": 2,
+        "DEFAULT_START_Z": 2,
+        "TOTAL_AREA_RESOLUTION": 9
+    },
+    "ImmaterialResourceManager": {
+        "RESOURCE_COUNT": 26,
+        "RESOURCEGRID_CELL_SIZE": 38.4,
+        "RESOURCEGRID_RESOLUTION": 256
+    },
+    "MessageManager": {
+        "RANDOM_MESSAGE_COUNT": 26,
+        "RECENT_MESSAGE_COUNT": 16
+    },
+    "NaturalResourceManager": {
+        "RESOURCEGRID_CELL_SIZE": 33.75,
+        "RESOURCEGRID_RESOLUTION": 512
+    },
+    "NetManager": {
+        "MAX_ASSET_LANES": 8192,
+        "MAX_ASSET_NODES": 1024,
+        "MAX_ASSET_SEGMENTS": 1024,
+        "MAX_LANE_COUNT": 262144,
+        "MAX_MAP_LANES": 131072,
+        "MAX_MAP_NODES": 16384,
+        "MAX_MAP_SEGMENTS": 16384,
+        "MAX_NODE_COUNT": 32768,
+        "MAX_SEGMENT_COUNT": 36864,
+        "NODEGRID_CELL_SIZE": 64,
+        "NODEGRID_RESOLUTION": 270
+    },
+    "PathManager": {
+        "MAX_PATHUNIT_COUNT": 262144
+    },
+    "PropManager": {
+        "MAX_ASSET_PROPS": 64,
+        "MAX_MAP_PROPS": 50000,
+        "MAX_PROP_COUNT": 65536,
+        "PROPGRID_CELL_SIZE": 64,
+        "PROPGRID_RESOLUTION": 270
+    },
+    "RenderManager": {
+        "GROUP_CELL_SIZE": 384,
+        "GROUP_RESOLUTION": 45,
+        "MAX_INSTANCE_HOLDERS": 118784,
+        "MEGA_GROUP_CELL_SIZE": 1920,
+        "MEGA_GROUP_RESOLUTION": 9,
+        "OBJECT_COLORMAP_WIDTH": 512,
+        "OBJECT_COLORMAP_HEIGHT": 256
+    },
+    "SimulationManager": {
+        "DAYTIME_FRAME_TO_HOUR": 0.000366210938,
+        "DAYTIME_FRAMES": 65536,
+        "DAYTIME_HOUR_TO_FRAME": 2730.66675,
+        "RELATIVE_DAY_LENGTH": 5,
+        "RELATIVE_NIGHT_LENGTH": 3,
+        "SIMULATION_PRIORITY": 2,
+        "SUNRISE_HOUR": 5,
+        "SUNSET_HOUR": 20,
+        "SYNCHRONIZE_TIMEOUT": 0
+    },
+    "TerrainManager": {
+        "DETAIL_CELL_SIZE": 4,
+        "DETAIL_MAP_RESOLUTION": 512,
+        "DETAIL_RESOLUTION": 480,
+        "DETAIL_SHIFT": 2,
+        "DIRT_BUFFER_SIZE": 524288,
+        "MAX_SUBPATCH_LEVELS": 4,
+        "MIN_WATER_AMOUNT": 8,
+        "PATCH_RESOLUTION": 9,
+        "RAW_CELL_SIZE": 16,
+        "RAW_MAP_RESOLUTION": 128,
+        "RAW_RESOLUTION": 1080,
+        "TERRAIN_HEIGHT": 1024,
+        "TERRAIN_LEVEL": 60
+    },
+    "TransferManager": {
+        "LARGE_POS_LIMIT": 4800,
+        "REASON_CELL_SIZE_LARGE": 270,
+        "REASON_CELL_SIZE_SMALL": 37.5,
+        "TRANSFER_OFFER_COUNT": 256,
+        "TRANSFER_PRIORITY_COUNT": 8,
+        "TRANSFER_REASON_COUNT": 128
+    },
+    "TransportManager": {
+        "MAX_LINE_COUNT": 256
+    },
+    "TreeManager": {
+        "MAX_ASSET_TREES": 64,
+        "MAX_MAP_TREES": 250000,
+        "MAX_TREE_COUNT": 262144,
+        "TREEGRID_CELL_SIZE": 32,
+        "TREEGRID_RESOLUTION": 540
+    },
+    "VehicleManager": {
+        "MAX_PARKED_COUNT": 32768,
+        "MAX_VEHICLE_COUNT": 16384,
+        "VEHICLEGRID_CELL_SIZE": 32,
+        "VEHICLEGRID_CELL_SIZE2": 320,
+        "VEHICLEGRID_RESOLUTION": 540,
+        "VEHICLEGRID_RESOLUTION2": 54
+    },
+    "WeatherManager": {
+        "WINDGRID_CELL_SIZE": 135,
+        "WINDGRID_RESOLUTION": 128
+    },
+    "WaterManager": {
+        "CONDUCTIVITY_LIMIT": 96,
+        "MAX_PULSE_GROUPS": 1024,
+        "WATERGRID_CELL_SIZE": 38.25,
+        "WATERGRID_RESOLUTION": 256
+    },
+    "ZoneManager": {
+        "MAX_ASSET_BLOCKS": 4096,
+        "MAX_BLOCK_COUNT": 49152,
+        "MAX_MAP_BLOCKS": 16384,
+        "ZONEGRID_CELL_SIZE": 64,
+        "ZONEGRID_RESOLUTION": 150
+    }
+}
