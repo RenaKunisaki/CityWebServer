@@ -1,10 +1,42 @@
 /** TODO:
- *  - Everything under Watch It!
+ *  - District:
+ *    - Births, Deaths
+ *    - CremateCapacity
+ *    - DeadCount (is this how many people are waiting to be moved?)
+ *    - ImportAmount, ExportAmount (units?)
+ *      - Overall natural resource amounts
+ *    - GarbageAccumulation, GarbagePiles, IncinerationCapacity
+ *    - IncomeAccumulation (what is this?)
+ *  - DistrictManager: m_districtCount, m_parkCount
+ *  - EventManager
+ *  - Road wetness
+ *  - Busiest roads by name
+ *  - PathManager: m_pathUnitCount
+ *  - SimulationManager: m_realTimer (what is this?)
+ *  - VehicleManager: m_maxTrafficFlow, m_totalTrafficFlow
+ *     what are these? node IDs?
+ *  - Weather, wind
+ *  - ZoneManager: demand
+ *  - Noise pollution
+ *  - Availability/coverage of police, fire, healthcare
+ *  - Fire hazard rate
+ *  - Crime rate
+ *  - Grab info from StatsManager or whatever
+ *  - Cyclists, Tourists
+ *  - Happiness, Health, Leisure
  *  - Average land value
  *  - City attractiveness
- *  - Disaster logs
- *  - Game limits
+ *  - Road/Park maintenance
+ *  - Disaster logs, escape route coverage, radio coverage, detection
+ *  - Postal stuff
  *  - Localized text
+ *  - Figure out how to get updated game limits, eg trees
+ *
+ * Ideas:
+ * - Have map zoom to camera height (RenderManager.CameraHeight)
+ *   - Have it rotate
+ * - A district selection dropdown in the top navbar, to show stats for
+ *   that district instead of whole city
  */
 
 class App {
