@@ -120,38 +120,6 @@
                     <td>Ground Pollution</td>
                     <td class="number" data-bind="percent:District.GroundPollution"></td>
                 </tr>
-                <tr>
-                    <td>Active Vehicles</td>
-                    <td class="number" data-bind="number:Tick.vehicleCount"></td>
-                </tr>
-                <tr>
-                    <td>Parked Vehicles</td>
-                    <td class="number" data-bind="number:Tick.parkedCount"></td>
-                </tr>
-                <tr>
-                    <td>Buildings</td>
-                    <td class="number" data-bind="number:Instances.BuildingManager.m_buildingCount"></td>
-                </tr>
-                <tr>
-                    <td>Active Citizens</td>
-                    <td class="number" data-bind="number:Instances.CitizenManager.m_instanceCount"></td>
-                </tr>
-                <tr>
-                    <td>Road Lanes</td>
-                    <td class="number" data-bind="number:Instances.NetManager.m_laneCount"></td>
-                </tr>
-                <tr>
-                    <td>Road Segments</td>
-                    <td class="number" data-bind="number:Instances.NetManager.m_segmentCount"></td>
-                </tr>
-                <tr>
-                    <td>Props</td>
-                    <td class="number" data-bind="number:Instances.PropManager.m_propCount"></td>
-                </tr>
-                <tr>
-                    <td>Trees</td>
-                    <td class="number" data-bind="number:Instances.TreeManager.m_treeCount"></td>
-                </tr>
             </table>
         </div></div>
 
@@ -186,62 +154,64 @@
                 </div>
             </div>
             <div id="budget-legend"></div>
-            <div class="taxes">
-                <table>
-                    <tr>
-                        <th>Tax Rate %</th>
-                        <th title="Low Density">Low</th>
-                        <th title="High Density">High</th>
-                    </tr>
-                    <!-- not using `percent` here because it adds a '%' -->
-                    <tr>
-                        <td>Residential</td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.ResidentialLow"></td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.ResidentialHigh"></td>
-                    </tr>
-                    <tr>
-                        <td>Commercial</td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.CommercialLow"></td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.CommercialHigh"></td>
-                    </tr>
-                    <tr>
-                        <td>Industry/Office</td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.Industrial"></td>
-                        <td class="number" data-bind="number:Budget.economy.taxRates.Office"></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="loans">
-                <table id="loans">
-                    <tr>
-                        <th>Loans</th>
-                        <th title="Amount left to repay">₡ Left</th>
-                        <th title="Time until paid">Time Left</th>
-                        <th title="Interest rate">Intrst</th>
-                        <th title="Weekly payment">₡/Week</th>
-                    </tr>
-                    <tr id="loan0">
-                        <td data-bind="text:Budget.loans.0.BankName"></td>
-                        <td class="money" data-bind="money:Budget.loans.0.PaymentLeft"></td>
-                        <td>XXX</td>
-                        <td class="number" data-bind="permyriad:Budget.loans.0.InterestRate"></td>
-                        <td>XXX</td>
-                    </tr>
-                    <tr id="loan1">
-                        <td data-bind="text:Budget.loans.1.BankName"></td>
-                        <td class="money" data-bind="money:Budget.loans.1.PaymentLeft"></td>
-                        <td>XXX</td>
-                        <td class="number" data-bind="permyriad:Budget.loans.1.InterestRate"></td>
-                        <td>XXX</td>
-                    </tr>
-                    <tr id="loan2">
-                        <td data-bind="text:Budget.loans.2.BankName"></td>
-                        <td class="money" data-bind="money:Budget.loans.2.PaymentLeft"></td>
-                        <td>XXX</td>
-                        <td class="number" data-bind="permyriad:Budget.loans.2.InterestRate"></td>
-                        <td>XXX</td>
-                    </tr>
-                </table>
+            <div class="tables">
+                <div class="taxes">
+                    <table>
+                        <tr>
+                            <th>Tax Rate %</th>
+                            <th title="Low Density">Low</th>
+                            <th title="High Density">High</th>
+                        </tr>
+                        <!-- not using `percent` here because it adds a '%' -->
+                        <tr>
+                            <td>Residential</td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.ResidentialLow"></td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.ResidentialHigh"></td>
+                        </tr>
+                        <tr>
+                            <td>Commercial</td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.CommercialLow"></td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.CommercialHigh"></td>
+                        </tr>
+                        <tr>
+                            <td>Industry/Office</td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.Industrial"></td>
+                            <td class="number" data-bind="number:Budget.economy.taxRates.Office"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="loans">
+                    <table id="loans">
+                        <tr>
+                            <th>Loans</th>
+                            <th title="Amount left to repay">₡ Left</th>
+                            <th title="Time until paid">Time Left</th>
+                            <th title="Interest rate">Intrst</th>
+                            <th title="Weekly payment">₡/Week</th>
+                        </tr>
+                        <tr id="loan0">
+                            <td data-bind="text:Budget.loans.0.BankName"></td>
+                            <td class="money" data-bind="money:Budget.loans.0.PaymentLeft"></td>
+                            <td>XXX</td>
+                            <td class="number" data-bind="permyriad:Budget.loans.0.InterestRate"></td>
+                            <td>XXX</td>
+                        </tr>
+                        <tr id="loan1">
+                            <td data-bind="text:Budget.loans.1.BankName"></td>
+                            <td class="money" data-bind="money:Budget.loans.1.PaymentLeft"></td>
+                            <td>XXX</td>
+                            <td class="number" data-bind="permyriad:Budget.loans.1.InterestRate"></td>
+                            <td>XXX</td>
+                        </tr>
+                        <tr id="loan2">
+                            <td data-bind="text:Budget.loans.2.BankName"></td>
+                            <td class="money" data-bind="money:Budget.loans.2.PaymentLeft"></td>
+                            <td>XXX</td>
+                            <td class="number" data-bind="permyriad:Budget.loans.2.InterestRate"></td>
+                            <td>XXX</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <div class="graph">
                 <div class="canvas" id="budget-graph">
