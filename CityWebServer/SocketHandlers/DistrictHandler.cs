@@ -12,11 +12,12 @@ namespace CityWebServer.SocketHandlers {
 	/// Pushes district info to client.
 	/// </summary>
 	public class DistrictHandler: SocketHandlerBase {
-		protected float totalTimeDelta;
+		protected float totalTimeDelta, updateInterval;
 
 		public DistrictHandler(SocketRequestHandler handler) :
 		base(handler, "District") {
 			totalTimeDelta = 0;
+			updateInterval = 5; //seconds
 			server.frameCallbacks.Register(Update);
 			handler.RegisterMessageHandler("District", OnDistrictMessage);
 			SendDistrict(0);
@@ -28,7 +29,7 @@ namespace CityWebServer.SocketHandlers {
 		/// <param name="param">Callback parameters.</param>
 		protected void Update(FrameCallbackParam param) {
 			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta >= 1) { //only update once per second
+			if(totalTimeDelta >= updateInterval) {
 				SendDistrict(0); //0 = whole city
 				totalTimeDelta = 0;
 			}
@@ -50,6 +51,13 @@ namespace CityWebServer.SocketHandlers {
 				Name = name,
 				Population = district.m_populationData.m_finalCount,
 				PopDelta = district.m_populationData.GetWeeklyDelta(),
+				Children = district.m_childData.m_finalCount,
+				Teens = district.m_teenData.m_finalCount,
+				YoungAdults = district.m_youngData.m_finalCount,
+				Adults = district.m_adultData.m_finalCount,
+				Seniors = district.m_seniorData.m_finalCount,
+				Births = district.m_birthData.m_finalCount,
+				Deaths = district.m_deathData.m_finalCount,
 				CremateCapacity = district.GetCremateCapacity(),
 				CriminalAmount = district.GetCriminalAmount(),
 				CriminalCapacity = district.GetCriminalCapacity(),
@@ -69,6 +77,7 @@ namespace CityWebServer.SocketHandlers {
 				ElectricityConsumption = district.GetElectricityConsumption(),
 				ExportAmount = district.GetExportAmount(),
 				ExtraCriminals = district.GetExtraCriminals(),
+				Flags = (int)district.m_flags,
 				GarbageAccumulation = district.GetGarbageAccumulation(),
 				GarbageAmount = district.GetGarbageAmount(),
 				GarbageCapacity = district.GetGarbageCapacity(),
