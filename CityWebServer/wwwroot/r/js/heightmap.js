@@ -4,6 +4,11 @@ class HeightMap {
     }
 
     run() {
+        this.app.registerMessageHandler("CityInfo", (data) => { this.refresh() });
+        this.refresh();
+    }
+
+    refresh() {
         //jQuery doesn't support getting binary blobs.
         const oReq = new XMLHttpRequest();
         oReq.open("GET", "/HeightMap", true);
@@ -49,6 +54,8 @@ class HeightMap {
         this.image = image;
         this.ctx   = ctx;
         this.resolution = resolution;
+
+        if(this.app.data.CityInfo) this.updateLockedTiles(this.app.data.CityInfo);
     }
 
     _showTileLocked(xpos, ypos, tileSize, locked) {
