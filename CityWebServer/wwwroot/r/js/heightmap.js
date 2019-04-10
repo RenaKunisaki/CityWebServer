@@ -133,7 +133,7 @@ class HeightMap {
             this.scale, 0, 0,
             -this.scale, -this.position[0],
             -this.position[1] + (this.bitmap.height * this.scale));
-        console.log("Bitmap size:", this.bitmap.width, this.bitmap.height);
+        //console.log("Bitmap size:", this.bitmap.width, this.bitmap.height);
 
         this.ctx.drawImage(this.bitmap, 0, 0);
         if(this.app.data.CityInfo) this.updateLockedTiles(this.app.data.CityInfo);
