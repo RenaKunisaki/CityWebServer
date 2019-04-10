@@ -8,7 +8,6 @@ class Population {
             Adults:      "#FFC000",
             Seniors:     "#800080",
         };
-        this.oldData = {};
         this.prevYear  = null;
         this.prevMonth = null;
         this.prevDay   = null;
@@ -29,7 +28,6 @@ class Population {
         for(const [name, color] of Object.entries(this.colors)) {
             labels.push(name);
             bgColors.push(color);
-            this.oldData[name] = [];
 
             const td  = $('<td>');
             this._table.append($('<tr>').append(
@@ -85,94 +83,44 @@ class Population {
         const datasets = [];
         for(let i=0; i<labels.length; i++) {
             const dataSet = {
-                backgroundColor: bgColors[i],
-                //hoverBackgroundColor: bgColors[i],
-                borderWidth: 1,
-                borderColor: bgColors[i],
-                data: this.oldData[labels[i]],
-                fill: '-1',
+                color: bgColors[i],
+                label: labels[i],
             }
             datasets.push(dataSet);
         }
-        ctx = $('#population-graph canvas')[0].getContext('2d');
-        this.graph = new Chart(ctx, {
-            type: 'line',
-            options: {
-                layout: {
-                    padding: { left: 0, right: 0, bottom: 0, top: 0 },
-                },
-                legend: { display: false },
-                scales: {
-                    yAxes: [{
-                        stacked: true
-                    }]
-                },
-                tooltips: {
-                    callbacks: {
-                        label: (item, data) => {
-                            const dset  = data.datasets[item.datasetIndex];
-                            const value = dset.data[item.index];
-                            const time  = new Date(value.x);
-                            let year    = time.getFullYear();
-                            let month   = this.app.monthNames[time.getMonth()];
-                            let day     = String(time.getDate()).padStart(2, "0");
-                            const amount = value.y.toLocaleString();
-                            return `${amount} on ${year} ${month} ${day}`;
-                        },
-                        title: (item, data) => {
-                            return labels[item[0].datasetIndex];
-                        },
-                    },
-                },
-            },
-            data: {
-                labels: [],
-                datasets: datasets,
-            },
+        this.graph = new TimeChart({
+            app: this.app,
+            element: $('#population-graph canvas')[0],
+            datasets: datasets,
         });
     }
 
     _update(district) {
         if(district.ID != 0) return;
         if(!this.app.data.Tick) return;
+
         const time = new Date(this.app.data.Tick.Time);
-        let year  = time.getFullYear();
-        let month = time.getMonth();
-        let day   = time.getDate();
+        let year   = time.getFullYear();
+        let month  = time.getMonth();
+        let day    = time.getDate();
+        if(day    == this.prevDay
+        && month  == this.prevMonth
+        && year   == this.prevYear) return;
 
-        if(day   == this.prevDay
-        && month == this.prevMonth
-        && year  == this.prevYear) return;
-        const dayS   = String(day).padStart(2, "0");
-        const monthS = String(month+1).padStart(2, "0");
-
-        if(year != this.prevYear) {
-            this.graph.data.labels.push(`${year}/${monthS}/${dayS}`);
-        }
-        else if(month != this.prevMonth) {
-            this.graph.data.labels.push(`${monthS}/${dayS}`);
-        }
-        else {
-            this.graph.data.labels.push(`${dayS}`);
-        }
-
-
-        this.prevYear  = year;
-        this.prevMonth = month;
-        this.prevDay   = day;
+        this.graph.add(time, district);
 
         const pieDataSet = [];
         for(const [name, color] of Object.entries(this.colors)) {
             this.rows[name].number(district[name]);
             pieDataSet.push(district[name]);
-            this.oldData[name].push({x:time, y:district[name]});
-            if(this.oldData[name].length > 31) {
-                this.oldData[name].unshift();
-            }
         }
 
         this.chart.data.datasets[0].data = pieDataSet;
         this.chart.update();
         this.graph.update();
+
+        this.prevYear  = year;
+        this.prevMonth = month;
+        this.prevDay   = day;
     }
 }
