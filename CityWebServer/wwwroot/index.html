@@ -14,6 +14,7 @@
     <link href='/r/css/navbar.css' rel='stylesheet'>
     <link href='/r/css/population.css' rel='stylesheet'>
     <link href='/r/css/problems.css' rel='stylesheet'>
+    <link href='/r/css/stats.css' rel='stylesheet'>
     <link href='/r/css/transit.css' rel='stylesheet'>
     <script src='/r/js/jquery-2.1.3.min.js'></script>
     <script src='/r/js/jquery.number.min.js'></script>
@@ -43,84 +44,6 @@
         <div class="grid-sizer"></div>
         <div id="chirper" class="list box"><div class="wrapper">
             <h1>Chirper Messages</h1>
-        </div></div>
-
-        <div id="stats" class="box"><div class="wrapper">
-            <h1>Stats</h1>
-            <table>
-                <tr>
-                    <td>Traffic Flow</td>
-                    <td class="number" data-bind="percent:Tick.trafficFlow"></td>
-                </tr>
-                <tr>
-                    <td>Electr. Usage</td>
-                    <td class="number" data-bind="percent:District.ElectricityUsage"></td>
-                </tr>
-                <tr>
-                    <td>Water Usage</td>
-                    <td class="number" data-bind="percent:District.WaterUsage"></td>
-                </tr>
-                <tr>
-                    <td>Sewer Usage</td>
-                    <td class="number" data-bind="percent:District.SewageUsage"></td>
-                </tr>
-                <tr>
-                    <td>Heat Usage</td>
-                    <td class="number" data-bind="percent:District.HeatingUsage"></td>
-                </tr>
-                <tr>
-                    <td>Landfill Usage</td>
-                    <td class="number" data-bind="percent:District.LandfillUsage"></td>
-                </tr>
-                <tr>
-                    <td>Hospital Usage</td>
-                    <td class="number" data-bind="percent:District.HospitalUsage"></td>
-                </tr>
-                <tr>
-                    <td>Cemetery Usage</td>
-                    <td class="number" data-bind="percent:District.CemeteryUsage"></td>
-                </tr>
-                <tr>
-                    <td>Water Storage</td>
-                    <td class="number" data-bind="percent:District.WaterStorageUsage"></td>
-                </tr>
-                <tr>
-                    <td>Shelter Usage</td>
-                    <td class="number" data-bind="percent:District.ShelterUsage"></td>
-                </tr>
-                <tr>
-                    <td>E.School Usage</td>
-                    <td class="number" data-bind="percent:District.Education1Usage"></td>
-                </tr>
-                <tr>
-                    <td>H.School Usage</td>
-                    <td class="number" data-bind="percent:District.Education2Usage"></td>
-                </tr>
-                <tr>
-                    <td>University Usage</td>
-                    <td class="number" data-bind="percent:District.Education3Usage"></td>
-                </tr>
-                <tr>
-                    <td>Jail Usage</td>
-                    <td class="number" data-bind="percent:District.JailUsage"></td>
-                </tr>
-                <tr>
-                    <td>Workplace Usage</td>
-                    <td class="number" data-bind="percent:District.WorkplaceUsage"></td>
-                </tr>
-                <tr>
-                    <td>Unemployment</td>
-                    <td class="number" data-bind="percent:District.Unemployment"></td>
-                </tr>
-                <tr>
-                    <td>Water Pollution</td>
-                    <td class="number" data-bind="percent:District.WaterPollution"></td>
-                </tr>
-                <tr>
-                    <td>Ground Pollution</td>
-                    <td class="number" data-bind="percent:District.GroundPollution"></td>
-                </tr>
-            </table>
         </div></div>
 
         <div id="map" class="box"><div class="wrapper">
@@ -220,6 +143,15 @@
             </div>
         </div></div>
 
+        <div id="stats" class="box"><div class="wrapper">
+            <h1>Resources</h1>
+            <div class="body">
+                <div class="canvas">
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div></div>
+
         <div id="population" class="box"><div class="wrapper">
             <h1>Population Breakdown</h1>
             <div class="body">
@@ -236,15 +168,6 @@
             </div>
         </div></div>
 
-        <div id="problems" class="list box"><div class="wrapper">
-            <h1>Problems</h1>
-            <div id="problem-list"></div>
-        </div></div>
-
-        <div id="transit" class="list box"><div class="wrapper">
-            <h1>Transit Overview</h1>
-        </div></div>
-
         <div id="limits" class="list box"><div class="wrapper">
             <h1>Game Limits</h1>
             <div class="body">
@@ -255,6 +178,16 @@
         </div></div>
 
 
+
+
+        <div id="problems" class="list box"><div class="wrapper">
+            <h1>Problems</h1>
+            <div id="problem-list"></div>
+        </div></div>
+
+        <div id="transit" class="list box"><div class="wrapper">
+            <h1>Transit Overview</h1>
+        </div></div>
 
     </div>
 </body>

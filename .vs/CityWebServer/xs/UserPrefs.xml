@@ -1,5 +1,5 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/InstancesHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/DistrictHandler.cs">
     <Files>
       <File FileName="CityWebServer/WebServer.cs" Line="3" Column="26" />
       <File FileName="CityWebServer/Models/CallbackParams.cs" Line="34" Column="41" />
@@ -9,7 +9,8 @@
       <File FileName="CityWebServer/SocketHandlers/NotificationHandler.cs" Line="75" Column="46" />
       <File FileName="CityWebServer/Models/Notification.cs" Line="6" Column="3" />
       <File FileName="CityWebServer/Models/DistrictInfo.cs" Line="22" Column="31" />
-      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="178" Column="7" />
+      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="177" Column="43" />
+      <File FileName="CityWebServer/SocketHandlers/DistrictHandler.cs" Line="100" Column="27" />
       <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="22" Column="2" NotebookId="1" />
     </Files>
     <Pads>
@@ -22,7 +23,7 @@
               <Node name="Properties" expanded="True" />
               <Node name="RequestHandlers" expanded="True" />
               <Node name="SocketHandlers" expanded="True">
-                <Node name="InstancesHandler.cs" selected="True" />
+                <Node name="DistrictHandler.cs" selected="True" />
               </Node>
               <Node name="wwwroot" expanded="True">
                 <Node name="r" expanded="True">

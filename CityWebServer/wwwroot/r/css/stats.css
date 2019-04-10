@@ -1,0 +1,8 @@
+#stats {
+    max-width: 32em;
+}
+
+#stats .canvas {
+    height: 16em;
+    width: 32em;
+}
