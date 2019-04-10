@@ -175,7 +175,7 @@ namespace CityWebServer.SocketHandlers {
 			return new Dictionary<String, float> {
 				["MaxAreaCount"] = manager.MaxAreaCount,
 				["m_areaCount"] = manager.m_areaCount,
-				["m_maxAreaCount"] = manager.m_maxAreaCount,
+				//["m_maxAreaCount"] = manager.m_maxAreaCount, //redundant?
 			};
 		}
 

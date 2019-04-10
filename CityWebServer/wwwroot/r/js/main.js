@@ -18,6 +18,7 @@ class App {
         this.population     = new Population(this);
         this.limits         = new Limits(this);
         this.problems       = new Problems(this);
+        this.stats          = new Stats(this);
         //this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
@@ -30,26 +31,34 @@ class App {
     }
 
     _registerjQueryExtensions() {
+        function isNumber(val) {
+            return (val != undefined) && (val != null) &&
+            !isNaN(val) && isFinite(val);
+        }
         jQuery.fn.extend({
             money: function(num) {
                 //$(...).money(num)
                 //formats num (in cents) as amount of money
                 //doesn't add currency symbol, does toggle "negative" class
-
-                $(this).text(Math.round(num / 100).toLocaleString());
-                $(this).toggleClass('negative', num < 0);
-                $(this).toggleClass('zero', Math.round(num/100) == 0);
+                if(!isNumber(num)) $(this).text("-");
+                else {
+                    $(this).text(Math.round(num / 100).toLocaleString());
+                    $(this).toggleClass('negative', num < 0);
+                    $(this).toggleClass('zero', Math.round(num/100) == 0);
+                }
                 return this;
             },
             percent: function(num) {
-                $(this).text(num.toFixed(0)+'%');
+                if(!isNumber(num)) $(this).text("-");
+                else $(this).text(num.toFixed(0)+'%');
                 return this;
             },
             //permyriad: percent of a percent
             //used because the game gives some percentages this way
             //eg 15% = 1500
             permyriad: function(num) {
-                $(this).text((num / 100).toFixed(2)+'%');
+                if(!isNumber(num)) $(this).text("-");
+                else $(this).text((num / 100).toFixed(2)+'%');
                 return this;
             },
             //there's also number() from jquery.number.min.js
@@ -189,6 +198,7 @@ class App {
         this.population.run();
         this.limits.run();
         this.problems.run();
+        this.stats.run();
         //this.transit.run();
         //$('#transit').append(this.transit.element);
         this._isInit = true;

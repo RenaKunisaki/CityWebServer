@@ -20,13 +20,14 @@
     <script src='/r/js/masonry.pkgd.min.js'></script>
     <script src='/r/js/bootstrap.min.js'></script>
     <script src='/r/js/Chart.min.js'></script>
+    <script src="/r/js/TimeChart.js"></script>
     <script src="/r/js/budget.js"></script>
     <script src="/r/js/chirper.js"></script>
     <script src="/r/js/heightmap.js"></script>
     <script src="/r/js/limits.js"></script>
     <script src="/r/js/population.js"></script>
     <script src="/r/js/problems.js"></script>
-    <script src="/r/js/TimeChart.js"></script>
+    <script src="/r/js/stats.js"></script>
     <script src="/r/js/transit.js"></script>
     <script defer src="/r/js/main.js"></script>
 </head>
@@ -42,6 +43,116 @@
         <div class="grid-sizer"></div>
         <div id="chirper" class="list box"><div class="wrapper">
             <h1>Chirper Messages</h1>
+        </div></div>
+
+        <div id="stats" class="box"><div class="wrapper">
+            <h1>Stats</h1>
+            <table>
+                <tr>
+                    <td>Traffic Flow</td>
+                    <td class="number" data-bind="percent:Tick.trafficFlow"></td>
+                </tr>
+                <tr>
+                    <td>Electr. Usage</td>
+                    <td class="number" data-bind="percent:District.ElectricityUsage"></td>
+                </tr>
+                <tr>
+                    <td>Water Usage</td>
+                    <td class="number" data-bind="percent:District.WaterUsage"></td>
+                </tr>
+                <tr>
+                    <td>Sewer Usage</td>
+                    <td class="number" data-bind="percent:District.SewageUsage"></td>
+                </tr>
+                <tr>
+                    <td>Heat Usage</td>
+                    <td class="number" data-bind="percent:District.HeatingUsage"></td>
+                </tr>
+                <tr>
+                    <td>Landfill Usage</td>
+                    <td class="number" data-bind="percent:District.LandfillUsage"></td>
+                </tr>
+                <tr>
+                    <td>Hospital Usage</td>
+                    <td class="number" data-bind="percent:District.HospitalUsage"></td>
+                </tr>
+                <tr>
+                    <td>Cemetery Usage</td>
+                    <td class="number" data-bind="percent:District.CemeteryUsage"></td>
+                </tr>
+                <tr>
+                    <td>Water Storage</td>
+                    <td class="number" data-bind="percent:District.WaterStorageUsage"></td>
+                </tr>
+                <tr>
+                    <td>Shelter Usage</td>
+                    <td class="number" data-bind="percent:District.ShelterUsage"></td>
+                </tr>
+                <tr>
+                    <td>E.School Usage</td>
+                    <td class="number" data-bind="percent:District.Education1Usage"></td>
+                </tr>
+                <tr>
+                    <td>H.School Usage</td>
+                    <td class="number" data-bind="percent:District.Education2Usage"></td>
+                </tr>
+                <tr>
+                    <td>University Usage</td>
+                    <td class="number" data-bind="percent:District.Education3Usage"></td>
+                </tr>
+                <tr>
+                    <td>Jail Usage</td>
+                    <td class="number" data-bind="percent:District.JailUsage"></td>
+                </tr>
+                <tr>
+                    <td>Workplace Usage</td>
+                    <td class="number" data-bind="percent:District.WorkplaceUsage"></td>
+                </tr>
+                <tr>
+                    <td>Unemployment</td>
+                    <td class="number" data-bind="percent:District.Unemployment"></td>
+                </tr>
+                <tr>
+                    <td>Water Pollution</td>
+                    <td class="number" data-bind="percent:District.WaterPollution"></td>
+                </tr>
+                <tr>
+                    <td>Ground Pollution</td>
+                    <td class="number" data-bind="percent:District.GroundPollution"></td>
+                </tr>
+                <tr>
+                    <td>Active Vehicles</td>
+                    <td class="number" data-bind="number:Tick.vehicleCount"></td>
+                </tr>
+                <tr>
+                    <td>Parked Vehicles</td>
+                    <td class="number" data-bind="number:Tick.parkedCount"></td>
+                </tr>
+                <tr>
+                    <td>Buildings</td>
+                    <td class="number" data-bind="number:Instances.BuildingManager.m_buildingCount"></td>
+                </tr>
+                <tr>
+                    <td>Active Citizens</td>
+                    <td class="number" data-bind="number:Instances.CitizenManager.m_instanceCount"></td>
+                </tr>
+                <tr>
+                    <td>Road Lanes</td>
+                    <td class="number" data-bind="number:Instances.NetManager.m_laneCount"></td>
+                </tr>
+                <tr>
+                    <td>Road Segments</td>
+                    <td class="number" data-bind="number:Instances.NetManager.m_segmentCount"></td>
+                </tr>
+                <tr>
+                    <td>Props</td>
+                    <td class="number" data-bind="number:Instances.PropManager.m_propCount"></td>
+                </tr>
+                <tr>
+                    <td>Trees</td>
+                    <td class="number" data-bind="number:Instances.TreeManager.m_treeCount"></td>
+                </tr>
+            </table>
         </div></div>
 
         <div id="map" class="box"><div class="wrapper">
