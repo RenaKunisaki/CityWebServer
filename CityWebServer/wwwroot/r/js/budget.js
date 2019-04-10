@@ -75,7 +75,6 @@
                         const dset  = data.datasets[item.datasetIndex];
                         const value = dset.data[item.index];
                         const amount = Math.round(value / 100).toLocaleString();
-                        //XXX format amount as number (commas)
                         return `${label}: ₡${amount}`;
                     },
                 },
