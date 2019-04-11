@@ -168,8 +168,8 @@ class HeightMap {
                 else {
                     if(tx  < this._minUnlockedX) this._minUnlockedX = tx;
                     if(tx2 > this._maxUnlockedX) this._maxUnlockedX = tx2;
-                    if(ty  < this._minUnlockedY) this._minUnlockedY = ty;
-                    if(ty2 > this._maxUnlockedY) this._maxUnlockedY = ty2;
+                    if(ty2 < this._minUnlockedY) this._minUnlockedY = ty2;
+                    if(ty  > this._maxUnlockedY) this._maxUnlockedY = ty;
                 }
                 tile++;
             }
