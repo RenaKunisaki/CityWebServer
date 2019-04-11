@@ -1,4 +1,4 @@
-class Stats {
+class Resources {
     constructor(app) {
         this.app = app;
     }
@@ -176,7 +176,7 @@ class Stats {
             bgColors.push(this.app.makeNameColor(name));
         }
 
-        let ctx = $('#stats canvas')[0].getContext('2d');
+        let ctx = $('#resources canvas')[0].getContext('2d');
         this.chart = new Chart(ctx, {
             type: 'horizontalBar',
             options: options,

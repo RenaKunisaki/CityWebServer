@@ -1,8 +1,8 @@
-#stats {
+#resources {
     max-width: 32em;
 }
 
-#stats .canvas {
+#resources .canvas {
     height: 16em;
     width: 32em;
 }
