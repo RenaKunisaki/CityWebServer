@@ -1,6 +1,5 @@
 /** TODO:
  *  - District:
- *    - Births, Deaths
  *    - CremateCapacity
  *    - DeadCount (is this how many people are waiting to be moved?)
  *    - ImportAmount, ExportAmount (units?)

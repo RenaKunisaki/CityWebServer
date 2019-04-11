@@ -76,6 +76,10 @@ td.money:before { content: '' }
     font-size: 0.8em;
 }
 
+.legend tr {
+    text-align: left;
+}
+
 .legend-box {
     width:  1em;
     height: 1em;

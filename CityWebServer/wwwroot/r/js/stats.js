@@ -20,7 +20,27 @@ class Stats {
             },
             "Death Rate": {
                 get: data => data.District.Deaths,
-                color: '#C04040',
+                color: '#804040',
+            },
+            "Traffic Flow": {
+                max: 100,
+                get: data => data.Tick.trafficFlow,
+                unit: '%',
+            },
+            "Unemployment": {
+                max: 100,
+                get: data => data.District.Unemployment,
+                unit: '%',
+            },
+            "Water Pollution": {
+                max: 100,
+                get: data => data.District.WaterPollution,
+                unit: '%',
+            },
+            "Ground Pollution": {
+                max: 100,
+                get: data => data.District.GroundPollution,
+                unit: '%',
             },
         };
 
@@ -72,8 +92,12 @@ class Stats {
         const data = {};
         for(const [name, field] of Object.entries(this.fields)) {
             let val = field.get(this.app.data);
+            let max = field.max;
+            if(max instanceof Function) max = max(this.app.data);
+            if(max != undefined) val = (val / max) * 100;
+            let unit = field.unit || '';
             data[name] = val;
-            this.legendRows[name].number(val);
+            this.legendRows[name].text(val.toLocaleString()+unit);
         }
         this.graph.add(time, data);
         //for(const [name, color] of Object.entries(this.colors)) {
