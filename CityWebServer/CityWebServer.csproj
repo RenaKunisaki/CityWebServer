@@ -108,6 +108,8 @@
     <Compile Include="SocketHandlers\ReflectionHandler.cs" />
     <Compile Include="Models\Vehicle.cs" />
     <Compile Include="SocketHandlers\NotificationHandler.cs" />
+    <Compile Include="SocketHandlers\CameraHandler.cs" />
+    <Compile Include="Models\Camera.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">

@@ -164,6 +164,7 @@ namespace CityWebServer.RequestHandlers {
 			Log($"Creating socket handlers (thread: {Thread.CurrentThread.Name})");
 			BudgetHandler budgetHandler = new BudgetHandler(this);
 			BuildingHandler buildingHandler = new BuildingHandler(this);
+			CameraHandler cameraHandler = new CameraHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			DistrictHandler districtHandler = new DistrictHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);

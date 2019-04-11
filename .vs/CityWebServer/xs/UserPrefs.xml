@@ -1,17 +1,19 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/DistrictHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/SocketHandlers/CameraHandler.cs">
     <Files>
       <File FileName="CityWebServer/WebServer.cs" Line="3" Column="26" />
       <File FileName="CityWebServer/Models/CallbackParams.cs" Line="34" Column="41" />
-      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="139" Column="5" />
+      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="139" Column="1" />
       <File FileName="CityWebServer/Properties/AssemblyInfo.cs" Line="23" Column="1" />
       <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="151" Column="34" />
       <File FileName="CityWebServer/SocketHandlers/NotificationHandler.cs" Line="75" Column="46" />
       <File FileName="CityWebServer/Models/Notification.cs" Line="6" Column="3" />
       <File FileName="CityWebServer/Models/DistrictInfo.cs" Line="22" Column="31" />
-      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="177" Column="43" />
-      <File FileName="CityWebServer/SocketHandlers/DistrictHandler.cs" Line="100" Column="27" />
+      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="215" Column="49" />
+      <File FileName="CityWebServer/SocketHandlers/DistrictHandler.cs" Line="23" Column="4" />
+      <File FileName="CityWebServer/Models/Camera.cs" Line="11" Column="2" />
       <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="22" Column="2" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="23" Column="43" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,7 +25,7 @@
               <Node name="Properties" expanded="True" />
               <Node name="RequestHandlers" expanded="True" />
               <Node name="SocketHandlers" expanded="True">
-                <Node name="DistrictHandler.cs" selected="True" />
+                <Node name="CameraHandler.cs" selected="True" />
               </Node>
               <Node name="wwwroot" expanded="True">
                 <Node name="r" expanded="True">
