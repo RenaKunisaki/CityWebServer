@@ -29,7 +29,7 @@ class Population {
             labels.push(name);
             bgColors.push(color);
 
-            const td  = $('<td class="number">');
+            const td = $('<td class="number">');
             this._table.append($('<tr>').append(
                 $('<th>').append(
                     $('<div class="legend-box">')

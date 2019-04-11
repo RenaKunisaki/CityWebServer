@@ -51,6 +51,7 @@ class App {
         this.limits         = new Limits(this);
         this.problems       = new Problems(this);
         this.resources      = new Resources(this);
+        this.stats          = new Stats(this);
         //this.transit        = new Transit(this);
 
         this.monthNames = [ //XXX get from game for localization
@@ -231,6 +232,7 @@ class App {
         this.limits.run();
         this.problems.run();
         this.resources.run();
+        this.stats.run();
         //this.transit.run();
         //$('#transit').append(this.transit.element);
         this._isInit = true;

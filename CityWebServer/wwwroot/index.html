@@ -15,6 +15,7 @@
     <link href='/r/css/population.css' rel='stylesheet'>
     <link href='/r/css/problems.css' rel='stylesheet'>
     <link href='/r/css/resources.css' rel='stylesheet'>
+    <link href='/r/css/stats.css' rel='stylesheet'>
     <link href='/r/css/transit.css' rel='stylesheet'>
     <script src='/r/js/jquery-2.1.3.min.js'></script>
     <script src='/r/js/jquery.number.min.js'></script>
@@ -29,6 +30,7 @@
     <script src="/r/js/population.js"></script>
     <script src="/r/js/problems.js"></script>
     <script src="/r/js/resources.js"></script>
+    <script src="/r/js/stats.js"></script>
     <script src="/r/js/transit.js"></script>
     <script defer src="/r/js/main.js"></script>
 </head>
@@ -180,6 +182,16 @@
         <div id="problems" class="list box"><div class="wrapper">
             <h1>Problems</h1>
             <div id="problem-list"></div>
+        </div></div>
+
+        <div id="stats" class="box"><div class="wrapper">
+            <h1>Stats</h1>
+            <div class="body">
+                <div class="canvas">
+                    <canvas></canvas>
+                </div>
+                <table class="legend"></table>
+            </div>
         </div></div>
 
         <!-- <div id="transit" class="list box"><div class="wrapper">

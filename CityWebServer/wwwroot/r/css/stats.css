@@ -1,0 +1,15 @@
+#stats {
+    width: 28em;
+}
+
+#stats .canvas {
+    height: 12em;
+    width: 20em;
+}
+
+#stats .legend {
+    position: absolute;
+    top: 1.7em;
+    right: 0;
+    border-left: 1px #FFF solid;
+}
