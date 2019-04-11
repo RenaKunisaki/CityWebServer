@@ -49,6 +49,24 @@ class TimeChart {
                     padding: { left: 0, right: 0, bottom: 0, top: 0 },
                 },
                 legend: { display: false },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)',
+                            zeroLineColor: 'rgba(255, 255, 255, 0.2)',
+                            display: true,
+                            lineWidth: 1,
+                        },
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)',
+                            zeroLineColor: 'rgba(255, 255, 255, 0.2)',
+                            display: true,
+                            lineWidth: 1,
+                        },
+                    }],
+                },
                 tooltips: {
                     callbacks: {
                         label: (item, data) => {

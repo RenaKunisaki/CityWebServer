@@ -12,12 +12,26 @@ class Limits {
             },
             legend: { display: false },
             scales: {
+                xAxes: [{
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        zeroLineColor: 'rgba(255, 255, 255, 0.2)',
+                        display: true,
+                        lineWidth: 1,
+                    },
+                }],
                 yAxes: [{
                     barPercentage: 1.0,
                     categoryPercentage: 1.0,
                     min: 0, max: 100,
                     suggestedMin: 0, suggestedMax: 100,
                     //maxBarThickness: 12,
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        zeroLineColor: 'rgba(255, 255, 255, 0.2)',
+                        display: true,
+                        lineWidth: 1,
+                    },
                 }],
             },
             tooltips: {

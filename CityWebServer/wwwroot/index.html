@@ -77,6 +77,11 @@
                 </div>
             </div>
             <div id="budget-legend"></div>
+            <div class="graph">
+                <div class="canvas" id="budget-graph">
+                    <canvas></canvas>
+                </div>
+            </div>
             <div class="tables">
                 <div class="taxes">
                     <table>
@@ -110,7 +115,7 @@
                             <th title="Amount left to repay">₡ Left</th>
                             <th title="Time until paid">Time Left</th>
                             <th title="Interest rate">Intrst</th>
-                            <th title="Weekly payment">₡/Week</th>
+                            <th title="Weekly payment">₡/Wkk</th>
                         </tr>
                         <tr id="loan0">
                             <td data-bind="text:Budget.loans.0.BankName"></td>
@@ -136,8 +141,12 @@
                     </table>
                 </div>
             </div>
-            <div class="graph">
-                <div class="canvas" id="budget-graph">
+        </div></div>
+
+        <div id="limits" class="list box"><div class="wrapper">
+            <h1>Game Limits</h1>
+            <div class="body">
+                <div class="canvas">
                     <canvas></canvas>
                 </div>
             </div>
@@ -168,26 +177,14 @@
             </div>
         </div></div>
 
-        <div id="limits" class="list box"><div class="wrapper">
-            <h1>Game Limits</h1>
-            <div class="body">
-                <div class="canvas">
-                    <canvas></canvas>
-                </div>
-            </div>
-        </div></div>
-
-
-
-
         <div id="problems" class="list box"><div class="wrapper">
             <h1>Problems</h1>
             <div id="problem-list"></div>
         </div></div>
 
-        <div id="transit" class="list box"><div class="wrapper">
+        <!-- <div id="transit" class="list box"><div class="wrapper">
             <h1>Transit Overview</h1>
-        </div></div>
+        </div></div> -->
 
     </div>
 </body>

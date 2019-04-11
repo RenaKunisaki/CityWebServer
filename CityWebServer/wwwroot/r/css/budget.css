@@ -6,19 +6,22 @@
 .money.zero { color: #888 !important }
 
 #budget {
-    max-width: 36em;
+    max-width: 31em;
 }
 
 #budget-legend {
-    display: inline-block;
+    /* display: inline-block;
     float: right;
-    vertical-align: top;
+    vertical-align: top; */
+    position: absolute;
+    top: 1.5em;
+    right: 0;
     border-left: 1px #FFF solid;
 }
 
-#budget-legend .income { display: none }
-#budget-legend .expense { display: none }
-#budget-legend .zero { display: none }
+/* #budget-legend .income { display: none }
+#budget-legend .expense { display: none } */
+#budget-legend tr.zero { display: none }
 
 #budget .legend td, #budget .legend th {
     padding: 0;
@@ -28,7 +31,7 @@
     display: inline-block;
     width: 130%;
     margin: 0;
-    margin-left: -15%;
+    margin-left: -5%;
     vertical-align: top;
 }
 
