@@ -43,6 +43,7 @@
     display: inline-block;
     vertical-align: top;
     width: 50%;
+    height: 24em;
     margin: 0;
     padding: 0;
     /* hack to make up for the excessive side padding */
@@ -59,7 +60,9 @@
     display: inline-block;
     padding-right: 0.25em;
 }
-#budget .tables {}
+#budget .tables {
+    font-size: 0.8em;
+}
 
 #budget .taxes table, #budget .loans table {
     border-left: 1px #FFF solid;

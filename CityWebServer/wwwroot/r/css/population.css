@@ -1,5 +1,5 @@
 #population-table th { text-align: left; }
-#population-table td { text-align: right;}
+#population-table td { text-align: right; font-family: monospace;}
 
 #population-table {
     width: 50%;
@@ -7,7 +7,7 @@
 
 #population {
     overflow-x: hidden;
-    width: 25em;
+    width: 22em;
 }
 
 #population .chart {
