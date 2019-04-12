@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using CityWebServer.Callbacks;
 using CityWebServer.Extensibility;
@@ -21,6 +22,7 @@ namespace CityWebServer.SocketHandlers {
 			totalTimeDelta = 0;
 			updateInterval = 5; //seconds
 			server.frameCallbacks.Register(Update);
+			handler.RegisterMessageHandler("Instances", OnClientMessage);
 			SendAll();
 		}
 
@@ -33,6 +35,90 @@ namespace CityWebServer.SocketHandlers {
 			if(totalTimeDelta >= updateInterval) {
 				SendAll();
 				totalTimeDelta = 0;
+			}
+		}
+
+		/// <summary>
+		/// Handle "Instances" message from client.
+		/// </summary>
+		/// <param name="_param">Parameter.</param>
+		/// <remarks>Expects a dict with one of the keys:
+		/// TODO
+		/// </remarks>
+		public void OnClientMessage(SocketMessageHandlerParam _param) {
+			var param = _param.param as Dictionary<string, object>;
+			var key = param.Keys.First();
+			switch(key) {
+				case null:
+					SendErrorResponse(HttpStatusCode.BadRequest);
+					break;
+				case "AudioManager":
+					SendJson(GetAudio(), "Instances.AudioManager");
+					break;
+				case "BuildingManager":
+					SendJson(GetBuildings(), "Instances.BuildingManager");
+					break;
+				case "CitizenManager":
+					SendJson(GetCitizens(), "Instances.CitizenManager");
+					break;
+				case "DisasterManager":
+					SendJson(GetDisasters(), "Instances.DisasterManager");
+					break;
+				case "DistrictManager":
+					SendJson(GetDistricts(), "Instances.DistrictManager");
+					break;
+				case "EconomyManager":
+					SendJson(GetEconomy(), "Instances.EconomyManager");
+					break;
+				case "ElectricityManager":
+					SendJson(GetElectricity(), "Instances.ElectricityManager");
+					break;
+				case "EventManager":
+					SendJson(GetEvents(), "Instances.EventManager");
+					break;
+				case "GameAreaManager":
+					SendJson(GetGameAreas(), "Instances.GameAreaManager");
+					break;
+				case "NetManager":
+					SendJson(GetNetworks(), "Instances.NetManager");
+					break;
+				case "PathManager":
+					SendJson(GetPaths(), "Instances.PathManager");
+					break;
+				case "PropManager":
+					SendJson(GetProps(), "Instances.PropManager");
+					break;
+				case "RenderManager":
+					SendJson(GetRender(), "Instances.RenderManager");
+					break;
+				case "SimulationManager":
+					SendJson(GetSimulation(), "Instances.SimulationManager");
+					break;
+				case "TerrainManager":
+					SendJson(GetTerrain(), "Instances.TerrainManager");
+					break;
+				case "TransferManager":
+					SendJson(GetTransfers(), "Instances.TransferManager");
+					break;
+				case "TransportManager":
+					SendJson(GetTransport(), "Instances.TransportManager");
+					break;
+				case "TreeManager":
+					SendJson(GetTrees(), "Instances.TreeManager");
+					break;
+				case "VehicleManager":
+					SendJson(GetVehicles(), "Instances.VehicleManager");
+					break;
+				case "WeatherManager":
+					SendJson(GetWeather(), "Instances.WeatherManager");
+					break;
+				case "ZoneManager":
+					SendJson(GetZones(), "Instances.ZoneManager");
+					break;
+				default:
+					SendErrorResponse($"Instances has no method '{key}'");
+					break;
+
 			}
 		}
 
