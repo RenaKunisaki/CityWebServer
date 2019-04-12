@@ -65,7 +65,8 @@ class Problems {
             .append(
                 $(`<div class="problem-label" id="problem-label-${type}">`)
             ).attr('title', type)
-            .css('background-image', `url(/r/img/problems/${type}.png)`);
+            .css('background-image', `url(/r/img/problems/${type}.png)`)
+            .on('click', event => this._onIconClick(type));
             this.icons[type] = icon;
             elems.push(icon);
         }
@@ -84,5 +85,14 @@ class Problems {
             $(`#problem-label-${type}`).number(count);
             $(`#problem-icon-${type}`).toggleClass('zero', count == 0);
         }
+    }
+
+    async _onIconClick(problem) {
+        let data = await this.app.query({
+            "Building": {
+                "getByProblem": problem,
+            }
+        }, "ProblemBuildings");
+        console.log("Buildings with problem", problem, data);
     }
 }

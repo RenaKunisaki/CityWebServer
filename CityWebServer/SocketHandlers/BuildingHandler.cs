@@ -12,6 +12,61 @@ namespace CityWebServer.SocketHandlers {
 	/// Sends building info to client.
 	/// </summary>
 	public class BuildingHandler: SocketHandlerBase {
+		//XXX this is copied from NotificationHandler
+		public static Dictionary<string, ulong> ProblemFlags =
+		new Dictionary<string, ulong>() {
+			["Crime"] = (ulong)Notification.Problem.Crime,
+			["Death"] = (ulong)Notification.Problem.Death,
+			["DepotNotConnected"] = (ulong)Notification.Problem.DepotNotConnected,
+			["DirtyWater"] = (ulong)Notification.Problem.DirtyWater,
+			["Electricity"] = (ulong)Notification.Problem.Electricity,
+			["ElectricityNotConnected"] = (ulong)Notification.Problem.ElectricityNotConnected,
+			["Emptying"] = (ulong)Notification.Problem.Emptying,
+			["EmptyingFinished"] = (ulong)Notification.Problem.EmptyingFinished,
+			["Evacuating"] = (ulong)Notification.Problem.Evacuating,
+			["FatalProblem"] = (ulong)Notification.Problem.FatalProblem,
+			["Fire"] = (ulong)Notification.Problem.Fire,
+			["Flood"] = (ulong)Notification.Problem.Flood,
+			["Garbage"] = (ulong)Notification.Problem.Garbage,
+			["Heating"] = (ulong)Notification.Problem.Heating,
+			["HeatingNotConnected"] = (ulong)Notification.Problem.HeatingNotConnected,
+			["LandfillFull"] = (ulong)Notification.Problem.LandfillFull,
+			["LandValueLow"] = (ulong)Notification.Problem.LandValueLow,
+			["LineNotConnected"] = (ulong)Notification.Problem.LineNotConnected,
+			["MajorProblem"] = (ulong)Notification.Problem.MajorProblem,
+			["NoCustomers"] = (ulong)Notification.Problem.NoCustomers,
+			["NoEducatedWorkers"] = (ulong)Notification.Problem.NoEducatedWorkers,
+			["NoFood"] = (ulong)Notification.Problem.NoFood,
+			["NoFuel"] = (ulong)Notification.Problem.NoFuel,
+			["NoGoods"] = (ulong)Notification.Problem.NoGoods,
+			["NoInputProducts"] = (ulong)Notification.Problem.NoInputProducts,
+			["Noise"] = (ulong)Notification.Problem.Noise,
+			["NoMainGate"] = (ulong)Notification.Problem.NoMainGate,
+			["NoNaturalResources"] = (ulong)Notification.Problem.NoNaturalResources,
+			["NoPark"] = (ulong)Notification.Problem.NoPark,
+			["NoPlaceforGoods"] = (ulong)Notification.Problem.NoPlaceforGoods,
+			["NoResources"] = (ulong)Notification.Problem.NoResources,
+			["NotInIndustryArea"] = (ulong)Notification.Problem.NotInIndustryArea,
+			["NoWorkers"] = (ulong)Notification.Problem.NoWorkers,
+			["PathNotConnected"] = (ulong)Notification.Problem.PathNotConnected,
+			["Pollution"] = (ulong)Notification.Problem.Pollution,
+			["ResourceNotSelected"] = (ulong)Notification.Problem.ResourceNotSelected,
+			["RoadNotConnected"] = (ulong)Notification.Problem.RoadNotConnected,
+			["Sewage"] = (ulong)Notification.Problem.Sewage,
+			["Snow"] = (ulong)Notification.Problem.Snow,
+			["StructureDamaged"] = (ulong)Notification.Problem.StructureDamaged,
+			["StructureVisited"] = (ulong)Notification.Problem.StructureVisited,
+			["StructureVisitedService"] = (ulong)Notification.Problem.StructureVisitedService,
+			["TaxesTooHigh"] = (ulong)Notification.Problem.TaxesTooHigh,
+			["TooFewServices"] = (ulong)Notification.Problem.TooFewServices,
+			["TooLong"] = (ulong)Notification.Problem.TooLong,
+			["TrackNotConnected"] = (ulong)Notification.Problem.TrackNotConnected,
+			["TurnedOff"] = (ulong)Notification.Problem.TurnedOff,
+			["Water"] = (ulong)Notification.Problem.Water,
+			["WaterNotConnected"] = (ulong)Notification.Problem.WaterNotConnected,
+			["WrongAreaType"] = (ulong)Notification.Problem.WrongAreaType,
+		};
+
 		public BuildingHandler(SocketRequestHandler handler) :
 		base(handler, "Building") {
 			//SendAll();
@@ -43,12 +98,14 @@ namespace CityWebServer.SocketHandlers {
 						break;
 					}
 				case "getByProblem": {
-						uint? flags = param["getByProblem"] as uint?;
-						if(flags == null) {
+						//This could be just a ulong parameter but nope,
+						//apparently you can't use ulong in json for reasons
+						string flags = param["getByProblem"] as string;
+						if(flags == null || !ProblemFlags.ContainsKey(flags)) {
 							SendErrorResponse("Invalid problem flags");
 							return;
 						}
-						SendProblems((uint)flags);
+						SendProblems(ProblemFlags[flags]);
 						break;
 					}
 				case "list":
@@ -106,11 +163,11 @@ namespace CityWebServer.SocketHandlers {
 		/// Send list of buildings that have specified problem flags.
 		/// </summary>
 		/// <param name="flags">Flags.</param>
-		protected void SendProblems(uint flags) {
+		protected void SendProblems(ulong flags) {
 			var buffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
 			var buildings = new List<CityWebServer.Models.BuildingInfo>();
 			for(int i = 0; i < buffer.Length; i++) {
-				if(((uint)buffer[i].m_problems & flags) != 0) {
+				if(((ulong)buffer[i].m_problems & flags) != 0) {
 					buildings.Add(GetBuilding(i));
 				}
 			}

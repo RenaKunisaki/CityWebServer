@@ -19,8 +19,8 @@
     border-left: 1px #FFF solid;
 }
 
-/* #budget-legend .income { display: none }
-#budget-legend .expense { display: none } */
+#budget-legend .income { display: none }
+#budget-legend .expense { display: none }
 #budget-legend tr.zero { display: none }
 
 #budget .legend td, #budget .legend th {

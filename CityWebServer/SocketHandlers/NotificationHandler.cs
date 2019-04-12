@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using CityWebServer.Callbacks;
 using CityWebServer.Extensibility;
 //using CityWebServer.Extensibility.Responses;
 using CityWebServer.Model;
@@ -67,14 +68,33 @@ namespace CityWebServer.SocketHandlers {
 			{Notification.Problem.WrongAreaType, "WrongAreaType"},
 		};
 
-		public NotificationHandler(SocketRequestHandler handler) :
-		base(handler, "Notifications") {
-			SendCounts();
-		}
-
 		public static Dictionary<Notification.Problem, string> ProblemFlags {
 			get => problemFlags;
 			set => problemFlags = value;
+		}
+
+		protected float totalTimeDelta, updateInterval;
+
+		public NotificationHandler(SocketRequestHandler handler) :
+		base(handler, "Notifications") {
+			totalTimeDelta = 0;
+			updateInterval = 5; //seconds
+			SendCounts();
+			server.frameCallbacks.Register(Update);
+		}
+
+		/// <summary>
+		/// Send new data to client.
+		/// </summary>
+		/// <param name="param">Callback parameters.</param>
+		protected void Update(FrameCallbackParam param) {
+			totalTimeDelta += param.realTimeDelta;
+			if(totalTimeDelta < updateInterval) {
+				//XXX update when info actually changes.
+				return;
+			}
+			totalTimeDelta = 0;
+			SendCounts();
 		}
 
 		/// <summary>

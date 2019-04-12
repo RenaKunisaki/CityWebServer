@@ -22,7 +22,7 @@ namespace CityWebServer.SocketHandlers {
 		protected void Update() {
 			Dictionary<String, Dictionary<String, ulong>> flags =
 			new Dictionary<String, Dictionary<String, ulong>> {
-				["Notification.Problem"] = new Dictionary<String, ulong> {
+				["Problem"] = new Dictionary<String, ulong> {
 					["Crime"] = (ulong)Notification.Problem.Crime,
 					["Death"] = (ulong)Notification.Problem.Death,
 					["DepotNotConnected"] = (ulong)Notification.Problem.DepotNotConnected,
