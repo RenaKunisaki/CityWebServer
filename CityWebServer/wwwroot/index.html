@@ -39,7 +39,6 @@
     <!-- Fixed navbar -->
     <nav id="navbar">
         <span id="city-name" data-bind="text:CityInfo.Name"></span>
-        <span id="navbar-population" class="population number" data-bind="number:District.Population"></span>
         <span id="navbar-error"></span>
         <div id="clock" data-bind="text:friendlyDate"></div>
     </nav>
@@ -62,7 +61,7 @@
                 </div>
             </div>
         </div></div> -->
-
+.
         <div id="budget" class="box"><div class="wrapper">
             <h1>Budget: <span class="money cash" data-bind="money:Budget.currentCash"></span> (<span data-bind="money:Budget.netIncome" class="money net"></span>/wk)</h1>
             <div class="charts">
@@ -80,11 +79,6 @@
                 </div>
             </div>
             <div id="budget-legend"></div>
-            <div class="graph">
-                <div class="canvas" id="budget-graph">
-                    <canvas></canvas>
-                </div>
-            </div>
             <div class="tables">
                 <div class="taxes">
                     <table>
@@ -146,6 +140,24 @@
             </div>
         </div></div>
 
+        <div id="budget-graph" class="box"><div class="wrapper">
+            <h1>Income/Expense Charts</h1>
+            <div class="body">
+                <h2>Income</h2>
+                <div class="graph income">
+                    <div class="canvas">
+                        <canvas></canvas>
+                    </div>
+                </div>
+                <h2>Expenses</h2>
+                <div class="graph expense">
+                    <div class="canvas">
+                        <canvas></canvas>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+
         <div id="limits" class="list box"><div class="wrapper">
             <h1>Game Limits</h1>
             <div class="body">
@@ -165,7 +177,7 @@
         </div></div>
 
         <div id="population" class="box"><div class="wrapper">
-            <h1>Population Breakdown</h1>
+            <h1>Population: <span class="population number" data-bind="number:District.Population"></span></h1>
             <div class="body">
                 <div class="chart"><!-- pie chart -->
                     <div class="canvas" id="population-chart">

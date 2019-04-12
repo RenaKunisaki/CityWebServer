@@ -68,3 +68,13 @@
     border-left: 1px #FFF solid;
     border-top: 1px #FFF solid;
 }
+
+#budget-graph {
+    width: 32em;
+    overflow: hidden;
+}
+
+#budget-graph .canvas {
+    height: 16em;
+    width: 32em;
+}

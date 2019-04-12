@@ -21,7 +21,7 @@ class TimeChart {
                 pointRadius: 1,
                 borderColor: param.color,
                 data: this._data[param.label],
-                fill: false,
+                fill: param.fill == undefined ? false : param.fill,
             }
             datasets.push(dataSet);
         }

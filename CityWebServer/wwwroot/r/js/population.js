@@ -85,6 +85,7 @@ class Population {
             const dataSet = {
                 color: bgColors[i],
                 label: labels[i],
+                fill: true,
             }
             datasets.push(dataSet);
         }

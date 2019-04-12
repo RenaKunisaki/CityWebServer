@@ -182,7 +182,7 @@
         });
         $('#budget-legend').append(legend);
 
-        //Make graph
+        //Make graphs
         const datasets = [];
         for(let i=0; i<labels.length; i++) {
             const dataSet = {
@@ -191,9 +191,14 @@
             }
             datasets.push(dataSet);
         }
-        this.graph = new TimeChart({
+        this.graphIn = new TimeChart({
             app: this.app,
-            element: $('#budget-graph canvas')[0],
+            element: $('#budget-graph .income canvas')[0],
+            datasets: datasets,
+        });
+        this.graphOut = new TimeChart({
+            app: this.app,
+            element: $('#budget-graph .expense canvas')[0],
             datasets: datasets,
         });
     }
@@ -208,13 +213,16 @@
         && month  == this.prevMonth
         && year   == this.prevYear) return;
 
-        let data = {};
+        let dataIn = {}, dataOut = {};
         for(const [name, group] of Object.entries(groups)) {
-            data[name] = (group.income - group.expense) / 100;
+            dataIn[name] = group.income / 100;
+            dataOut[name] = group.expense / 100;
         }
-        this.graph.add(time, data);
+        this.graphIn.add(time, dataIn);
+        this.graphOut.add(time, dataOut);
 
-        this.graph.update();
+        this.graphIn.update();
+        this.graphOut.update();
         this.prevYear  = year;
         this.prevMonth = month;
         this.prevDay   = day;

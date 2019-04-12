@@ -1,5 +1,7 @@
 #stats {
     width: 35em;
+    height: 14em;
+    overflow: hidden;
 }
 
 #stats .canvas {
