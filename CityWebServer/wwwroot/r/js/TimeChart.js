@@ -35,9 +35,10 @@ class TimeChart {
                 backgroundColor: param.color,
                 //hoverBackgroundColor: bgColors[i],
                 borderWidth: 1,
+                pointRadius: 1,
                 borderColor: param.color,
                 data: this._data[param.label],
-                fill: '-1',
+                fill: false,
             }
             datasets.push(dataSet);
         }
@@ -56,6 +57,7 @@ class TimeChart {
                             zeroLineColor: 'rgba(255, 255, 255, 0.2)',
                             display: true,
                             lineWidth: 1,
+                            pointRadius: 1,
                         },
                     }],
                     yAxes: [{
@@ -64,6 +66,7 @@ class TimeChart {
                             zeroLineColor: 'rgba(255, 255, 255, 0.2)',
                             display: true,
                             lineWidth: 1,
+                            pointRadius: 1,
                         },
                     }],
                 },

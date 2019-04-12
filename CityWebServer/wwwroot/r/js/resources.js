@@ -86,6 +86,7 @@ class Resources {
             "Heat Usage": {
                 max: data => data.District.HeatingCapacity,
                 get: data => data.District.HeatingConsumption,
+                scale: 1/1000, //data is given in KW but game shows in MW
                 unit: " MW",
             },
             "Landfill Usage": {
@@ -117,30 +118,15 @@ class Resources {
                 get: data => data.District.Education1Need,
                 unit: " people",
             },
-            "E.School Grads": {
-                max: 100,
-                get: data => data.District.Education1Rate,
-                unit: "%",
-            },
             "H.School Usage": {
                 max: data => data.District.Education2Capacity,
                 get: data => data.District.Education2Need,
                 unit: " people",
             },
-            "H.School Grads": {
-                max: 100,
-                get: data => data.District.Education2Rate,
-                unit: "%",
-            },
             "University Usage": {
                 max: data => data.District.Education3Capacity,
                 get: data => data.District.Education3Need,
                 unit: " people",
-            },
-            "University Grads": {
-                max: 100,
-                get: data => data.District.Education3Rate,
-                unit: "%",
             },
             "Jail Usage": {
                 max: data => data.District.CriminalCapacity,

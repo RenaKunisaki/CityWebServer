@@ -1,10 +1,10 @@
 #stats {
-    width: 28em;
+    width: 35em;
 }
 
 #stats .canvas {
-    height: 12em;
-    width: 20em;
+    height: 16em;
+    width: 25em;
 }
 
 #stats .legend {

@@ -166,6 +166,7 @@ namespace CityWebServer.RequestHandlers {
 			BuildingHandler buildingHandler = new BuildingHandler(this);
 			CameraHandler cameraHandler = new CameraHandler(this);
 			ChirperHandler chirperHandler = new ChirperHandler(this);
+			CitizenHandler citizenHandler = new CitizenHandler(this);
 			DistrictHandler districtHandler = new DistrictHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
 			InstancesHandler instancesHandler = new InstancesHandler(this);

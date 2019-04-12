@@ -27,6 +27,21 @@ class Stats {
                 get: data => data.Tick.trafficFlow,
                 unit: '%',
             },
+            "E.School Grads": {
+                max: 100,
+                get: data => data.District.Education1Rate,
+                unit: "%",
+            },
+            "H.School Grads": {
+                max: 100,
+                get: data => data.District.Education2Rate,
+                unit: "%",
+            },
+            "University Grads": {
+                max: 100,
+                get: data => data.District.Education3Rate,
+                unit: "%",
+            },
             "Unemployment": {
                 max: 100,
                 get: data => data.District.Unemployment,
