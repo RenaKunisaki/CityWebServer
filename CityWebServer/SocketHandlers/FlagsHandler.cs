@@ -75,6 +75,7 @@ namespace CityWebServer.SocketHandlers {
 					["WrongAreaType"] = (ulong)Notification.Problem.WrongAreaType,
 				},
 			};
+			SendJson(flags, "Flags");
 		}
 	}
 }
