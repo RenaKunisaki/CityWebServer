@@ -243,7 +243,10 @@ class App {
         if(!this._isInit) this._init();
         $('#navbar-error').hide();
         message = JSON.parse(message);
+        this._callMessageHandlers(message);
 
+        //do this after calling handlers so that changes they make
+        //are reflected in the result.
         for(const [name, field] of Object.entries(message)) {
             //Merge new data into existing data
             let keys = name.split('.');
@@ -254,7 +257,6 @@ class App {
             }
             merge(target, field, true);
         }
-        this._callMessageHandlers(message);
         this._updateBoundElements();
 
     }
