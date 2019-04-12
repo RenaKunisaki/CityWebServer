@@ -33,14 +33,24 @@ namespace CityWebServer.SocketHandlers {
 				case null:
 					SendErrorResponse(HttpStatusCode.BadRequest);
 					break;
-				case "get":
-					int? id = param["get"] as int?;
-					if(id == null) {
-						SendErrorResponse("Invalid building ID");
-						return;
+				case "get": {
+						int? id = param["get"] as int?;
+						if(id == null) {
+							SendErrorResponse("Invalid building ID");
+							return;
+						}
+						SendBuilding((int)id);
+						break;
 					}
-					SendBuilding((int)id);
-					break;
+				case "getByProblem": {
+						uint? flags = param["getByProblem"] as uint?;
+						if(flags == null) {
+							SendErrorResponse("Invalid problem flags");
+							return;
+						}
+						SendProblems((uint)flags);
+						break;
+					}
 				case "list":
 					SendList();
 					break;
@@ -90,6 +100,21 @@ namespace CityWebServer.SocketHandlers {
 		/// <param name="id">Building ID.</param>
 		protected void SendBuilding(int id) {
 			SendJson(GetBuilding(id));
+		}
+
+		/// <summary>
+		/// Send list of buildings that have specified problem flags.
+		/// </summary>
+		/// <param name="flags">Flags.</param>
+		protected void SendProblems(uint flags) {
+			var buffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
+			var buildings = new List<CityWebServer.Models.BuildingInfo>();
+			for(int i = 0; i < buffer.Length; i++) {
+				if(((uint)buffer[i].m_problems & flags) != 0) {
+					buildings.Add(GetBuilding(i));
+				}
+			}
+			SendJson(buildings, "ProblemBuildings");
 		}
 
 		/// <summary>
