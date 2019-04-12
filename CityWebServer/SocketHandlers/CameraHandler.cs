@@ -26,7 +26,7 @@ namespace CityWebServer.SocketHandlers {
 		}
 
 		/// <summary>
-		/// Handle "Canera" message from client.
+		/// Handle "Camera" message from client.
 		/// </summary>
 		/// <param name="_param">Parameter.</param>
 		/// <remarks>Expects a dict with one of the keys:
@@ -75,7 +75,7 @@ namespace CityWebServer.SocketHandlers {
 						break;
 					}
 				default:
-					SendErrorResponse($"District has no method '{key}'");
+					SendErrorResponse($"Camera has no method '{key}'");
 					break;
 			}
 		}
