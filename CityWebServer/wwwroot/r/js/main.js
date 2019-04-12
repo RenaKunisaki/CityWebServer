@@ -246,7 +246,13 @@ class App {
 
         for(const [name, field] of Object.entries(message)) {
             //Merge new data into existing data
-            this.data[name] = field;
+            let keys = name.split('.');
+            let target = this.data;
+            for(const key of keys) {
+                if(target[key] == undefined) target[key] = {};
+                target = target[key];
+            }
+            merge(target, field, true);
         }
         this._callMessageHandlers(message);
         this._updateBoundElements();

@@ -3,22 +3,23 @@
     <Files>
       <File FileName="CityWebServer/WebServer.cs" Line="451" Column="28" />
       <File FileName="CityWebServer/Models/CallbackParams.cs" Line="34" Column="41" />
-      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="139" Column="1" />
+      <File FileName="CityWebServer/SocketHandlers/LimitsHandler.cs" Line="25" Column="55" />
       <File FileName="CityWebServer/Properties/AssemblyInfo.cs" Line="23" Column="1" />
-      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="149" Column="48" />
+      <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="155" Column="4" />
       <File FileName="CityWebServer/SocketHandlers/NotificationHandler.cs" Line="75" Column="46" />
       <File FileName="CityWebServer/Models/Notification.cs" Line="6" Column="3" />
       <File FileName="CityWebServer/Models/DistrictInfo.cs" Line="22" Column="31" />
       <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="133" Column="39" />
       <File FileName="CityWebServer/SocketHandlers/DistrictHandler.cs" Line="123" Column="51" />
       <File FileName="CityWebServer/Models/Camera.cs" Line="11" Column="2" />
-      <File FileName="CityWebServer/SocketHandlers/CitizenHandler.cs" Line="70" Column="48" />
+      <File FileName="CityWebServer/SocketHandlers/CitizenHandler.cs" Line="83" Column="35" />
       <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="9" Column="19" />
+      <File FileName="CityWebServer/SocketHandlers/FlagsHandler.cs" Line="17" Column="54" />
       <File FileName="CityWebServer/SocketHandlers/TerrainHandler.cs" Line="10" Column="29" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="77" Column="5" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="114" Column="35" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="109" Column="6" NotebookId="1" />
       <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="11" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="28" NotebookId="1" />
+      <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="25" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

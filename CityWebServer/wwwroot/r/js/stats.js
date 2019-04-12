@@ -14,14 +14,14 @@ class Stats {
 
     _makeCharts(data) {
         this.fields = {
-            "Birth Rate": {
+            /* "Birth Rate": {
                 get: data => data.District.Births,
                 color: '#009DF3',
             },
             "Death Rate": {
                 get: data => data.District.Deaths,
                 color: '#804040',
-            },
+            }, */
             "Traffic Flow": {
                 max: 100,
                 get: data => data.Tick.trafficFlow,

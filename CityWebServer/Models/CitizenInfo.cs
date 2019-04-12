@@ -27,6 +27,6 @@ namespace CityWebServer.Models {
 		public byte gender; //I hope there are fewer than 256
 		public float height;
 		public string subCulture;
-		public string thumbnaill;
+		public string thumbnail;
 	}
 }
