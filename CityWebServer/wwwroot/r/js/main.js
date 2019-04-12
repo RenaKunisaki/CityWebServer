@@ -44,7 +44,7 @@ class App {
         this.viewModel      = null;
         this.currentDate    = null;
         this.chirper        = new Chirper(this);
-        this.heightMap      = new HeightMap(this);
+        //this.heightMap      = new HeightMap(this);
         this.budget         = new Budget(this);
         this.population     = new Population(this);
         this.limits         = new Limits(this);
@@ -224,7 +224,7 @@ class App {
     }
 
     _init() {
-        this.heightMap.run();
+        //this.heightMap.run();
         this.chirper.run();
         this.budget.run();
         this.population.run();
