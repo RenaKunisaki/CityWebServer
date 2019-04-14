@@ -168,6 +168,7 @@ namespace CityWebServer.RequestHandlers {
 			ChirperHandler chirperHandler = new ChirperHandler(this);
 			CitizenHandler citizenHandler = new CitizenHandler(this);
 			CityInfoHandler cityInfoHandler = new CityInfoHandler(this);
+			DebugHandler debugHandler = new DebugHandler(this);
 			DistrictHandler districtHandler = new DistrictHandler(this);
 			FlagsHandler flagsHandler = new FlagsHandler(this);
 			InstancesHandler instancesHandler = new InstancesHandler(this);

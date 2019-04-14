@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -49,6 +50,9 @@ namespace CityWebServer {
 		public CallbackList<FrameCallbackParam> frameCallbacks;
 		public CallbackList<UnlockAreaCallbackParam> unlockAreaCallbacks;
 		public CallbackList<TerrainCallbackParam> terrainCallbacks;
+		private int _numActiveHandlers;
+		private readonly object numActiveHandlersLock;
+		private readonly int _numActiveHandlers1;
 
 
 		/* So, why using TcpListener instead of HttpListener?
@@ -73,7 +77,8 @@ namespace CityWebServer {
 		}
 
 		public WebServer() {
-			// We need a place to store all the request handlers that have been registered.
+			_numActiveHandlers = 0;
+			numActiveHandlersLock = new object();
 			_requestHandlers = new List<IRequestHandler>();
 			frameCallbacks = new CallbackList<FrameCallbackParam>("Frame");
 			unlockAreaCallbacks = new CallbackList<UnlockAreaCallbackParam>("UnlockArea");
@@ -136,6 +141,9 @@ namespace CityWebServer {
 		public void Run() {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
+				lock(numActiveHandlersLock) {
+					_numActiveHandlers++;
+				}
 				Log("Server running");
 				try {
 					Thread.CurrentThread.Name = "WebServerMain";
@@ -159,6 +167,11 @@ namespace CityWebServer {
 						UnityEngine.Debug.LogException(ex);
 					}
 				}
+				finally {
+					lock(numActiveHandlersLock) {
+						_numActiveHandlers--;
+					}
+				}
 			});
 		}
 
@@ -180,6 +193,7 @@ namespace CityWebServer {
 			get { return _requestHandlers.ToArray(); }
 		}
 
+		public int NumActiveHandlers => _numActiveHandlers;
 		/// <summary>
 		/// Callback in the client handler thread.
 		/// </summary>
@@ -306,7 +320,9 @@ namespace CityWebServer {
 			foreach(var type in types) {
 				Boolean isValid = false;
 				try {
-					isValid = typeof(IRequestHandler).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract;
+					isValid = typeof(IRequestHandler).IsAssignableFrom(type)
+					&& type.IsClass && !type.IsAbstract
+					&& type.Name != "RequestHandlerBase";
 				}
 				catch { }
 
@@ -334,9 +350,9 @@ namespace CityWebServer {
 			Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			Log("Initializing...");
 
-			if(fileWatcher == null) {
+			/* if(fileWatcher == null) {
 				fileWatcher = new FileWatcher();
-			}
+			} */
 
 			GetWebRoot();
 			try {
@@ -447,7 +463,6 @@ namespace CityWebServer {
 		}
 
 		#endregion IAreasExtension
-
 		#region ITerrainExtension
 
 		public void OnCreated(ITerrain terrain) { }
