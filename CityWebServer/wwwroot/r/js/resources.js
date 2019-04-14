@@ -68,89 +68,89 @@ class Resources {
                 unit: '%',
             },
             "Electricity Usage": {
-                max: data => data.District.ElectricityCapacity,
-                get: data => data.District.ElectricityConsumption,
+                max: data => data.District[0].ElectricityCapacity,
+                get: data => data.District[0].ElectricityConsumption,
                 scale: 1/1000, //data is given in KW but game shows in MW
                 unit: " MW",
             },
             "Water Usage": {
-                max: data => data.District.WaterCapacity,
-                get: data => data.District.WaterConsumption,
+                max: data => data.District[0].WaterCapacity,
+                get: data => data.District[0].WaterConsumption,
                 unit: " m³"
             },
             "Sewer Usage": {
-                max: data => data.District.SewageCapacity,
-                get: data => data.District.SewageAccumulation,
+                max: data => data.District[0].SewageCapacity,
+                get: data => data.District[0].SewageAccumulation,
                 unit: " m³"
             },
             "Heat Usage": {
-                max: data => data.District.HeatingCapacity,
-                get: data => data.District.HeatingConsumption,
+                max: data => data.District[0].HeatingCapacity,
+                get: data => data.District[0].HeatingConsumption,
                 scale: 1/1000, //data is given in KW but game shows in MW
                 unit: " MW",
             },
             "Landfill Usage": {
-                max: data => data.District.GarbageCapacity,
-                get: data => data.District.GarbageAmount,
+                max: data => data.District[0].GarbageCapacity,
+                get: data => data.District[0].GarbageAmount,
             },
             "Hospital Usage": {
-                max: data => data.District.HealCapacity,
-                get: data => data.District.SickCount,
+                max: data => data.District[0].HealCapacity,
+                get: data => data.District[0].SickCount,
                 unit: " people",
             },
             "Cemetery Usage": {
-                max: data => data.District.DeadCapacity,
-                get: data => data.District.DeadAmount,
+                max: data => data.District[0].DeadCapacity,
+                get: data => data.District[0].DeadAmount,
                 unit: "people",
             },
             "Water Storage": {
-                max: data => data.District.WaterStorageCapacity,
-                get: data => data.District.WaterStorageAmount,
+                max: data => data.District[0].WaterStorageCapacity,
+                get: data => data.District[0].WaterStorageAmount,
                 unit: " m³"
             },
             "Shelter Usage": {
-                max: data => data.District.ShelterCitizenCapacity,
-                get: data => data.District.ShelterCitizenNumber,
+                max: data => data.District[0].ShelterCitizenCapacity,
+                get: data => data.District[0].ShelterCitizenNumber,
                 unit: " people",
             },
             "E.School Usage": {
-                max: data => data.District.Education1Capacity,
-                get: data => data.District.Education1Need,
+                max: data => data.District[0].Education1Capacity,
+                get: data => data.District[0].Education1Need,
                 unit: " people",
             },
             "H.School Usage": {
-                max: data => data.District.Education2Capacity,
-                get: data => data.District.Education2Need,
+                max: data => data.District[0].Education2Capacity,
+                get: data => data.District[0].Education2Need,
                 unit: " people",
             },
             "University Usage": {
-                max: data => data.District.Education3Capacity,
-                get: data => data.District.Education3Need,
+                max: data => data.District[0].Education3Capacity,
+                get: data => data.District[0].Education3Need,
                 unit: " people",
             },
             "Jail Usage": {
-                max: data => data.District.CriminalCapacity,
-                get: data => data.District.CriminalAmount,
+                max: data => data.District[0].CriminalCapacity,
+                get: data => data.District[0].CriminalAmount,
                 unit: " people",
             },
             "Job Usage": {
-                max: data => data.District.WorkplaceCount,
-                get: data => data.District.WorkerCount,
+                max: data => data.District[0].WorkplaceCount,
+                get: data => data.District[0].WorkerCount,
                 unit: " jobs",
             },
             "Unemployment": {
                 max: 100,
-                get: data => data.District.Unemployment,
+                get: data => data.District[0].Unemployment,
                 unit: '%',
             },
             "Water Pollution": {
                 max: 100,
-                get: data => data.District.WaterPollution,
+                get: data => data.District[0].WaterPollution,
                 unit: '%',
             },
             "Ground Pollution": {
                 max: 100,
-                get: data => data.District.GroundPollution,
+                get: data => data.District[0].GroundPollution,
                 unit: '%',
             },
         };

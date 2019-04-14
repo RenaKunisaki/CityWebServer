@@ -17,8 +17,8 @@ class TimeChart {
             const dataSet = {
                 backgroundColor: param.color,
                 //hoverBackgroundColor: bgColors[i],
-                borderWidth: 1,
-                pointRadius: 1,
+                borderWidth: 0.5,
+                pointRadius: 0.5,
                 borderColor: param.color,
                 data: this._data[param.label],
                 fill: param.fill == undefined ? false : param.fill,

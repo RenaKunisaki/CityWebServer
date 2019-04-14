@@ -255,7 +255,10 @@ class App {
                 if(target[key] == undefined) target[key] = {};
                 target = target[key];
             }
-            merge(target, field, true);
+            if(field.ID == undefined) merge(target, field, true);
+            else {
+                target[parseInt(field.ID)] = field;
+            }
         }
         this._updateBoundElements();
 

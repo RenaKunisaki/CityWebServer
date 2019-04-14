@@ -29,32 +29,32 @@ class Stats {
             },
             "E.School Grads": {
                 max: 100,
-                get: data => data.District.Education1Rate,
+                get: data => data.District[0].Education1Rate,
                 unit: "%",
             },
             "H.School Grads": {
                 max: 100,
-                get: data => data.District.Education2Rate,
+                get: data => data.District[0].Education2Rate,
                 unit: "%",
             },
             "University Grads": {
                 max: 100,
-                get: data => data.District.Education3Rate,
+                get: data => data.District[0].Education3Rate,
                 unit: "%",
             },
             "Unemployment": {
                 max: 100,
-                get: data => data.District.Unemployment,
+                get: data => data.District[0].Unemployment,
                 unit: '%',
             },
             "Water Pollution": {
                 max: 100,
-                get: data => data.District.WaterPollution,
+                get: data => data.District[0].WaterPollution,
                 unit: '%',
             },
             "Ground Pollution": {
                 max: 100,
-                get: data => data.District.GroundPollution,
+                get: data => data.District[0].GroundPollution,
                 unit: '%',
             },
         };

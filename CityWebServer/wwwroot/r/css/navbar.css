@@ -27,6 +27,10 @@
     background: #400;
 }
 
+#navbar a {
+    color: #0DD;
+}
+
 #clock {
     position: absolute;
     top: 0;

@@ -90,9 +90,40 @@ class Problems {
     async _onIconClick(problem) {
         let data = await this.app.query({
             "Building": {
-                "getByProblem": problem,
+                "action": "getByProblem",
+                "problem": problem,
             }
         }, "ProblemBuildings");
         console.log("Buildings with problem", problem, data);
+
+        const list = $('<ul class="list">');
+        for(const building of data) {
+            list.append($('<li class="building">').append(
+                $('<span class="name">').text(building.title),
+                $('<span class="type">').text(building.category),
+                $('<button class="camera-goto">').text("Go There")
+                .on('click', e => {
+                    this.app.query({"Camera":{
+                        "set":{
+                            "x":building.posX,
+                            "y":building.posY,
+                            "z":building.posZ,
+                        },
+                    }})
+                }),
+                $('<button class="building-destroy">').text("Demolish")
+                .on('click', e => {
+                    this.app.query({"Building":{
+                        "action": "destroy",
+                        "id": building.ID,
+                    }})
+                }),
+            ));
+        }
+
+        new Popup({
+            title: "Buildings with "+problem,
+            body: list,
+        }).show();
     }
 }

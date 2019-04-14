@@ -35,7 +35,7 @@ body {
     position: relative;
 }
 
-.box h1 {
+.box h1, .popup h1 {
     text-align: center;
     font-size: 1.2em;
     margin: 0;
@@ -46,11 +46,11 @@ body {
     border-bottom: 1px #FFF solid;
 }
 
-.box h1 .buttons {
+.box h1 .buttons, .popup h1 .buttons {
     float: right;
 }
 
-.box h2 {
+.box h2, .popup h2 {
     font-size: 1.1em;
     margin: 0;
 }
@@ -84,4 +84,37 @@ td.money:before { content: '' }
     width:  1em;
     height: 1em;
     display: inline-block;
+}
+
+.popup {
+    position: fixed;
+    top: 25%;
+    bottom: 25%;
+    left: 25%;
+    right: 25%;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px #FFF solid;
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.8);
+}
+
+.popup button.close {
+    width: 1em;
+    height: 1em;
+    margin-right: 0.1em;
+    border-top:    2px #F88 solid;
+    border-left:   2px #F88 solid;
+    border-right:  2px #800 solid;
+    border-bottom: 2px #800 solid;
+    background-color: #C44;
+}
+
+.building .name {
+    margin-right: 1em;
+    font-weight: bold;
+}
+
+.building .type::before { content: '(' }
+.building .type::after  { content: ')' }
+.building .type {
+    margin-right: 1em;
 }
