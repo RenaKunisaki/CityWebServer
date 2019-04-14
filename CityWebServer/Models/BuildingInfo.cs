@@ -54,6 +54,7 @@ namespace CityWebServer.Models {
 		public int ownVehicles;
 		public int parentBuilding;
 		//public UnityEngine.Vector3 position;
+		public float posX, posY, posZ;
 		//public Notification.Problem problems;
 		public int productionRate;
 		public int seniors;

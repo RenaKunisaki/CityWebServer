@@ -6,6 +6,7 @@ using CityWebServer.RequestHandlers;
 using ColossalFramework;
 using CityWebServer.Callbacks;
 using System.Linq;
+using UnityEngine;
 
 namespace CityWebServer.SocketHandlers {
 	/// <summary>
@@ -67,6 +68,41 @@ namespace CityWebServer.SocketHandlers {
 			["WrongAreaType"] = (ulong)Notification.Problem.WrongAreaType,
 		};
 
+		protected class ClientMessage {
+			public ClientMessage(SocketMessageHandlerParam _param) {
+				this.param = _param.param;
+			}
+
+			public string GetString(string key, bool allowNull = false) {
+				var p = this.param as Dictionary<string, object>;
+				string s = p[key] as string;
+				if(s == null && !allowNull) {
+					throw new ArgumentException($"invalid value for {key}");
+				}
+				return s;
+			}
+
+			public int GetInt(string key) {
+				var p = this.param as Dictionary<string, object>;
+				int? val = p[key] as int?;
+				if(val == null) {
+					throw new ArgumentException($"invalid value for {key}");
+				}
+				return (int)val;
+			}
+
+			public float GetFloat(string key) {
+				var p = this.param as Dictionary<string, object>;
+				float? val = p[key] as float?;
+				if(val == null) {
+					throw new ArgumentException($"invalid value for {key}");
+				}
+				return (float)val;
+			}
+
+			protected object param;
+		}
+
 		public BuildingHandler(SocketRequestHandler handler) :
 		base(handler, "Building") {
 			//SendAll();
@@ -82,38 +118,38 @@ namespace CityWebServer.SocketHandlers {
 		/// <c>list</c>: (anything) => get list of valid IDs
 		/// </remarks>
 		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
-				case "get": {
-						int? id = param["get"] as int?;
-						if(id == null) {
-							SendErrorResponse("Invalid building ID");
-							return;
+			try {
+				ClientMessage msg = new ClientMessage(_param);
+				string action = msg.GetString("action");
+				switch(action) {
+					case "get": {
+							SendBuilding(msg.GetInt("id"));
+							break;
 						}
-						SendBuilding((int)id);
-						break;
-					}
-				case "getByProblem": {
-						//This could be just a ulong parameter but nope,
-						//apparently you can't use ulong in json for reasons
-						string flags = param["getByProblem"] as string;
-						if(flags == null || !ProblemFlags.ContainsKey(flags)) {
-							SendErrorResponse("Invalid problem flags");
-							return;
+					case "getByProblem": {
+							//This could be just a ulong parameter but nope,
+							//apparently you can't use ulong in json for reasons
+							string flags = msg.GetString("problem");
+							if(flags == null || !ProblemFlags.ContainsKey(flags)) {
+								throw new ArgumentException("Invalid problem name");
+							}
+							SendProblems(ProblemFlags[flags]);
+							break;
 						}
-						SendProblems(ProblemFlags[flags]);
+					case "list":
+						SendList();
 						break;
-					}
-				case "list":
-					SendList();
-					break;
-				default:
-					SendErrorResponse($"Building has no method '{key}'");
-					break;
+					case "destroy": {
+							DestroyBuilding(msg.GetInt("id"));
+							break;
+						}
+					default:
+						throw new ArgumentException($"Invalid method {action}");
+				}
+			}
+			catch(ArgumentException ex) {
+				SendErrorResponse(ex.Message);
+				return;
 			}
 		}
 
@@ -157,6 +193,57 @@ namespace CityWebServer.SocketHandlers {
 		/// <param name="id">Building ID.</param>
 		protected void SendBuilding(int id) {
 			SendJson(GetBuilding(id));
+		}
+
+		protected void DestroyBuilding(int id) {
+			//Much copied from https://github.com/elboletaire/cities-skylines-destroy-everything/blob/master/Source/Destroyer.cs
+			var manager = BuildingManager.instance;
+			var target = manager.m_buildings.m_buffer[id];
+			if(target.m_flags == Building.Flags.None) {
+				SendErrorResponse($"Building doesn't exist: {id}");
+				return;
+			}
+			var info = target.Info;
+
+			//Give refund if possible.
+			int amount = target.Info.m_buildingAI.GetRefundAmount(
+				(ushort)id, ref target);
+			Log($"Destroying building {id} gives refund of {amount}");
+			if(amount != 0) {
+				EconomyManager.instance.AddResource(
+					EconomyManager.Resource.RefundAmount, amount, info.m_class);
+			}
+
+			//Get info before destroying
+			Vector3 position = target.m_position;
+			float angle = target.m_angle;
+			int length = target.m_length;
+			var lod = info.m_lodMeshData;
+
+			//Delete the building
+			Log($"Destroy building: {id}");
+			manager.ReleaseBuilding((ushort)id);
+			Log($"Building {id} deleted.");
+
+			//Trigger the bulldoze effect
+			EffectInfo effect = manager.m_properties.m_bulldozeEffect;
+			if(effect != null) {
+				Log("Triggering bulldoze effect...");
+				var nullAudioGroup = new AudioGroup(0,
+					new SavedFloat("Bulldoze",
+						Settings.gameSettingsFile, 0, false));
+				var instance = new InstanceID();
+				var spawnArea = new EffectInfo.SpawnArea(
+					Matrix4x4.TRS(
+						Building.CalculateMeshPosition(info, position, angle, length),
+						Building.CalculateMeshRotation(angle),
+						Vector3.one
+					),
+					lod);
+				EffectManager.instance.DispatchEffect(effect, instance, spawnArea,
+					Vector3.zero, 0.0f, 1f, nullAudioGroup);
+				Log("Triggered bulldoze effect.");
+			}
 		}
 
 		/// <summary>
