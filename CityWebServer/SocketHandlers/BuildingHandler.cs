@@ -68,41 +68,6 @@ namespace CityWebServer.SocketHandlers {
 			["WrongAreaType"] = (ulong)Notification.Problem.WrongAreaType,
 		};
 
-		protected class ClientMessage {
-			public ClientMessage(SocketMessageHandlerParam _param) {
-				this.param = _param.param;
-			}
-
-			public string GetString(string key, bool allowNull = false) {
-				var p = this.param as Dictionary<string, object>;
-				string s = p[key] as string;
-				if(s == null && !allowNull) {
-					throw new ArgumentException($"invalid value for {key}");
-				}
-				return s;
-			}
-
-			public int GetInt(string key) {
-				var p = this.param as Dictionary<string, object>;
-				int? val = p[key] as int?;
-				if(val == null) {
-					throw new ArgumentException($"invalid value for {key}");
-				}
-				return (int)val;
-			}
-
-			public float GetFloat(string key) {
-				var p = this.param as Dictionary<string, object>;
-				float? val = p[key] as float?;
-				if(val == null) {
-					throw new ArgumentException($"invalid value for {key}");
-				}
-				return (float)val;
-			}
-
-			protected object param;
-		}
-
 		public BuildingHandler(SocketRequestHandler handler) :
 		base(handler, "Building") {
 			//SendAll();
@@ -120,16 +85,16 @@ namespace CityWebServer.SocketHandlers {
 		public void OnClientMessage(SocketMessageHandlerParam _param) {
 			try {
 				ClientMessage msg = new ClientMessage(_param);
-				string action = msg.GetString("action");
+				string action = msg.Get<string>("action");
 				switch(action) {
 					case "get": {
-							SendBuilding(msg.GetInt("id"));
+							SendBuilding(msg.Get<int>("id"));
 							break;
 						}
 					case "getByProblem": {
 							//This could be just a ulong parameter but nope,
 							//apparently you can't use ulong in json for reasons
-							string flags = msg.GetString("problem");
+							string flags = msg.Get<string>("problem");
 							if(flags == null || !ProblemFlags.ContainsKey(flags)) {
 								throw new ArgumentException("Invalid problem name");
 							}
@@ -140,7 +105,7 @@ namespace CityWebServer.SocketHandlers {
 						SendList();
 						break;
 					case "destroy": {
-							DestroyBuilding(msg.GetInt("id"));
+							DestroyBuilding(msg.Get<int>("id"));
 							break;
 						}
 					default:

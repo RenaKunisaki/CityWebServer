@@ -113,6 +113,8 @@
     <Compile Include="SocketHandlers\CitizenHandler.cs" />
     <Compile Include="Models\CitizenInfo.cs" />
     <Compile Include="SocketHandlers\FlagsHandler.cs" />
+    <Compile Include="SocketHandlers\DebugHandler.cs" />
+    <Compile Include="Helpers\ClientMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CityWebServer.Extensibility\CityWebServer.Extensibility.csproj">
