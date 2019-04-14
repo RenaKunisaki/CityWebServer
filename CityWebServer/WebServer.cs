@@ -252,8 +252,6 @@ namespace CityWebServer {
 				IRequestHandler handlerInstance = null;
 				Boolean exists = false;
 
-				//XXX this tries to register RequestHandlerBase itself,
-				//which fails, adding a useless exception to the log.
 				try {
 					if(typeof(RequestHandlerBase).IsAssignableFrom(handler)) {
 						handlerInstance = (RequestHandlerBase)Activator.CreateInstance(handler);

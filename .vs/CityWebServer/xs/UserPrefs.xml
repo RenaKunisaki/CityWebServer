@@ -3,15 +3,15 @@
     <Files>
       <File FileName="CityWebServer/SocketHandlers/DebugHandler.cs" Line="32" Column="15" />
       <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="22" Column="28" />
-      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="78" Column="45" />
-      <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="31" Column="54" />
-      <File FileName="CityWebServer Status" />
+      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="86" Column="9" />
+      <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="10" Column="9" />
       <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer/WebServer.cs" Line="309" Column="21" NotebookId="1" />
+      <File FileName="CityWebServer/WebServer.cs" Line="320" Column="10" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="432" Column="4" NotebookId="1" />
       <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="165" Column="28" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="48" Column="27" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="29" Column="16" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="135" Column="36" NotebookId="1" />
+      <File FileName="CityWebServer Status" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,7 +23,7 @@
               <Node name="Properties" expanded="True" />
               <Node name="RequestHandlers" expanded="True" />
               <Node name="SocketHandlers" expanded="True">
-                <Node name="BuildingHandler.cs" selected="True" />
+                <Node name="CameraHandler.cs" selected="True" />
               </Node>
               <Node name="wwwroot" expanded="True">
                 <Node name="r" expanded="True">

@@ -9,6 +9,7 @@ using CityWebServer.Model;
 using CityWebServer.Models;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
+using UnityEngine;
 
 namespace CityWebServer.SocketHandlers {
 	/// <summary>
@@ -33,50 +34,27 @@ namespace CityWebServer.SocketHandlers {
 		/// TODO
 		/// </remarks>
 		public void OnCameraMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
+			ClientMessage msg = new ClientMessage(_param);
+			string action = msg.Get<string>("action");
+			switch(action) {
 				case "get":
 					SendAll();
 					break;
-				case "set": {
-						//XXX allow to set more than position
-						var manager = Singleton<RenderManager>.instance;
-						if(manager == null) {
-							SendErrorResponse(HttpStatusCode.ServiceUnavailable);
-							return;
-						}
-						var cameraInfo = manager.CurrentCameraInfo;
-						float[] vals = param["set"] as float[];
-						cameraInfo.m_position = new UnityEngine.Vector3(
-							vals[0], vals[1], vals[2]);
-						break;
-					}
-				case "move": {
-						//XXX allow to set more than position
-						var manager = Singleton<RenderManager>.instance;
-						if(manager == null) {
-							SendErrorResponse(HttpStatusCode.ServiceUnavailable);
-							return;
-						}
-						var cameraInfo = manager.CurrentCameraInfo;
-						float[] vals = param["move"] as float[];
-						cameraInfo.m_position += new UnityEngine.Vector3(
-							vals[0], vals[1], vals[2]);
-						break;
-					}
+				case "set":
+					HandleMove(msg, false);
+					break;
+				case "move":
+					HandleMove(msg, true);
+					break;
+				case "lookAt":
+					HandleLookAt(msg);
+					break;
 				case "updateInterval": {
-						float? interval = param["updateInterval"] as float?;
-						if(interval == null) updateInterval = 0;
-						else updateInterval = (float)interval;
+						updateInterval = msg.Get<float>("interval");
 						break;
 					}
 				default:
-					SendErrorResponse($"Camera has no method '{key}'");
-					break;
+					throw new ArgumentException($"Invalid method {action}");
 			}
 		}
 
@@ -111,6 +89,99 @@ namespace CityWebServer.SocketHandlers {
 				far = cameraInfo.m_far,
 			};
 			SendJson(info);
+		}
+
+		/// <summary>
+		/// Handles "set" and "move" messages from client.
+		/// </summary>
+		/// <param name="msg">Message.</param>
+		/// <param name="relative">If set to <c>true</c> relative.</param>
+		protected void HandleMove(ClientMessage msg, bool relative) {
+			var cam = ToolsModifierControl.cameraController;
+			cam.ClearTarget();
+			Vector3 targetPos, currentPos;
+			Vector2 targetAngle, currentAngle;
+
+			if(msg.HasKey("targetPosition")) {
+				targetPos = msg.GetVector3("targetPosition");
+			}
+			else targetPos = cam.m_targetPosition;
+
+			if(msg.HasKey("position")) {
+				currentPos = msg.GetVector3("position");
+			}
+			else currentPos = cam.m_currentPosition;
+
+			if(msg.HasKey("targetAngle")) {
+				targetAngle = msg.GetVector2("targetAngle");
+			}
+			else targetAngle = cam.m_targetAngle;
+
+			if(msg.HasKey("angle")) {
+				currentAngle = msg.GetVector2("angle");
+			}
+			else currentAngle = cam.m_currentAngle;
+
+			if(!relative) {
+				cam.m_targetPosition.Set(0, 0, 0);
+				cam.m_currentPosition.Set(0, 0, 0);
+				cam.m_targetAngle.Set(0, 0);
+				cam.m_currentAngle.Set(0, 0);
+			}
+			cam.m_targetPosition += targetPos;
+			cam.m_currentPosition += currentPos;
+			cam.m_targetAngle += targetAngle;
+			cam.m_currentAngle += currentAngle;
+		}
+
+		/// <summary>
+		/// Handles "lookAt" message from client.
+		/// </summary>
+		/// <param name="msg">Message.</param>
+		protected void HandleLookAt(ClientMessage msg) {
+			Vector3 pos;
+			InstanceID id = default(InstanceID);
+			var cam = ToolsModifierControl.cameraController;
+			cam.ClearTarget();
+			if(msg.HasKey("building")) {
+				id.Building = (ushort)msg.Get<int>("building");
+				pos = BuildingManager.instance.m_buildings.m_buffer[id.Building].m_position;
+			}
+			else if(msg.HasKey("vehicle")) {
+				id.Vehicle = (ushort)msg.Get<int>("vehicle");
+				pos = VehicleManager.instance.m_vehicles.m_buffer[id.Vehicle].GetLastFramePosition();
+			}
+			else if(msg.HasKey("parkedVehicle")) {
+				id.ParkedVehicle = (ushort)msg.Get<int>("parkedVehicle");
+				pos = VehicleManager.instance.m_parkedVehicles.m_buffer[id.ParkedVehicle].m_position;
+			}
+			else if(msg.HasKey("segment")) {
+				id.NetSegment = (ushort)msg.Get<int>("segment");
+				pos = NetManager.instance.m_segments.m_buffer[id.NetSegment].m_bounds.center;
+			}
+			else if(msg.HasKey("node")) {
+				id.NetNode = (ushort)msg.Get<int>("node");
+				pos = NetManager.instance.m_nodes.m_buffer[id.NetNode].m_position;
+			}
+			else if(msg.HasKey("citizenInstance")) {
+				id.CitizenInstance = (ushort)msg.Get<int>("citizenInstance");
+				pos = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].GetLastFramePosition();
+			}
+			else if(msg.HasKey("position")) {
+				cam.m_targetPosition = msg.GetVector3("position");
+				return;
+			}
+			else {
+				throw new ArgumentException("No target specified");
+			}
+			bool zoom = !msg.HasKey("zoom") || msg.Get<bool>("zoom");
+			bool openPanel = !msg.HasKey("openInfoPanel") || msg.Get<bool>("openInfoPanel");
+			cam.SetTarget(id, pos, zoom);
+			if(openPanel) {
+				SimulationManager.instance.m_ThreadingWrapper.QueueMainThread(() => {
+					DefaultTool.OpenWorldInfoPanel(id, pos);
+				});
+			}
 		}
 	}
 }
