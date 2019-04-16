@@ -11,6 +11,13 @@ namespace CityWebServer.Callbacks {
 		public float simulationTimeDelta;
 	}
 
+	/// <summary>
+	/// Callback parameter for WebServer once-per-day callbacks.
+	/// </summary>
+	public class DailyCallbackParam {
+		public DateTime time;
+	}
+
 	public class SocketMessageHandlerParam {
 		public object param;
 	}

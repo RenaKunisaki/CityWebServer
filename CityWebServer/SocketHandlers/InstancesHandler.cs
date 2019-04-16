@@ -15,13 +15,9 @@ namespace CityWebServer.SocketHandlers {
 	/// Sends info about object instances and other runtime stats.
 	/// </summary>
 	public class InstancesHandler: SocketHandlerBase {
-		protected float totalTimeDelta, updateInterval;
-
 		public InstancesHandler(SocketRequestHandler handler) :
 		base(handler, "Instances") {
-			totalTimeDelta = 0;
-			updateInterval = 5; //seconds
-			server.frameCallbacks.Register(Update);
+			server.dailyCallbacks.Register(Update);
 			handler.RegisterMessageHandler("Instances", OnClientMessage);
 			SendAll();
 		}
@@ -30,12 +26,8 @@ namespace CityWebServer.SocketHandlers {
 		/// Called each frame to send new data to client.
 		/// </summary>
 		/// <param name="param">Callback parameters.</param>
-		protected void Update(FrameCallbackParam param) {
-			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta >= updateInterval) {
-				SendAll();
-				totalTimeDelta = 0;
-			}
+		protected void Update(DailyCallbackParam param) {
+			SendAll();
 		}
 
 		/// <summary>

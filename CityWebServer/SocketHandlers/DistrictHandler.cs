@@ -13,13 +13,9 @@ namespace CityWebServer.SocketHandlers {
 	/// Pushes district info to client.
 	/// </summary>
 	public class DistrictHandler: SocketHandlerBase {
-		protected float totalTimeDelta, updateInterval;
-
 		public DistrictHandler(SocketRequestHandler handler) :
 		base(handler, "District") {
-			totalTimeDelta = 0;
-			updateInterval = 5; //seconds
-			server.frameCallbacks.Register(Update);
+			server.dailyCallbacks.Register(Update);
 			handler.RegisterMessageHandler("District", OnDistrictMessage);
 			SendDistrict(0);
 		}
@@ -28,12 +24,8 @@ namespace CityWebServer.SocketHandlers {
 		/// Called each frame to send new data to client.
 		/// </summary>
 		/// <param name="param">Callback parameters.</param>
-		protected void Update(FrameCallbackParam param) {
-			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta >= updateInterval) {
-				SendDistrict(0); //0 = whole city
-				totalTimeDelta = 0;
-			}
+		protected void Update(DailyCallbackParam param) {
+			SendDistrict(0); //0 = whole city
 		}
 
 		public DistrictInfo GetDistrict(int districtID) {

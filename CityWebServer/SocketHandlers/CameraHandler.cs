@@ -35,7 +35,7 @@ namespace CityWebServer.SocketHandlers {
 		/// </remarks>
 		public void OnCameraMessage(SocketMessageHandlerParam _param) {
 			ClientMessage msg = new ClientMessage(_param);
-			string action = msg.Get<string>("action");
+			string action = msg.GetString("action");
 			switch(action) {
 				case "get":
 					SendAll();
@@ -50,7 +50,7 @@ namespace CityWebServer.SocketHandlers {
 					HandleLookAt(msg);
 					break;
 				case "updateInterval": {
-						updateInterval = msg.Get<float>("interval");
+						updateInterval = msg.GetFloat("interval");
 						break;
 					}
 				default:
@@ -144,27 +144,27 @@ namespace CityWebServer.SocketHandlers {
 			var cam = ToolsModifierControl.cameraController;
 			cam.ClearTarget();
 			if(msg.HasKey("building")) {
-				id.Building = (ushort)msg.Get<int>("building");
+				id.Building = (ushort)msg.GetInt("building");
 				pos = BuildingManager.instance.m_buildings.m_buffer[id.Building].m_position;
 			}
 			else if(msg.HasKey("vehicle")) {
-				id.Vehicle = (ushort)msg.Get<int>("vehicle");
+				id.Vehicle = (ushort)msg.GetInt("vehicle");
 				pos = VehicleManager.instance.m_vehicles.m_buffer[id.Vehicle].GetLastFramePosition();
 			}
 			else if(msg.HasKey("parkedVehicle")) {
-				id.ParkedVehicle = (ushort)msg.Get<int>("parkedVehicle");
+				id.ParkedVehicle = (ushort)msg.GetInt("parkedVehicle");
 				pos = VehicleManager.instance.m_parkedVehicles.m_buffer[id.ParkedVehicle].m_position;
 			}
 			else if(msg.HasKey("segment")) {
-				id.NetSegment = (ushort)msg.Get<int>("segment");
+				id.NetSegment = (ushort)msg.GetInt("segment");
 				pos = NetManager.instance.m_segments.m_buffer[id.NetSegment].m_bounds.center;
 			}
 			else if(msg.HasKey("node")) {
-				id.NetNode = (ushort)msg.Get<int>("node");
+				id.NetNode = (ushort)msg.GetInt("node");
 				pos = NetManager.instance.m_nodes.m_buffer[id.NetNode].m_position;
 			}
 			else if(msg.HasKey("citizenInstance")) {
-				id.CitizenInstance = (ushort)msg.Get<int>("citizenInstance");
+				id.CitizenInstance = (ushort)msg.GetInt("citizenInstance");
 				pos = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].GetLastFramePosition();
 			}
 			else if(msg.HasKey("position")) {
@@ -174,8 +174,8 @@ namespace CityWebServer.SocketHandlers {
 			else {
 				throw new ArgumentException("No target specified");
 			}
-			bool zoom = !msg.HasKey("zoom") || msg.Get<bool>("zoom");
-			bool openPanel = !msg.HasKey("openInfoPanel") || msg.Get<bool>("openInfoPanel");
+			bool zoom = !msg.HasKey("zoom") || msg.GetBool("zoom");
+			bool openPanel = !msg.HasKey("openInfoPanel") || msg.GetBool("openInfoPanel");
 			cam.SetTarget(id, pos, zoom);
 			if(openPanel) {
 				SimulationManager.instance.m_ThreadingWrapper.QueueMainThread(() => {

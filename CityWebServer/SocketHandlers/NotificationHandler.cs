@@ -73,27 +73,17 @@ namespace CityWebServer.SocketHandlers {
 			set => problemFlags = value;
 		}
 
-		protected float totalTimeDelta, updateInterval;
-
 		public NotificationHandler(SocketRequestHandler handler) :
 		base(handler, "Notifications") {
-			totalTimeDelta = 0;
-			updateInterval = 5; //seconds
 			SendCounts();
-			server.frameCallbacks.Register(Update);
+			server.dailyCallbacks.Register(Update);
 		}
 
 		/// <summary>
 		/// Send new data to client.
 		/// </summary>
 		/// <param name="param">Callback parameters.</param>
-		protected void Update(FrameCallbackParam param) {
-			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta < updateInterval) {
-				//XXX update when info actually changes.
-				return;
-			}
-			totalTimeDelta = 0;
+		protected void Update(DailyCallbackParam param) {
 			SendCounts();
 		}
 

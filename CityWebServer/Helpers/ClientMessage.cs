@@ -26,6 +26,42 @@ namespace CityWebServer.SocketHandlers {
 			return v;
 		}
 
+		public string GetString(string key, bool allowNull = false) {
+			var p = this.param as Dictionary<string, object>;
+			string v = p[key] as string;
+			if(v == null && !allowNull) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return v;
+		}
+
+		public int GetInt(string key) {
+			var p = this.param as Dictionary<string, object>;
+			int? v = p[key] as int?;
+			if(v == null) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return (int)v;
+		}
+
+		public float GetFloat(string key) {
+			var p = this.param as Dictionary<string, object>;
+			float? v = p[key] as float?;
+			if(v == null) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return (float)v;
+		}
+
+		public bool GetBool(string key) {
+			var p = this.param as Dictionary<string, object>;
+			bool? v = p[key] as bool?;
+			if(v == null) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return (bool)v;
+		}
+
 		public Vector2 GetVector2(string key, bool allowNull = false) {
 			var p = this.param as Dictionary<string, float[]>;
 			var v = p[key];

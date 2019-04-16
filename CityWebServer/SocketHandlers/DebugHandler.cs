@@ -12,26 +12,17 @@ namespace CityWebServer.SocketHandlers {
 	/// Sends debug info to client.
 	/// </summary>
 	public class DebugHandler: SocketHandlerBase {
-		protected float totalTimeDelta, updateInterval;
-
 		public DebugHandler(SocketRequestHandler handler) :
 		base(handler, "Debug") {
-			totalTimeDelta = 0;
-			updateInterval = 0; //seconds (0=disable)
-			server.frameCallbacks.Register(Update);
+			server.dailyCallbacks.Register(Update);
 		}
 
 		/// <summary>
 		/// Called each frame to send new data to client.
 		/// </summary>
 		/// <param name="param">Callback parameters.</param>
-		protected void Update(FrameCallbackParam param) {
-			if(updateInterval <= 0) return; //reporting disabled
-			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta >= updateInterval) {
-				SendAll();
-				totalTimeDelta = 0;
-			}
+		protected void Update(DailyCallbackParam param) {
+			SendAll();
 		}
 
 		/// <summary>

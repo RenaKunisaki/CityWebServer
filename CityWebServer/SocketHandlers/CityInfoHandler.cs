@@ -13,12 +13,9 @@ namespace CityWebServer.SocketHandlers {
 	/// Pushes updated city info to client.
 	/// </summary>
 	public class CityInfoHandler: SocketHandlerBase {
-		protected float totalTimeDelta;
-
 		public CityInfoHandler(SocketRequestHandler handler) :
 		base(handler, "CityInfo") {
-			totalTimeDelta = 0;
-			server.frameCallbacks.Register(Update);
+			server.dailyCallbacks.Register(Update);
 			server.unlockAreaCallbacks.Register(OnAreaUnlocked);
 			SendInitialInfo();
 		}
@@ -68,12 +65,8 @@ namespace CityWebServer.SocketHandlers {
 		/// Called each frame to send new data to client.
 		/// </summary>
 		/// <param name="param">Callback parameters.</param>
-		protected void Update(FrameCallbackParam param) {
-			totalTimeDelta += param.realTimeDelta;
-			if(totalTimeDelta >= 1) { //only update once per second
-				SendNewInfo();
-				totalTimeDelta = 0;
-			}
+		protected void Update(DailyCallbackParam param) {
+			SendNewInfo();
 		}
 
 		/// <summary>

@@ -85,16 +85,16 @@ namespace CityWebServer.SocketHandlers {
 		public void OnClientMessage(SocketMessageHandlerParam _param) {
 			try {
 				ClientMessage msg = new ClientMessage(_param);
-				string action = msg.Get<string>("action");
+				string action = msg.GetString("action");
 				switch(action) {
 					case "get": {
-							SendBuilding(msg.Get<int>("id"));
+							SendBuilding(msg.GetInt("id"));
 							break;
 						}
 					case "getByProblem": {
 							//This could be just a ulong parameter but nope,
 							//apparently you can't use ulong in json for reasons
-							string flags = msg.Get<string>("problem");
+							string flags = msg.GetString("problem");
 							if(flags == null || !ProblemFlags.ContainsKey(flags)) {
 								throw new ArgumentException("Invalid problem name");
 							}
@@ -105,7 +105,7 @@ namespace CityWebServer.SocketHandlers {
 						SendList();
 						break;
 					case "destroy": {
-							DestroyBuilding(msg.Get<int>("id"));
+							DestroyBuilding(msg.GetInt("id"));
 							break;
 						}
 					default:

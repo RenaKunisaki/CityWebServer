@@ -48,11 +48,13 @@ namespace CityWebServer {
 		private readonly TcpListener _listener;
 		public IThreading threading;
 		public CallbackList<FrameCallbackParam> frameCallbacks;
+		public CallbackList<DailyCallbackParam> dailyCallbacks;
 		public CallbackList<UnlockAreaCallbackParam> unlockAreaCallbacks;
 		public CallbackList<TerrainCallbackParam> terrainCallbacks;
-		private int _numActiveHandlers;
+		private volatile int _numActiveHandlers;
 		private readonly object numActiveHandlersLock;
-		private readonly int _numActiveHandlers1;
+		private static readonly object logLock = new object();
+		protected DateTime lastTime; //last in-game time of daily callback
 
 
 		/* So, why using TcpListener instead of HttpListener?
@@ -81,15 +83,17 @@ namespace CityWebServer {
 			numActiveHandlersLock = new object();
 			_requestHandlers = new List<IRequestHandler>();
 			frameCallbacks = new CallbackList<FrameCallbackParam>("Frame");
+			dailyCallbacks = new CallbackList<DailyCallbackParam>("Daily");
 			unlockAreaCallbacks = new CallbackList<UnlockAreaCallbackParam>("UnlockArea");
 			terrainCallbacks = new CallbackList<TerrainCallbackParam>("Terrain");
+			lastTime = new DateTime();
 
 			IPAddress address = IPAddress.Parse("127.0.0.1");
 			int port = 7135;
 			//_endpoint = $"http://{address.ToString()}:{port}/";
 			_endpoint = "xxx";
 			_listener = new TcpListener(address, port);
-			//Log("Created Server");
+			Log("Created Server");
 		}
 
 		/// <summary>
@@ -98,19 +102,26 @@ namespace CityWebServer {
 		/// </summary>
 		/// <param name="message">Message.</param>
 		public static void Log(String message) {
-			String time = DateTime.Now.ToUniversalTime()
-				.ToString("yyyyMMdd' 'HHmmss'.'fff");
-			var tid = Thread.CurrentThread.ManagedThreadId;
-			var tname = Thread.CurrentThread.Name;
-			if(tname == "") tname = "?";
-			message = $"{time} {tid}/{tname}: {message}{Environment.NewLine}";
-			Trace.Write(message);
-			Trace.Flush();
-			try {
-				UnityEngine.Debug.Log("[WebServer] " + message);
-			}
-			catch(NullReferenceException) {
-				//Happens if Unity's logger isn't set up yet.
+			lock(logLock) {
+				//This lock shouldn't be necessary, but the game keeps crashing
+				//in funlockfile, and this deals with locking files, so...?
+				//apparently that's a known issue with Unity on Linux
+				String time = DateTime.Now.ToUniversalTime()
+					.ToString("yyyyMMdd' 'HHmmss'.'fff");
+				var tid = Thread.CurrentThread.ManagedThreadId;
+				var tname = Thread.CurrentThread.Name;
+				if(tname == "") tname = "?";
+				message = $"{time} {tid}/{tname}: {message}{Environment.NewLine}";
+				Trace.Write(message);
+				Trace.Flush();
+				try {
+					UnityEngine.Debug.Log("[WebServer] " + message);
+				}
+				catch(NullReferenceException) {
+					//Happens if Unity's logger isn't set up yet.
+					Trace.Write("Unity debug log not ready");
+					Trace.Flush();
+				}
 			}
 		}
 
@@ -141,9 +152,6 @@ namespace CityWebServer {
 		public void Run() {
 			Log("Server starting");
 			ThreadPool.QueueUserWorkItem(o => {
-				lock(numActiveHandlersLock) {
-					_numActiveHandlers++;
-				}
 				Log("Server running");
 				try {
 					Thread.CurrentThread.Name = "WebServerMain";
@@ -166,10 +174,8 @@ namespace CityWebServer {
 						Log($"Error running server: {ex}");
 						UnityEngine.Debug.LogException(ex);
 					}
-				}
-				finally {
-					lock(numActiveHandlersLock) {
-						_numActiveHandlers--;
+					else {
+						Log($"Server shutting down: {ex}");
 					}
 				}
 			});
@@ -180,6 +186,7 @@ namespace CityWebServer {
 		/// still be finished.
 		/// </summary>
 		public void Stop() {
+			Log("WebServer::Stop()");
 			_listener.Stop();
 		}
 		#endregion User Methods
@@ -199,6 +206,10 @@ namespace CityWebServer {
 		/// </summary>
 		/// <param name="client">TcpClient; new client socket.</param>
 		private void RequestProcessorCallback(object client) {
+			lock(numActiveHandlersLock) {
+				_numActiveHandlers++;
+			}
+
 			TcpClient clnt = client as TcpClient;
 			//clnt.ReceiveTimeout = 10000; //msec
 			try {
@@ -208,12 +219,19 @@ namespace CityWebServer {
 				catch(System.InvalidOperationException) {
 					//Thread name can only be set once
 				}
+				Log($"Handling client: ${clnt}");
 				var processor = new RequestProcessor(this, clnt);
 				processor.Handle();
 			}
 			catch(Exception ex) {
 				Log($"Error handling client: {ex}");
 				UnityEngine.Debug.LogException(ex);
+			}
+			finally {
+				Log($"Done handling client");
+				lock(numActiveHandlersLock) {
+					_numActiveHandlers--;
+				}
 			}
 		}
 
@@ -361,8 +379,11 @@ namespace CityWebServer {
 				UnityEngine.Debug.LogException(ex);
 			}
 
+			Log("Starting...");
 			Run();
+			Log("Startup OK.");
 			base.OnCreated(threading);
+			Log("OnCreated: done");
 		}
 
 		/// <summary>
@@ -375,6 +396,7 @@ namespace CityWebServer {
 			// TODO: Unregister from events
 			if(_requestHandlers != null) _requestHandlers.Clear();
 			base.OnReleased();
+			Log("Server is now shut down.");
 		}
 
 		/// <summary>
@@ -390,6 +412,13 @@ namespace CityWebServer {
 				realTimeDelta = realTimeDelta,
 				simulationTimeDelta = simulationTimeDelta,
 			});
+			var now = SimulationManager.instance.m_currentGameTime;
+			if(now.Day != lastTime.Day) {
+				lastTime = now;
+				dailyCallbacks.Call(new DailyCallbackParam {
+					time = lastTime,
+				});
+			}
 		}
 
 		#endregion ThreadingExtensionBase
@@ -414,7 +443,9 @@ namespace CityWebServer {
 		/// We don't use this because we already have another OnCreated method.
 		/// </summary>
 		/// <param name="areas">Areas.</param>
-		public void OnCreated(IAreas areas) { }
+		public void OnCreated(IAreas areas) {
+			Log("IAreasExtension::OnCreated");
+		}
 
 		/// <summary>
 		/// Invoked when the game checks if a tile can be unlocked
@@ -463,7 +494,9 @@ namespace CityWebServer {
 		#endregion IAreasExtension
 		#region ITerrainExtension
 
-		public void OnCreated(ITerrain terrain) { }
+		public void OnCreated(ITerrain terrain) {
+			Log("ITerrainExtension::OnCreated");
+		}
 
 		/// <summary>
 		/// Invoked after the terrain heights have been modified

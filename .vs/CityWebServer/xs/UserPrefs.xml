@@ -1,17 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
     <Files>
-      <File FileName="CityWebServer/SocketHandlers/DebugHandler.cs" Line="32" Column="15" />
-      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="22" Column="28" />
-      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="86" Column="9" />
-      <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="10" Column="9" />
+      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="24" Column="31" />
+      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="75" Column="4" />
+      <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="65" Column="66" />
+      <File FileName="CityWebServer/Models/CallbackParams.cs" Line="37" Column="16" />
+      <File FileName="CityWebServer Status" />
       <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="25" NotebookId="1" />
-      <File FileName="CityWebServer/WebServer.cs" Line="320" Column="10" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="432" Column="4" NotebookId="1" />
+      <File FileName="CityWebServer/WebServer.cs" Line="411" Column="30" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="416" Column="25" NotebookId="1" />
       <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="165" Column="28" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="29" Column="16" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="135" Column="36" NotebookId="1" />
-      <File FileName="CityWebServer Status" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="33" Column="45" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/InstancesHandler.cs" Line="34" Column="38" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/ChirperHandler.cs" Line="39" Column="16" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CitizenHandler.cs" Line="81" Column="31" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/CityInfoHandler.cs" Line="76" Column="42" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -19,12 +22,12 @@
           <Node name="CityWebServer" expanded="True">
             <Node name="CityWebServer" expanded="True">
               <Node name="Helpers" expanded="True" />
-              <Node name="Models" expanded="True" />
+              <Node name="Models" expanded="True">
+                <Node name="BuildingInfo.cs" selected="True" />
+              </Node>
               <Node name="Properties" expanded="True" />
               <Node name="RequestHandlers" expanded="True" />
-              <Node name="SocketHandlers" expanded="True">
-                <Node name="CameraHandler.cs" selected="True" />
-              </Node>
+              <Node name="SocketHandlers" expanded="True" />
               <Node name="wwwroot" expanded="True">
                 <Node name="r" expanded="True">
                   <Node name="js" expanded="True" />
