@@ -106,17 +106,25 @@ namespace CityWebServer.SocketHandlers {
 				return;
 			}
 
+			//don't use NotificationManager.instance.m_groupData here
+			//because it defines the visual groups, which overlap
+			//(for when several icons combine while zoomed out)
+			//meaning the counts are inflated.
+
 			var problemCount = new Dictionary<string, int>();
-			var groups = NotificationManager.instance.m_groupData;
-			for(int i = 0; i < groups.Length; i++) {
-				var problems = groups[i].m_problems;
-				if(problems == Notification.Problem.None) continue;
-				foreach(KeyValuePair<Notification.Problem, String> flag in problemFlags) {
-					if(((long)problems & (long)flag.Key) != 0) {
-						if(!problemCount.ContainsKey(flag.Value)) {
-							problemCount[flag.Value] = 1;
+			//var groups = NotificationManager.instance.m_groupData;
+			var buffer = BuildingManager.instance.m_buildings.m_buffer;
+			var buildings = new List<CityWebServer.Models.BuildingInfo>();
+			for(int i = 0; i < buffer.Length; i++) {
+				if(buffer[i].m_problems != Notification.Problem.None) {
+					var problems = buffer[i].m_problems;
+					foreach(KeyValuePair<Notification.Problem, String> flag in problemFlags) {
+						if(((long)problems & (long)flag.Key) != 0) {
+							if(!problemCount.ContainsKey(flag.Value)) {
+								problemCount[flag.Value] = 1;
+							}
+							else problemCount[flag.Value]++;
 						}
-						else problemCount[flag.Value]++;
 					}
 				}
 			}
