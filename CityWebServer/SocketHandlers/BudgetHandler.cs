@@ -439,27 +439,38 @@ namespace CityWebServer.SocketHandlers {
 		/// Get list of active loans.
 		/// </summary>
 		/// <returns>The loans.</returns>
-		/// XXX this actually returns all 3 loans even if inactive.
-		/// The inactive ones just have PaymentLeft = 0.
 		public List<Loan> GetLoans() {
 			List<Loan> loans = new List<Loan>(EconomyManager.MAX_LOANS);
 			//for(int i = 0; i < economyManager.CountLoans(); i++) {
 			for(int i = 0; i < EconomyManager.MAX_LOANS; i++) {
 				economyManager.GetLoan(i, out EconomyManager.Loan loan);
+				if(loan.m_amountLeft == 0) continue;
+
+				//Compute how long ago the loan was taken.
+				//thanks to Vectorial1024 for the formula.
+				float remain = loan.m_amountLeft;
+				float initial = loan.m_amountTaken;
+				//rate is 52 weeks * 100%
+				//m_interestRate is per 10,000, ie 0.01%, so we
+				//further divide it by 100.
+				float rate = 1 + (loan.m_interestRate / 520000);
+				float cost = loan.m_amountTaken / loan.m_length; //weekly payment
+				double weeks = (Math.Log(remain + cost / (1 - rate)) -
+					Math.Log(initial + cost / (1 - rate))) / Math.Log(rate);
+
 				loans.Add(new Loan {
 					//bank names aren't the ones shown in-game,
 					//they're just BankA, BankB, BankC. WTF?
 					//can LocaleFormatter give us the names?
-					BankName = economyManager.GetBankName(i),
+					//BankName = economyManager.GetBankName(i),
+					BankName = economyManager.m_properties.m_banks[i].m_bankName,
 					Amount = loan.m_amountTaken,
 					PaymentLeft = loan.m_amountLeft,
 					InterestRate = loan.m_interestRate,
 					InterestPaid = loan.m_interestPaid,
 					Length = loan.m_length,
-					//XXX how to get weekly cost, weeks left,
-					//correct bank name?
-					//do we just have to compute them? but we don't know
-					//when the loan was taken.
+					TimeLeft = weeks,
+					WeeklyPayment = (long)cost,
 				});
 			}
 			return loans;
