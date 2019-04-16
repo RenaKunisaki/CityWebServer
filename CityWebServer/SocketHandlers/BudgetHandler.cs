@@ -395,9 +395,23 @@ namespace CityWebServer.SocketHandlers {
 
 		public BudgetHandler(SocketRequestHandler handler) :
 		base(handler, "Budget") {
-			economyManager = Singleton<EconomyManager>.instance;
+			economyManager = EconomyManager.instance;
 			server.dailyCallbacks.Register(Update);
 			SendAll();
+			handler.RegisterMessageHandler("Budget", OnClientMessage);
+		}
+
+		public void OnClientMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
+				case "gimme":
+					EconomyManager.instance.AddResource(
+						EconomyManager.Resource.RewardAmount,
+						msg.GetInt("amount"), new ItemClass());
+					break;
+				default:
+					throw new ArgumentException($"Invalid method {action}");
+			}
 		}
 
 		/// <summary>
