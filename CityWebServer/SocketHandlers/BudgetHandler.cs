@@ -405,10 +405,21 @@ namespace CityWebServer.SocketHandlers {
 			string action = msg.GetString("action");
 			switch(action) {
 				case "gimme":
-					EconomyManager.instance.AddResource(
+					economyManager.AddResource(
 						EconomyManager.Resource.RewardAmount,
 						msg.GetInt("amount"), new ItemClass());
 					break;
+				case "payLoan": {
+						var r = economyManager.PayLoanNow(msg.GetInt("id"));
+						if(r == null) Log($"PayLoanNow returns null");
+						else Log($"PayLoanNow returns: {r}");
+						break;
+					}
+				//case "setBudget": {
+				//		//TODO, also set tax rate
+				//		//economyManager.SetBudget();
+				//		break;
+				//	}
 				default:
 					throw new ArgumentException($"Invalid method {action}");
 			}
