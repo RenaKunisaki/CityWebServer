@@ -1,4 +1,10 @@
-﻿using System;
+﻿//#define USE_LOG_FILE
+//Uncomment to log server messages to a separate file,
+//in addition to the debug console.
+//Disabled by defaut because Unity on Linux has
+//a bug with file locking causing crashes.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,8 +24,10 @@ namespace CityWebServer {
 	[UsedImplicitly]
 	public class WebServer: ThreadingExtensionBase, IWebServer, IAreasExtension,
 	ITerrainExtension {
+#if USE_LOG_FILE
 		protected static Stream logFile = null;
 		protected static TextWriterTraceListener logListener;
+#endif
 		protected static String wwwRoot = null;
 		private static string _endpoint; //used for UI button
 		protected static FileWatcher fileWatcher = null;
@@ -53,7 +61,9 @@ namespace CityWebServer {
 		public CallbackList<TerrainCallbackParam> terrainCallbacks;
 		private volatile int _numActiveHandlers;
 		private readonly object numActiveHandlersLock;
+#if USE_LOG_FILE
 		private static readonly object logLock = new object();
+#endif
 		protected DateTime lastTime; //last in-game time of daily callback
 
 
@@ -102,27 +112,35 @@ namespace CityWebServer {
 		/// </summary>
 		/// <param name="message">Message.</param>
 		public static void Log(String message) {
+#if USE_LOG_FILE
 			lock(logLock) {
-				//This lock shouldn't be necessary, but the game keeps crashing
-				//in funlockfile, and this deals with locking files, so...?
-				//apparently that's a known issue with Unity on Linux
-				String time = DateTime.Now.ToUniversalTime()
-					.ToString("yyyyMMdd' 'HHmmss'.'fff");
-				var tid = Thread.CurrentThread.ManagedThreadId;
-				var tname = Thread.CurrentThread.Name;
-				if(tname == "") tname = "?";
-				message = $"{time} {tid}/{tname}: {message}{Environment.NewLine}";
-				Trace.Write(message);
-				Trace.Flush();
-				try {
-					UnityEngine.Debug.Log("[WebServer] " + message);
-				}
-				catch(NullReferenceException) {
-					//Happens if Unity's logger isn't set up yet.
-					Trace.Write("Unity debug log not ready");
-					Trace.Flush();
-				}
+#endif
+			//This lock shouldn't be necessary, but the game keeps crashing
+			//in funlockfile, and this deals with locking files, so...?
+			//apparently that's a known issue with Unity on Linux
+			String time = DateTime.Now.ToUniversalTime()
+				.ToString("yyyyMMdd' 'HHmmss'.'fff");
+			var tid = Thread.CurrentThread.ManagedThreadId;
+			var tname = Thread.CurrentThread.Name;
+			if(tname == "") tname = "?";
+			message = $"{time} {tid}/{tname}: {message}{Environment.NewLine}";
+#if USE_LOG_FILE
+			Trace.Write(message);
+			Trace.Flush();
+#endif
+			try {
+				UnityEngine.Debug.Log("[WebServer] " + message);
 			}
+			catch(NullReferenceException) {
+#if USE_LOG_FILE
+				//Happens if Unity's logger isn't set up yet.
+				Trace.Write("Unity debug log not ready");
+				Trace.Flush();
+#endif
+			}
+#if USE_LOG_FILE
+		}
+#endif
 		}
 
 
@@ -358,11 +376,13 @@ namespace CityWebServer {
 		/// <param name="threading">The threading.</param>
 		public override void OnCreated(IThreading threading) {
 			this.threading = threading;
+#if USE_LOG_FILE
 			if(logFile == null) {
 				logFile = File.Create("CSL-WebServer.log");
 				logListener = new TextWriterTraceListener(logFile);
 				Trace.Listeners.Add(logListener);
 			}
+#endif
 			Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			Log("Initializing...");
 
