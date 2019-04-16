@@ -29,12 +29,11 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Camera" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// TODO
 		/// </remarks>
-		public void OnCameraMessage(SocketMessageHandlerParam _param) {
-			ClientMessage msg = new ClientMessage(_param);
+		public void OnCameraMessage(ClientMessage msg) {
 			string action = msg.GetString("action");
 			switch(action) {
 				case "get":

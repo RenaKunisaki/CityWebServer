@@ -68,7 +68,7 @@ namespace CityWebServer.RequestHandlers {
 		//Not using ConcurrentQueue because .Net 3.5 doesn't support it
 		protected Queue<String> sendQueue;
 		protected readonly object sendQueueLock;
-		protected Dictionary<string, CallbackList<SocketMessageHandlerParam>> messageHandlers;
+		protected Dictionary<string, CallbackList<ClientMessage>> messageHandlers;
 		protected readonly object messageHandlersLock;
 
 		public SocketRequestHandler()
@@ -81,7 +81,7 @@ namespace CityWebServer.RequestHandlers {
 			sendQueueLock = new object();
 			sendQueue = new Queue<String>();
 			messageHandlersLock = new object();
-			messageHandlers = new Dictionary<string, CallbackList<SocketMessageHandlerParam>>();
+			messageHandlers = new Dictionary<string, CallbackList<ClientMessage>>();
 		}
 
 		/// <summary>
@@ -90,11 +90,11 @@ namespace CityWebServer.RequestHandlers {
 		/// <param name="message">Message to handle.</param>
 		/// <param name="handler">Handler.</param>
 		public void RegisterMessageHandler(string message,
-		Action<SocketMessageHandlerParam> handler) {
+		Action<ClientMessage> handler) {
 			lock(messageHandlersLock) {
 				if(!messageHandlers.ContainsKey(message)) {
 					messageHandlers[message] = new
-						CallbackList<SocketMessageHandlerParam>(message);
+						CallbackList<ClientMessage>(message);
 				}
 				messageHandlers[message].Register(handler);
 			}
@@ -106,7 +106,7 @@ namespace CityWebServer.RequestHandlers {
 		/// <param name="message">Message.</param>
 		/// <param name="handler">Handler.</param>
 		public void UnregisterMessageHandler(string message,
-		Action<SocketMessageHandlerParam> handler) {
+		Action<ClientMessage> handler) {
 			lock(messageHandlersLock) {
 				if(!messageHandlers.ContainsKey(message)) return;
 				messageHandlers[message].Unregister(handler);
@@ -119,8 +119,8 @@ namespace CityWebServer.RequestHandlers {
 		/// <param name="message">Message.</param>
 		/// <param name="param">Parameter from client.</param>
 		protected void CallMessageHandler(string message,
-		SocketMessageHandlerParam param) {
-			CallbackList<SocketMessageHandlerParam> callbacks;
+		ClientMessage param) {
+			CallbackList<ClientMessage> callbacks;
 			lock(messageHandlersLock) {
 				if(!messageHandlers.ContainsKey(message)) return;
 				callbacks = messageHandlers[message];
@@ -289,15 +289,18 @@ namespace CityWebServer.RequestHandlers {
 				return;
 			}
 
+			string key = "";
 			try {
 				var input = reader.Read<Dictionary<string, object>>(message);
 				//Log($"message: {input}");
 				//XXX what happens if message is empty or not a dict?
-				string key = input.Keys.First();
+				key = input.Keys.First();
 				Log($"Calling message handlers: '{key}'");
-				CallMessageHandler(key, new SocketMessageHandlerParam {
-					param = input[key],
-				});
+				CallMessageHandler(key, new ClientMessage(input[key]));
+			}
+			catch(ArgumentException ex) {
+				SendErrorPacket(ex.Message, type: "ArgumentException");
+				return;
 			}
 			catch(Exception ex) {
 				if(ex is ObjectDisposedException
@@ -306,6 +309,25 @@ namespace CityWebServer.RequestHandlers {
 				}
 				Log($"Error handling socket msg: {message}: {ex}");
 			}
+		}
+
+		/// <summary>
+		/// Send an error response as a WebSocket JSON packet.
+		/// </summary>
+		/// <param name="error">Error message.</param>
+		/// <param name="name">Class name. Default is the name given
+		/// <param name="type">Error type.</param>
+		/// in the handler's constructor.</param>
+		public void SendErrorPacket(string error, string name = null, string type = "error") {
+			if(name == null) name = Name;
+			var body = new Dictionary<string, Dictionary<string, string>> {
+				{"error", new Dictionary<string, string> {
+					{name, error},
+					{"type", type},
+				}},
+			};
+			var writer = new JsonFx.Json.JsonWriter();
+			this.EnqueueMessage(writer.Write(body));
 		}
 
 		/// <summary>

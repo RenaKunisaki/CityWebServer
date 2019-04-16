@@ -23,32 +23,22 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Transport" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// <c>get</c>: line ID => get info about specified line
 		/// <c>list</c>: (anything) => get list of valid IDs
 		/// </remarks>
-		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
+		public void OnClientMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
 				case "get":
-					int? id = param["get"] as int?;
-					if(id == null) {
-						SendErrorResponse("Invalid line ID");
-						return;
-					}
-					SendLine((int)id);
+					SendLine(msg.GetInt("id"));
 					break;
 				case "list":
 					SendList();
 					break;
 				default:
-					SendErrorResponse($"Transport has no method '{key}'");
-					break;
+					throw new ArgumentException($"Invalid method {action}");
 			}
 		}
 

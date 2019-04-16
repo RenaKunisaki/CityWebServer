@@ -18,10 +18,6 @@ namespace CityWebServer.Callbacks {
 		public DateTime time;
 	}
 
-	public class SocketMessageHandlerParam {
-		public object param;
-	}
-
 	/// <summary>
 	/// Callback parameter for terrain height modified event.
 	/// </summary>

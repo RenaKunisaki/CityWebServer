@@ -77,44 +77,37 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Building" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// <c>get</c>: building ID => get info about specified building
 		/// <c>list</c>: (anything) => get list of valid IDs
 		/// </remarks>
-		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			try {
-				ClientMessage msg = new ClientMessage(_param);
-				string action = msg.GetString("action");
-				switch(action) {
-					case "get": {
-							SendBuilding(msg.GetInt("id"));
-							break;
-						}
-					case "getByProblem": {
-							//This could be just a ulong parameter but nope,
-							//apparently you can't use ulong in json for reasons
-							string flags = msg.GetString("problem");
-							if(flags == null || !ProblemFlags.ContainsKey(flags)) {
-								throw new ArgumentException("Invalid problem name");
-							}
-							SendProblems(ProblemFlags[flags]);
-							break;
-						}
-					case "list":
-						SendList();
+		public void OnClientMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
+				case "get": {
+						SendBuilding(msg.GetInt("id"));
 						break;
-					case "destroy": {
-							DestroyBuilding(msg.GetInt("id"));
-							break;
+					}
+				case "getByProblem": {
+						//This could be just a ulong parameter but nope,
+						//apparently you can't use ulong in json for reasons
+						string flags = msg.GetString("problem");
+						if(flags == null || !ProblemFlags.ContainsKey(flags)) {
+							throw new ArgumentException("Invalid problem name");
 						}
-					default:
-						throw new ArgumentException($"Invalid method {action}");
-				}
-			}
-			catch(ArgumentException ex) {
-				SendErrorResponse(ex.Message);
-				return;
+						SendProblems(ProblemFlags[flags]);
+						break;
+					}
+				case "list":
+					SendList();
+					break;
+				case "destroy": {
+						DestroyBuilding(msg.GetInt("id"));
+						break;
+					}
+				default:
+					throw new ArgumentException($"Invalid method {action}");
 			}
 		}
 

@@ -102,32 +102,22 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "District" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// <c>get</c>: district ID => get info about specified district
 		/// <c>list</c>: (anything) => get list of valid IDs
 		/// </remarks>
-		public void OnDistrictMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
+		public void OnDistrictMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
 				case "get":
-					int? id = param["get"] as int?;
-					if(id == null) {
-						SendErrorResponse("Invalid line ID");
-						return;
-					}
-					SendJson(GetDistrict((int)id), "District");
+					SendJson(GetDistrict(msg.GetInt("id")), "District");
 					break;
 				case "list":
 					SendDistrictList();
 					break;
 				default:
-					SendErrorResponse($"District has no method '{key}'");
-					break;
+					throw new ArgumentException($"Invalid method {action}");
 			}
 		}
 

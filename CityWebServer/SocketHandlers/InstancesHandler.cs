@@ -33,17 +33,13 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Instances" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// TODO
 		/// </remarks>
-		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
+		public void OnClientMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
 				case "AudioManager":
 					SendJson(GetAudio(), "Instances.AudioManager");
 					break;
@@ -108,8 +104,7 @@ namespace CityWebServer.SocketHandlers {
 					SendJson(GetZones(), "Instances.ZoneManager");
 					break;
 				default:
-					SendErrorResponse($"Instances has no method '{key}'");
-					break;
+					throw new ArgumentException($"Invalid method {action}");
 
 			}
 		}

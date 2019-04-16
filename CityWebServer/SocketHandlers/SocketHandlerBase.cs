@@ -53,12 +53,14 @@ namespace CityWebServer.SocketHandlers {
 		/// </summary>
 		/// <param name="error">Error message.</param>
 		/// <param name="name">Class name. Default is the name given
+		/// <param name="type">Error type.</param>
 		/// in the handler's constructor.</param>
-		public void SendErrorResponse(string error, string name = null) {
+		public void SendErrorResponse(string error, string name = null, string type = "error") {
 			if(name == null) name = Name;
 			SendUnencapsulatedJson(new Dictionary<string, Dictionary<string, string>> {
 				{"error", new Dictionary<string, string> {
 					{name, error},
+					{"type", type},
 				}},
 			});
 		}

@@ -28,19 +28,18 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Reflection" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// TODO
 		/// </remarks>
-		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
+		public void OnClientMessage(ClientMessage msg) {
 			string[] targetName;
 			string parentName = "<none>", objectName = "<none>";
 			string action;
 			Response resp;
 			try {
-				targetName = param["object"] as string[];
-				action = param["action"] as string;
+				targetName = msg.GetStringArray("object");
+				action = msg.GetString("action");
 				resp = new Response {
 					targetName = targetName,
 					action = action,
@@ -153,8 +152,8 @@ namespace CityWebServer.SocketHandlers {
 						resp.result = target.GetType(); //.FullName;
 						break;
 					case "GetValue": {
-							string field = param["field"] as string;
-							object[] index = param["index"] as object[];
+							string field = msg.GetString("field");
+							object[] index = msg.GetObjectArray("index");
 							var prop = target.GetType().GetProperty(field);
 							if(prop == null) {
 								resp.error = $"No field '{field}' in object '{objectName}'";
@@ -165,13 +164,13 @@ namespace CityWebServer.SocketHandlers {
 					case "Invoke":
 						//XXX cast args to appropriate types...
 						resp.result = target.GetType().GetMethod(
-							param["field"] as string).Invoke(
-							target, param["args"] as object[]);
+							msg.GetString("field")).Invoke(
+							target, msg.GetObjectArray("args"));
 						break;
 					case "SetValue": {
-							string field = param["field"] as string;
-							object value = param["value"];
-							object[] index = param["index"] as object[];
+							string field = msg.GetString("field");
+							object value = msg.GetObject("value");
+							object[] index = msg.GetObjectArray("index");
 							Log($"Set field '{field}' of '{objectName}' to value '{value}'");
 							var prop = target.GetType().GetProperty(field);
 							if(prop == null) {
@@ -181,8 +180,7 @@ namespace CityWebServer.SocketHandlers {
 							break;
 						}
 					default:
-						SendErrorResponse($"Reflection has no method '{action}'");
-						return;
+						throw new ArgumentException($"Invalid method {action}");
 				}
 				SendJson(resp);
 			}

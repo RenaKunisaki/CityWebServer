@@ -20,29 +20,19 @@ namespace CityWebServer.SocketHandlers {
 		/// <summary>
 		/// Handle "Citizen" message from client.
 		/// </summary>
-		/// <param name="_param">Parameter.</param>
+		/// <param name="msg">Message.</param>
 		/// <remarks>Expects a dict with one of the keys:
 		/// <c>get</c>: building ID => get info about specified building
 		/// <c>list</c>: (anything) => get list of valid IDs
 		/// </remarks>
-		public void OnClientMessage(SocketMessageHandlerParam _param) {
-			var param = _param.param as Dictionary<string, object>;
-			var key = param.Keys.First();
-			switch(key) {
-				case null:
-					SendErrorResponse(HttpStatusCode.BadRequest);
-					break;
+		public void OnClientMessage(ClientMessage msg) {
+			string action = msg.GetString("action");
+			switch(action) {
 				case "get":
-					int? id = param["get"] as int?;
-					if(id == null) {
-						SendErrorResponse("Invalid citizen ID");
-						return;
-					}
-					SendCitizen((int)id);
+					SendCitizen(msg.GetInt("id"));
 					break;
 				default:
-					SendErrorResponse($"Citizen has no method '{key}'");
-					break;
+					throw new ArgumentException($"Invalid method {action}");
 			}
 		}
 

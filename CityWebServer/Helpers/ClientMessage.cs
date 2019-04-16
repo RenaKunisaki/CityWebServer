@@ -8,8 +8,8 @@ namespace CityWebServer.SocketHandlers {
 	/// A message received from a socket client.
 	/// </summary>
 	public class ClientMessage {
-		public ClientMessage(SocketMessageHandlerParam _param) {
-			this.param = _param.param;
+		public ClientMessage(object _param) {
+			this.param = _param;
 		}
 
 		public bool HasKey(string key) {
@@ -29,6 +29,15 @@ namespace CityWebServer.SocketHandlers {
 		public string GetString(string key, bool allowNull = false) {
 			var p = this.param as Dictionary<string, object>;
 			string v = p[key] as string;
+			if(v == null && !allowNull) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return v;
+		}
+
+		public string[] GetStringArray(string key, bool allowNull = false) {
+			var p = this.param as Dictionary<string, object>;
+			string[] v = p[key] as string[];
 			if(v == null && !allowNull) {
 				throw new ArgumentException($"invalid value for {key}");
 			}
@@ -60,6 +69,24 @@ namespace CityWebServer.SocketHandlers {
 				throw new ArgumentException($"invalid value for {key}");
 			}
 			return (bool)v;
+		}
+
+		public object GetObject(string key, bool allowNull = false) {
+			var p = this.param as Dictionary<string, object>;
+			object v = p[key] as object;
+			if(v == null && !allowNull) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return v;
+		}
+
+		public object[] GetObjectArray(string key, bool allowNull = false) {
+			var p = this.param as Dictionary<string, object>;
+			object[] v = p[key] as object[];
+			if(v == null && !allowNull) {
+				throw new ArgumentException($"invalid value for {key}");
+			}
+			return v;
 		}
 
 		public Vector2 GetVector2(string key, bool allowNull = false) {
