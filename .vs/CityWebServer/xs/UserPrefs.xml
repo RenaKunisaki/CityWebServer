@@ -1,11 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer/Models/BuildingInfo.cs">
     <Files>
-      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="24" Column="31" />
+      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="26" Column="25" />
       <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="75" Column="4" />
       <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="65" Column="66" />
       <File FileName="CityWebServer/Models/CallbackParams.cs" Line="37" Column="16" />
-      <File FileName="CityWebServer Status" />
       <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="25" NotebookId="1" />
       <File FileName="CityWebServer/WebServer.cs" Line="411" Column="30" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="416" Column="25" NotebookId="1" />

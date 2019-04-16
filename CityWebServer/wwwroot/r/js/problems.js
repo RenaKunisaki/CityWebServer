@@ -104,25 +104,24 @@ class Problems {
                 $('<button class="camera-goto">').text("Go There")
                 .on('click', e => {
                     this.app.query({"Camera":{
-                        "set":{
-                            "x":building.posX,
-                            "y":building.posY,
-                            "z":building.posZ,
-                        },
+                        "action":"lookAt",
+                        "building":building.ID,
                     }})
                 }),
                 $('<button class="building-destroy">').text("Demolish")
                 .on('click', e => {
-                    this.app.query({"Building":{
-                        "action": "destroy",
-                        "id": building.ID,
-                    }})
+                    if(confirm(`Demolish ${building.title}?`)) {
+                        this.app.query({"Building":{
+                            "action": "destroy",
+                            "id": building.ID,
+                        }})
+                    }
                 }),
             ));
         }
 
         new Popup({
-            title: "Buildings with "+problem,
+            title: "Buildings with problem: "+problem,
             body: list,
         }).show();
     }
