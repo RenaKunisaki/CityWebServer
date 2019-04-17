@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using CityWebServer.Extensibility;
 using CityWebServer.RequestHandlers;
 using ColossalFramework;
-using CityWebServer.Callbacks;
-using System.Linq;
 using UnityEngine;
 
 namespace CityWebServer.SocketHandlers {
@@ -162,47 +158,186 @@ namespace CityWebServer.SocketHandlers {
 				return;
 			}
 			var info = target.Info;
-
-			//Give refund if possible.
-			int amount = target.Info.m_buildingAI.GetRefundAmount(
-				(ushort)id, ref target);
-			Log($"Destroying building {id} gives refund of {amount}");
-			if(amount != 0) {
-				EconomyManager.instance.AddResource(
-					EconomyManager.Resource.RefundAmount, amount, info.m_class);
-			}
-
-			//Get info before destroying
-			Vector3 position = target.m_position;
-			float angle = target.m_angle;
-			int length = target.m_length;
-			var lod = info.m_lodMeshData;
+			GiveRefund(id);
+			PlayBulldozeSound(target);
 
 			//Delete the building
 			Log($"Destroy building: {id}");
 			manager.ReleaseBuilding((ushort)id);
 			Log($"Building {id} deleted.");
+		}
 
-			//Trigger the bulldoze effect
-			EffectInfo effect = manager.m_properties.m_bulldozeEffect;
-			if(effect != null) {
-				Log("Triggering bulldoze effect...");
-				//var nullAudioGroup = new AudioGroup(0,
-				//	new SavedFloat("Bulldoze",
-				//		Settings.gameSettingsFile, 0, false));
-				var instance = new InstanceID();
-				var spawnArea = new EffectInfo.SpawnArea(
-					Matrix4x4.TRS(
-						Building.CalculateMeshPosition(info, position, angle, length),
-						Building.CalculateMeshRotation(angle),
-						Vector3.one
-					),
-					lod);
-				EffectManager.instance.DispatchEffect(effect, instance, spawnArea,
-					Vector3.zero, 0.0f, 1f,
-					AudioManager.instance.EffectGroup);
-				//nullAudioGroup);
-				Log("Triggered bulldoze effect.");
+		/// <summary>
+		/// Gives appropriate refund for destroying specified building.
+		/// </summary>
+		/// <param name="id">Identifier.</param>
+		/// <remarks>Refund may be zero.</remarks>
+		protected void GiveRefund(int id) {
+			var target = BuildingManager.instance.m_buildings.m_buffer[id];
+			int amount = target.Info.m_buildingAI.GetRefundAmount(
+				(ushort)id, ref target);
+			Log($"Destroying building {id} gives refund of {amount}");
+			if(amount != 0) {
+				EconomyManager.instance.AddResource(
+					EconomyManager.Resource.RefundAmount, amount,
+					target.Info.m_class);
+			}
+		}
+
+		/// <summary>
+		/// Play bulldoze sound (if enabled) for specified building.
+		/// </summary>
+		/// <param name="target">The building being destroyed.</param>
+		protected void PlayBulldozeSound(Building target) {
+			EffectInfo effect = BuildingManager.instance.m_properties.m_bulldozeEffect;
+			if(effect == null) return; //effect is disabled.
+
+			Log("Triggering bulldoze effect...");
+
+			//var nullAudioGroup = new AudioGroup(0,
+			//	new SavedFloat("Bulldoze",
+			//		Settings.gameSettingsFile, 0, false));
+			var instance = new InstanceID();
+			var spawnArea = new EffectInfo.SpawnArea(
+				//Compute where the sound should come from in the world.
+				Matrix4x4.TRS(
+					Building.CalculateMeshPosition(target.Info,
+						target.m_position, target.m_angle, target.m_length),
+					Building.CalculateMeshRotation(target.m_angle),
+					Vector3.one),
+				target.Info.m_lodMeshData);
+			EffectManager.instance.DispatchEffect(effect, instance, spawnArea,
+				Vector3.zero, 0.0f, 1f,
+				AudioManager.instance.EffectGroup);
+			//nullAudioGroup);
+			Log("Triggered bulldoze effect.");
+		}
+
+		/// <summary>
+		/// Attempt to rebuild the specified building.
+		/// </summary>
+		/// <returns><c>true</c>, if building was rebuilt, <c>false</c> otherwise.</returns>
+		/// <param name="id">Building ID.</param>
+		/// <param name="force">Whether to override normal restrictions.</param>
+		/// <remarks>Mostly copied from https://github.com/keallu/CSL-RebuildIt/blob/master/RebuildIt/RebuildUtils.cs</remarks>
+		protected bool RebuildBuilding(int id, bool force = false) {
+			BuildingManager buildingManager = BuildingManager.instance;
+			Building building = buildingManager.m_buildings.m_buffer[id];
+			BuildingInfo info = building.Info;
+			if(!force && IsRico(building)) {
+				Log($"Building {id} is not a city building.");
+				return false;
+			}
+
+			var flags = Building.Flags.BurnedDown | Building.Flags.Collapsed;
+			if(!force && (building.m_flags & flags) == 0) {
+				Log($"Building {id} does not need rebuilding.");
+				return false;
+			}
+
+			var problems = (
+				Notification.Problem.StructureVisited | //RICO ready to rebuild
+				Notification.Problem.StructureVisitedService); //other ready to rebuild
+			if(!force && (building.m_problems & problems) == 0) {
+				Log($"Building {id} is not ready to rebuild.");
+				return false;
+			}
+
+			int relocationCost = info.m_buildingAI.GetRelocationCost();
+			Log($"Rebuilding building {id} costs {relocationCost / 100}");
+			if(!force && relocationCost >= EconomyManager.instance.InternalCashAmount) {
+				Log($"Not enough money to rebuild building {id}.");
+				return false;
+			}
+
+			Log($"Rebuilding building {id}...");
+			//Actually deduct the cost.
+			EconomyManager.instance.FetchResource(
+				EconomyManager.Resource.Construction,
+				relocationCost, info.m_class);
+
+			//Relocate the building to its current location, ie rebuild it.
+			buildingManager.RelocateBuilding((ushort)id,
+				building.m_position, building.m_angle);
+			RebuildSubBuildings(id);
+
+			//Restore whatever service the building was providing.
+			int publicServiceIndex = ItemClass.GetPublicServiceIndex(info.m_class.m_service);
+			if(publicServiceIndex != -1) {
+				buildingManager.m_buildingDestroyed2.Disable();
+				GuideManager.instance.m_serviceNotUsed[publicServiceIndex].Disable();
+				GuideManager.instance.m_serviceNeeded[publicServiceIndex].Deactivate();
+				CoverageManager.instance.CoverageUpdated(info.m_class.m_service,
+					info.m_class.m_subService, info.m_class.m_level);
+			}
+			Log($"Rebuilt building {id}.");
+			return true;
+
+		}
+
+		/// <summary>
+		/// Check if specified building is Residential, Industrial,
+		/// Commercial, or Office.
+		/// </summary>
+		/// <returns><c>true</c> if one of these types, <c>false</c> otherwise.</returns>
+		/// <param name="building">Building.</param>
+		protected bool IsRico(Building building) {
+			switch(building.Info.m_class.GetZone()) {
+				case ItemClass.Zone.ResidentialHigh:
+				case ItemClass.Zone.ResidentialLow:
+				case ItemClass.Zone.Industrial:
+				case ItemClass.Zone.CommercialHigh:
+				case ItemClass.Zone.CommercialLow:
+				case ItemClass.Zone.Office:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		protected void RebuildSubBuildings(int id) {
+			BuildingManager buildingManager = BuildingManager.instance;
+			SimulationManager simulationManager = SimulationManager.instance;
+			Building building = buildingManager.m_buildings.m_buffer[id];
+			BuildingInfo info = building.Info;
+
+			if(info.m_subBuildings == null || info.m_subBuildings.Length == 0) return;
+			Matrix4x4 matrix4x = default(Matrix4x4);
+			matrix4x.SetTRS(building.m_position,
+				//This number is 1 radian in degrees.
+				Quaternion.AngleAxis(building.m_angle * 57.29578f, Vector3.down),
+				Vector3.one);
+
+			BuildingInfo subBuildingInfo;
+			Vector3 position;
+			float angle;
+			bool fixedHeight;
+			for(int i = 0; i < info.m_subBuildings.Length; i++) {
+				subBuildingInfo = info.m_subBuildings[i].m_buildingInfo;
+				position = matrix4x.MultiplyPoint(
+					info.m_subBuildings[i].m_position);
+				//This number is 1 degree in radians.
+				angle = info.m_subBuildings[i].m_angle * 0.0174532924f +
+					building.m_angle;
+				fixedHeight = info.m_subBuildings[i].m_fixedHeight;
+
+				if(buildingManager.CreateBuilding(out ushort subBuildingId,
+					ref SimulationManager.instance.m_randomizer,
+					info, position, angle, 0,
+					SimulationManager.instance.m_currentBuildIndex)) {
+					if(fixedHeight) {
+						buildingManager.m_buildings.m_buffer[subBuildingId]
+						.m_flags |= Building.Flags.FixedHeight;
+					}
+					SimulationManager.instance.m_currentBuildIndex++;
+				}
+
+				if(id != 0 && subBuildingId != 0) {
+					buildingManager.m_buildings.m_buffer[id].m_subBuilding = subBuildingId;
+					buildingManager.m_buildings.m_buffer[subBuildingId].m_parentBuilding = id;
+					buildingManager.m_buildings.m_buffer[subBuildingId].m_flags |= Building.Flags.Untouchable;
+					id = subBuildingId;
+				}
 			}
 		}
 
