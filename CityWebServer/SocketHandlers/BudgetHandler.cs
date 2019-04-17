@@ -407,7 +407,8 @@ namespace CityWebServer.SocketHandlers {
 				case "gimme":
 					economyManager.AddResource(
 						EconomyManager.Resource.RewardAmount,
-						msg.GetInt("amount"), new ItemClass());
+						msg.GetInt("amount"),
+						(ItemClass)ScriptableObject.CreateInstance("ItemClass"));
 					break;
 				case "payLoan": {
 						var r = economyManager.PayLoanNow(msg.GetInt("id"));
