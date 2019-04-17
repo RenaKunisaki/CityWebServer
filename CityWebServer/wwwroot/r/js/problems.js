@@ -96,27 +96,33 @@ class Problems {
         }, "ProblemBuildings");
         console.log("Buildings with problem", problem, data);
 
-        const list = $('<ul class="list">');
+        const list = $('<table class="list">');
         for(const building of data) {
-            list.append($('<li class="building">').append(
-                $('<span class="name">').text(building.title),
-                $('<span class="type">').text(building.category),
-                $('<button class="camera-goto">').text("Go There")
-                .on('click', e => {
-                    this.app.query({"Camera":{
-                        "action":"lookAt",
-                        "building":building.ID,
-                    }})
-                }),
-                $('<button class="building-destroy">').text("Demolish")
-                .on('click', e => {
-                    if(confirm(`Demolish ${building.title}?`)) {
-                        this.app.query({"Building":{
-                            "action": "destroy",
-                            "id": building.ID,
-                        }})
-                    }
-                }),
+            list.append($('<tr class="building">').append(
+                $('<td class="name">').text(building.name),
+                $('<td class="type">').text(building.category),
+                $('<td class="buttons">').append(
+                    $('<button class="camera-goto">').text("Go There")
+                    .on('click', e => {
+                        //add a small delay so that we can get back
+                        //into the game window so it won't scroll away
+                        setTimeout(() => {
+                            this.app.query({"Camera":{
+                                "action":"lookAt",
+                                "building":building.ID,
+                            }})
+                        }, 500);
+                    }),
+                    $('<button class="building-destroy">').text("Demolish")
+                    .on('click', e => {
+                        if(confirm(`Demolish ${building.name}?`)) {
+                            this.app.query({"Building":{
+                                "action": "destroy",
+                                "id": building.ID,
+                            }})
+                        }
+                    })
+                )
             ));
         }
 

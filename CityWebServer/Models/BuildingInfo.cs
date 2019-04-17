@@ -5,6 +5,7 @@ namespace CityWebServer.Models {
 		public int ID;
 		public string category;
 		public string title;
+		public string name;
 		public string thumbnail;
 		public int classLevel;
 		public int service;

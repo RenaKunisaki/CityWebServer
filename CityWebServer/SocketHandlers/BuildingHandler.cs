@@ -187,9 +187,9 @@ namespace CityWebServer.SocketHandlers {
 			EffectInfo effect = manager.m_properties.m_bulldozeEffect;
 			if(effect != null) {
 				Log("Triggering bulldoze effect...");
-				var nullAudioGroup = new AudioGroup(0,
-					new SavedFloat("Bulldoze",
-						Settings.gameSettingsFile, 0, false));
+				//var nullAudioGroup = new AudioGroup(0,
+				//	new SavedFloat("Bulldoze",
+				//		Settings.gameSettingsFile, 0, false));
 				var instance = new InstanceID();
 				var spawnArea = new EffectInfo.SpawnArea(
 					Matrix4x4.TRS(
@@ -199,7 +199,9 @@ namespace CityWebServer.SocketHandlers {
 					),
 					lod);
 				EffectManager.instance.DispatchEffect(effect, instance, spawnArea,
-					Vector3.zero, 0.0f, 1f, nullAudioGroup);
+					Vector3.zero, 0.0f, 1f,
+					AudioManager.instance.EffectGroup);
+				//nullAudioGroup);
 				Log("Triggered bulldoze effect.");
 			}
 		}
@@ -237,6 +239,8 @@ namespace CityWebServer.SocketHandlers {
 				ID = id,
 				category = building.Info.category,
 				title = building.Info.GetUncheckedLocalizedTitle(),
+				name = BuildingManager.instance.GetBuildingName(
+					(ushort)id, building.Info.m_instanceID),
 				thumbnail = building.Info.m_Thumbnail,
 				classLevel = (int)building.Info.GetClassLevel(),
 				maintenanceCost = building.Info.GetMaintenanceCost(),
