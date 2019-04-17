@@ -98,8 +98,29 @@ namespace CityWebServer.SocketHandlers {
 				case "list":
 					SendList();
 					break;
-				case "destroy": {
-						DestroyBuilding(msg.GetInt("id"));
+				case "destroy":
+					DestroyBuilding(msg.GetInt("id"));
+					break;
+				case "canRebuild": {
+						int id = msg.GetInt("id");
+						bool ok = CanRebuild(msg.GetInt("id"), out string status);
+						SendJson(new Dictionary<string, string> {
+							{ "canRebuild", ok.ToString() },
+							{ "id", id.ToString() },
+							{ "status", status },
+						});
+						break;
+					}
+				case "rebuild": {
+						int id = msg.GetInt("id");
+						bool force = msg.HasKey("force") && msg.GetBool("force");
+						bool ok = RebuildBuilding(msg.GetInt("id"),
+							out string status, force);
+						SendJson(new Dictionary<string, string> {
+							{ "rebuild", ok.ToString() },
+							{ "id", id.ToString() },
+							{ "status", status },
+						});
 						break;
 					}
 				default:
@@ -214,65 +235,104 @@ namespace CityWebServer.SocketHandlers {
 		}
 
 		/// <summary>
-		/// Attempt to rebuild the specified building.
+		/// Check if we can rebuild the specified building.
 		/// </summary>
-		/// <returns><c>true</c>, if building was rebuilt, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c> if able to rebuild.</returns>
 		/// <param name="id">Building ID.</param>
-		/// <param name="force">Whether to override normal restrictions.</param>
-		/// <remarks>Mostly copied from https://github.com/keallu/CSL-RebuildIt/blob/master/RebuildIt/RebuildUtils.cs</remarks>
-		protected bool RebuildBuilding(int id, bool force = false) {
+		/// <param name="status">Receives status code.</param>
+		protected bool CanRebuild(int id, out string status) {
 			BuildingManager buildingManager = BuildingManager.instance;
 			Building building = buildingManager.m_buildings.m_buffer[id];
 			BuildingInfo info = building.Info;
-			if(!force && IsRico(building)) {
+			if(IsRico(building)) {
 				Log($"Building {id} is not a city building.");
+				status = "WrongType";
 				return false;
 			}
 
 			var flags = Building.Flags.BurnedDown | Building.Flags.Collapsed;
-			if(!force && (building.m_flags & flags) == 0) {
+			if((building.m_flags & flags) == 0) {
 				Log($"Building {id} does not need rebuilding.");
+				status = "NotDestroyed";
 				return false;
 			}
 
 			var problems = (
 				Notification.Problem.StructureVisited | //RICO ready to rebuild
 				Notification.Problem.StructureVisitedService); //other ready to rebuild
-			if(!force && (building.m_problems & problems) == 0) {
+			if((building.m_problems & problems) == 0) {
 				Log($"Building {id} is not ready to rebuild.");
+				status = "NotReady";
 				return false;
 			}
 
 			int relocationCost = info.m_buildingAI.GetRelocationCost();
 			Log($"Rebuilding building {id} costs {relocationCost / 100}");
-			if(!force && relocationCost >= EconomyManager.instance.InternalCashAmount) {
+			if(relocationCost >= EconomyManager.instance.InternalCashAmount) {
 				Log($"Not enough money to rebuild building {id}.");
+				status = "NoMoney";
 				return false;
 			}
 
+			status = "OK";
+			return true;
+		}
+
+		/// <summary>
+		/// Attempt to rebuild the specified building.
+		/// </summary>
+		/// <returns><c>true</c> if rebuilt.</returns>
+		/// <param name="id">Building ID.</param>
+		/// <param name="status">Receives status code.</param>
+		/// <param name="force">Whether to override normal restrictions.</param>
+		/// <remarks>Mostly copied from https://github.com/keallu/CSL-RebuildIt/blob/master/RebuildIt/RebuildUtils.cs</remarks>
+		protected bool RebuildBuilding(int id, out string status, bool force = false) {
+			if(!force) {
+				if(!CanRebuild(id, out string r)) {
+					status = r;
+					return false;
+				}
+			}
+
+			BuildingManager buildingManager = BuildingManager.instance;
+			Building building = buildingManager.m_buildings.m_buffer[id];
+			BuildingInfo info = building.Info;
+
 			Log($"Rebuilding building {id}...");
-			//Actually deduct the cost.
-			EconomyManager.instance.FetchResource(
-				EconomyManager.Resource.Construction,
-				relocationCost, info.m_class);
+			if(IsRico(building)) {
+				//Normally can't be rebuilt by player, but `force` overrides this.
+				building.m_problems = Notification.Problem.None;
+				//XXX what are Active and Completed?
+				building.m_flags &= ~(Building.Flags.BurnedDown |
+					Building.Flags.Collapsed | Building.Flags.Active |
+					Building.Flags.Completed);
+				building.m_flags |= Building.Flags.ZonesUpdated;
+			}
+			else {
+				//Actually deduct the cost.
+				int relocationCost = info.m_buildingAI.GetRelocationCost();
+				EconomyManager.instance.FetchResource(
+					EconomyManager.Resource.Construction,
+					relocationCost, info.m_class);
 
-			//Relocate the building to its current location, ie rebuild it.
-			buildingManager.RelocateBuilding((ushort)id,
-				building.m_position, building.m_angle);
-			RebuildSubBuildings(id);
+				//Relocate the building to its current location, ie rebuild it.
+				buildingManager.RelocateBuilding((ushort)id,
+					building.m_position, building.m_angle);
+				RebuildSubBuildings(id);
 
-			//Restore whatever service the building was providing.
-			int publicServiceIndex = ItemClass.GetPublicServiceIndex(info.m_class.m_service);
-			if(publicServiceIndex != -1) {
-				buildingManager.m_buildingDestroyed2.Disable();
-				GuideManager.instance.m_serviceNotUsed[publicServiceIndex].Disable();
-				GuideManager.instance.m_serviceNeeded[publicServiceIndex].Deactivate();
-				CoverageManager.instance.CoverageUpdated(info.m_class.m_service,
-					info.m_class.m_subService, info.m_class.m_level);
+				//Restore whatever service the building was providing.
+				int publicServiceIndex = ItemClass.GetPublicServiceIndex(info.m_class.m_service);
+				if(publicServiceIndex != -1) {
+					buildingManager.m_buildingDestroyed2.Disable();
+					GuideManager.instance.m_serviceNotUsed[publicServiceIndex].Disable();
+					GuideManager.instance.m_serviceNeeded[publicServiceIndex].Deactivate();
+					CoverageManager.instance.CoverageUpdated(info.m_class.m_service,
+						info.m_class.m_subService, info.m_class.m_level);
+				}
 			}
 			Log($"Rebuilt building {id}.");
+			status = "OK";
 			return true;
-
 		}
 
 		/// <summary>
@@ -334,9 +394,9 @@ namespace CityWebServer.SocketHandlers {
 
 				if(id != 0 && subBuildingId != 0) {
 					buildingManager.m_buildings.m_buffer[id].m_subBuilding = subBuildingId;
-					buildingManager.m_buildings.m_buffer[subBuildingId].m_parentBuilding = id;
+					buildingManager.m_buildings.m_buffer[subBuildingId].m_parentBuilding = (ushort)id;
 					buildingManager.m_buildings.m_buffer[subBuildingId].m_flags |= Building.Flags.Untouchable;
-					id = subBuildingId;
+					id = subBuildingId; //XXX is this right?
 				}
 			}
 		}
