@@ -479,7 +479,8 @@ namespace CityWebServer.SocketHandlers {
 				//rate is 52 weeks * 100%
 				//m_interestRate is per 10,000, ie 0.01%, so we
 				//further divide it by 100.
-				float rate = 1 + (loan.m_interestRate / 520000);
+				float interest = loan.m_interestRate / 100;
+				float rate = 1 + (interest / 5200);
 				float cost = loan.m_amountTaken / loan.m_length; //weekly payment
 				double weeks = (Math.Log(remain + cost / (1 - rate)) -
 					Math.Log(initial + cost / (1 - rate))) / Math.Log(rate);
@@ -495,8 +496,8 @@ namespace CityWebServer.SocketHandlers {
 					InterestRate = loan.m_interestRate,
 					InterestPaid = loan.m_interestPaid,
 					Length = loan.m_length,
-					TimeLeft = weeks,
-					WeeklyPayment = (long)cost,
+					TimeLeft = (float)weeks,
+					WeeklyPayment = (long)(cost * (1 + interest)),
 				});
 			}
 			return loans;
