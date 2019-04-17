@@ -41,7 +41,7 @@ namespace CityWebServer.Models {
 		public int InterestRate;
 		public long InterestPaid;
 		public long Length;
-		public double TimeLeft; //in weeks until fully repaid
+		public float TimeLeft; //in weeks until fully repaid
 		public long WeeklyPayment;
 	}
 

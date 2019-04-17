@@ -201,9 +201,18 @@
             element: $('#budget-graph .expense canvas')[0],
             datasets: datasets,
         });
+        this.graphTotal = new TimeChart({
+            app: this.app,
+            element: $('#budget-graph .total canvas')[0],
+            datasets: [
+                {color:"#0F0", backgroundColor:"rgba(0,255,0,0.5)", label:"Income"},
+                {color:"#F00", backgroundColor:"rgba(255,0,0,0.5)", label:"Expense"},
+                {color:"#FF0", label:"Balance"},
+            ],
+        });
     }
 
-    _updateGraph(groups) {
+    _updateGraphs(data) {
         if(!this.app.data.Tick) return;
         const time = new Date(this.app.data.Tick.Time);
         let year   = time.getFullYear();
@@ -214,12 +223,17 @@
         && year   == this.prevYear) return;
 
         let dataIn = {}, dataOut = {};
-        for(const [name, group] of Object.entries(groups)) {
+        for(const [name, group] of Object.entries(data.groups)) {
             dataIn[name] = group.income / 100;
             dataOut[name] = group.expense / 100;
         }
         this.graphIn.add(time, dataIn);
         this.graphOut.add(time, dataOut);
+        this.graphTotal.add(time, {
+            Income: data.totalIncome,
+            Expense: data.totalExpenses,
+            //XXX balance
+        });
 
         this.graphIn.update();
         this.graphOut.update();
@@ -263,7 +277,7 @@
         this.chartExpenses.data.datasets[0].data = expenseData;
         this.chartIncome.update();
         this.chartExpenses.update();
-        this._updateGraph(data.groups)
+        this._updateGraphs(data);
     }
 
     _update(data) {

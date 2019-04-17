@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using CityWebServer.Callbacks;
-using CityWebServer.Extensibility;
 using CityWebServer.Models;
 using CityWebServer.RequestHandlers;
-using ColossalFramework;
 using UnityEngine;
 
 namespace CityWebServer.SocketHandlers {
@@ -482,22 +479,21 @@ namespace CityWebServer.SocketHandlers {
 				float interest = loan.m_interestRate / 100;
 				float rate = 1 + (interest / 5200);
 				float cost = loan.m_amountTaken / loan.m_length; //weekly payment
-				double weeks = (Math.Log(remain + cost / (1 - rate)) -
-					Math.Log(initial + cost / (1 - rate))) / Math.Log(rate);
+				float weeks = (remain * rate) / cost;
 
 				loans.Add(new Loan {
 					//bank names aren't the ones shown in-game,
 					//they're just BankA, BankB, BankC. WTF?
 					//can LocaleFormatter give us the names?
-					//BankName = economyManager.GetBankName(i),
-					BankName = economyManager.m_properties.m_banks[i].m_bankName,
+					BankName = economyManager.GetBankName(i),
+					//BankName = economyManager.m_properties.m_banks[i].m_bankName,
 					Amount = loan.m_amountTaken,
 					PaymentLeft = loan.m_amountLeft,
 					InterestRate = loan.m_interestRate,
 					InterestPaid = loan.m_interestPaid,
 					Length = loan.m_length,
 					TimeLeft = (float)weeks,
-					WeeklyPayment = (long)(cost * (1 + interest)),
+					WeeklyPayment = (long)(cost * (1 + (interest / 100))),
 				});
 			}
 			return loans;
