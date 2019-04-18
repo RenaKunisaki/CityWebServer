@@ -203,7 +203,7 @@
         });
         this.graphTotal = new TimeChart({
             app: this.app,
-            element: $('#budget-graph .total canvas')[0],
+            element: $('#budget-graph .totals canvas')[0],
             datasets: [
                 {color:"#0F0", backgroundColor:"rgba(0,255,0,0.5)", label:"Income"},
                 {color:"#F00", backgroundColor:"rgba(255,0,0,0.5)", label:"Expense"},
@@ -230,13 +230,14 @@
         this.graphIn.add(time, dataIn);
         this.graphOut.add(time, dataOut);
         this.graphTotal.add(time, {
-            Income: data.totalIncome,
-            Expense: data.totalExpenses,
-            //XXX balance
+            Income: data.totalIncome / 100,
+            Expense: data.totalExpenses / 100,
+            Balance: data.currentCash / 100,
         });
 
         this.graphIn.update();
         this.graphOut.update();
+        this.graphTotal.update();
         this.prevYear  = year;
         this.prevMonth = month;
         this.prevDay   = day;

@@ -113,8 +113,8 @@ td.money:before { content: '' }
     font-weight: bold;
 }
 
-.building .type::before { content: '(' }
+/* .building .type::before { content: '(' }
 .building .type::after  { content: ')' }
 .building .type {
     margin-right: 1em;
-}
+} */

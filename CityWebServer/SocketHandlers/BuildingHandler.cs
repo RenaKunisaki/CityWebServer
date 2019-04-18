@@ -64,6 +64,25 @@ namespace CityWebServer.SocketHandlers {
 			["WrongAreaType"] = (ulong)Notification.Problem.WrongAreaType,
 		};
 
+		/// <summary>
+		/// Flags that indicate problems which may not be included in m_problems.
+		/// </summary>
+		public static readonly Building.Flags ProblemBuildingFlags =
+				Building.Flags.Abandoned |
+				Building.Flags.BurnedDown |
+				Building.Flags.CapacityFull |
+				Building.Flags.Collapsed |
+				Building.Flags.RateReduced;
+
+		public static readonly Dictionary<string, Building.Flags> ProblemFlagNames =
+			new Dictionary<string, Building.Flags> {
+				{ "Abandoned", Building.Flags.Abandoned },
+				{ "BurnedDown", Building.Flags.BurnedDown },
+				{ "CapacityFull", Building.Flags.CapacityFull },
+				{ "Collapsed", Building.Flags.Collapsed },
+				{ "RateReduced", Building.Flags.RateReduced },
+	};
+
 		public BuildingHandler(SocketRequestHandler handler) :
 		base(handler, "Building") {
 			//SendAll();
@@ -89,10 +108,13 @@ namespace CityWebServer.SocketHandlers {
 						//This could be just a ulong parameter but nope,
 						//apparently you can't use ulong in json for reasons
 						string flags = msg.GetString("problem");
-						if(flags == null || !ProblemFlags.ContainsKey(flags)) {
+						if(flags == null || (!ProblemFlags.ContainsKey(flags)
+						&& !ProblemFlagNames.ContainsKey(flags))) {
 							throw new ArgumentException("Invalid problem name");
 						}
-						SendProblems(ProblemFlags[flags]);
+						if(ProblemFlags.ContainsKey(flags))
+							SendProblems(ProblemFlags[flags]);
+						else SendFlags(ProblemFlagNames[flags]);
 						break;
 					}
 				case "list":
@@ -108,7 +130,7 @@ namespace CityWebServer.SocketHandlers {
 							{ "canRebuild", ok.ToString() },
 							{ "id", id.ToString() },
 							{ "status", status },
-						});
+						}, "canRebuild");
 						break;
 					}
 				case "rebuild": {
@@ -120,7 +142,7 @@ namespace CityWebServer.SocketHandlers {
 							{ "rebuild", ok.ToString() },
 							{ "id", id.ToString() },
 							{ "status", status },
-						});
+						}, "rebuild");
 						break;
 					}
 				default:
@@ -417,6 +439,21 @@ namespace CityWebServer.SocketHandlers {
 		}
 
 		/// <summary>
+		/// Send list of buildings that have specified flags.
+		/// </summary>
+		/// <param name="flags">Flags.</param>
+		protected void SendFlags(Building.Flags flags) {
+			var buffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
+			var buildings = new List<CityWebServer.Models.BuildingInfo>();
+			for(int i = 0; i < buffer.Length; i++) {
+				if((buffer[i].m_flags & flags) != 0) {
+					buildings.Add(GetBuilding(i));
+				}
+			}
+			SendJson(buildings, "FlagBuildings");
+		}
+
+		/// <summary>
 		/// Get info about specified building by ID.
 		/// </summary>
 		/// <returns>The building info.</returns>
@@ -463,7 +500,7 @@ namespace CityWebServer.SocketHandlers {
 				finalImport = building.m_finalImport,
 				fireHazard = building.m_fireHazard,
 				fireIntensity = building.m_fireIntensity,
-				//flags = building.m_flags,
+				flags = (uint)building.m_flags,
 				garbageBuffer = building.m_garbageBuffer,
 				guestVehicles = building.m_guestVehicles,
 				happiness = building.m_happiness,

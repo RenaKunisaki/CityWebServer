@@ -73,6 +73,25 @@ namespace CityWebServer.SocketHandlers {
 			set => problemFlags = value;
 		}
 
+		/// <summary>
+		/// Flags that indicate problems which may not be included in m_problems.
+		/// </summary>
+		public static readonly Building.Flags ProblemBuildingFlags =
+				Building.Flags.Abandoned |
+				Building.Flags.BurnedDown |
+				Building.Flags.CapacityFull |
+				Building.Flags.Collapsed |
+				Building.Flags.RateReduced;
+
+		public static readonly Dictionary<string, Building.Flags> ProblemFlagNames =
+			new Dictionary<string, Building.Flags> {
+				{ "Abandoned", Building.Flags.Abandoned },
+				{ "BurnedDown", Building.Flags.BurnedDown },
+				{ "CapacityFull", Building.Flags.CapacityFull },
+				{ "Collapsed", Building.Flags.Collapsed },
+				{ "RateReduced", Building.Flags.RateReduced },
+			};
+
 		public NotificationHandler(SocketRequestHandler handler) :
 		base(handler, "Notifications") {
 			SendCounts();
@@ -114,6 +133,18 @@ namespace CityWebServer.SocketHandlers {
 								problemCount[flag.Value] = 1;
 							}
 							else problemCount[flag.Value]++;
+						}
+					}
+				}
+				//Check building flags as well
+				if((buffer[i].m_flags & ProblemBuildingFlags) != 0) {
+					var flags = buffer[i].m_flags;
+					foreach(KeyValuePair<string, Building.Flags> flag in ProblemFlagNames) {
+						if(((long)flags & (long)flag.Value) != 0) {
+							if(!problemCount.ContainsKey(flag.Key)) {
+								problemCount[flag.Key] = 1;
+							}
+							else problemCount[flag.Key]++;
 						}
 					}
 				}

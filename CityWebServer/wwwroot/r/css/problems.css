@@ -1,5 +1,6 @@
 #problems {
     height: 12em;
+    overflow: auto;
 }
 
 .problem-icon {

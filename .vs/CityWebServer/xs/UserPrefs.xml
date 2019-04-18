@@ -1,17 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="CityWebServer Status">
     <Files>
-      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="8" Column="22" />
-      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="277" Column="18" />
+      <File FileName="CityWebServer/Models/BuildingInfo.cs" Line="40" Column="21" />
+      <File FileName="CityWebServer/SocketHandlers/BuildingHandler.cs" Line="134" Column="6" />
       <File FileName="CityWebServer/Helpers/ClientMessage.cs" Line="86" Column="28" />
       <File FileName="CityWebServer/Models/CallbackParams.cs" Line="21" Column="2" />
       <File FileName="CityWebServer/SocketHandlers/CameraHandler.cs" Line="159" Column="69" />
       <File FileName="CityWebServer/SocketHandlers/CitizenHandler.cs" Line="29" Column="44" />
       <File FileName="CityWebServer/Models/Economy.cs" Line="17" Column="36" />
+      <File FileName="CityWebServer/SocketHandlers/NotificationHandler.cs" Line="153" Column="4" />
       <File FileName="CityWebServer Status" />
       <File FileName="CityWebServer/Models/CitizenInfo.cs" Line="30" Column="25" NotebookId="1" />
       <File FileName="CityWebServer/WebServer.cs" Line="24" Column="18" NotebookId="1" />
-      <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="478" Column="11" NotebookId="1" />
+      <File FileName="CityWebServer/SocketHandlers/BudgetHandler.cs" Line="481" Column="17" NotebookId="1" />
       <File FileName="CityWebServer/RequestHandlers/SocketRequestHandler.cs" Line="302" Column="30" NotebookId="1" />
       <File FileName="CityWebServer/SocketHandlers/SocketHandlerBase.cs" Line="45" Column="47" NotebookId="1" />
       <File FileName="CityWebServer/RequestHandlerBase.cs" Line="54" Column="1" NotebookId="1" />

@@ -70,11 +70,11 @@
 }
 
 #budget-graph {
-    width: 32em;
+    width: 24em;
     overflow: hidden;
 }
 
 #budget-graph .canvas {
-    height: 16em;
-    width: 32em;
+    height: 12em;
+    width: 24em;
 }

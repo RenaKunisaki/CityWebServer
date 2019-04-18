@@ -33,7 +33,7 @@ namespace CityWebServer.Models {
 		public int finalImport;
 		public int fireHazard;
 		public int fireIntensity;
-		//public Building.Flags flags;
+		public uint flags;
 		public int garbageBuffer;
 		public int guestVehicles;
 		public int happiness;
