@@ -54,7 +54,7 @@ const problemTypes = [
 const problemFlagTypes = [
     "Abandoned",
     "BurnedDown",
-    "CapacityFull",
+    //"CapacityFull",
     "Collapsed",
     "RateReduced",
 ];
@@ -65,6 +65,12 @@ const rebuildFailMessages = {
     "NotReady": "Building is not ready to rebuild",
     "NoMoney": "Not enough money to rebuild",
 };
+
+//Which building flags should be shown in UI
+const flagsToShow = ["Abandoned", "BurnedDown", "CapacityStep1",
+    "CapacityStep2", "Collapsed", "Demolishing", "Downgrading",
+    "Evacuating", "Flooded", "HighDensity", "Historical",
+    "RateReduced", "RoadAccessFailed", "Upgrading"];
 
 class Problems {
     constructor(app) {
@@ -133,6 +139,17 @@ class Problems {
         }
     }
 
+    buildingFlagsToImages(flags) {
+        const result = $('<span class="flags">');
+        for(const flag of flagsToShow) {
+            const val = this.app.data.Flags.Building[flag];
+            if(flags & val) {
+                result.append($(`<img src="/r/img/BuildingFlags/${flag}.png" title="${flag}">`));
+            }
+        }
+        return result;
+    }
+
     async _onIconClick(problem) {
         let data = await this.app.query({
             "Building": {
@@ -145,14 +162,37 @@ class Problems {
         const list = $('<table class="list">').append(
             $('<th>').text("Name"),
             $('<th>').text("Category"),
+            $('<th>').text("District"),
+            $('<th>').text("Flags"),
             $('<th>').text("Actions"),
         );
         for(const building of data) {
+            //Get district name
+            //It might not be in the list if it's new
+            let tdDistrict = $('<td class="district">');
+            if(building.district != 0) {
+                let district = this.app.data.District[building.district];
+                if(district == undefined) {
+                    this.app.query({"District":{
+                        "action":"get","id":building.district
+                    }}).then(result => {
+                        tdDistrict.text(result.Name);
+                    })
+                }
+                else {
+                    tdDistrict.text(district.Name);
+                }
+            }
+            else tdDistrict.text("-");
+
             list.append($('<tr class="building">').append(
                 $('<td class="name">').text(building.name),
                 $('<td class="type">').text(building.category),
+                tdDistrict,
+                $('<td class="flags">').append(
+                    this.buildingFlagsToImages(building.flags)),
                 $('<td class="buttons">').append(
-                    $('<button class="camera-goto">').text("Go There")
+                    $('<button class="camera-goto">').text("Show")
                     .on('click', e => this._doGoto(building)),
                     $('<button class="building-destroy">').text("Demolish")
                     .on('click', e => this._doDemolish(building)),
@@ -164,6 +204,7 @@ class Problems {
 
         new Popup({
             title: "Buildings with problem: "+problem,
+            classes: "problems",
             body: list,
         }).show();
     }
