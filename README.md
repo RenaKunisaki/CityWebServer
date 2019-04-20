@@ -43,6 +43,7 @@ You should be able to run this alongside the original version (it uses a differe
     - From the list, you can see each problem building and click Show to focus the camera on it, Demolish to destroy it, or Rebuild to rebuild it if necessary.
     - Demolish will let you destroy some buildings the game normally won't let you destroy, eg cemeteries and dumps that aren't empty. It will give the appropriate refunds.
     - Rebuild only functions if the building is destroyed, owned by the city, and ready for rebuilding. (The API is capable of overriding these restrictions, but this functionality isn't exposed in the UI yet.) It deducts the appropriate funds and fails if you don't have enough money.
+    - Even abandoned buildings will show up in the lists of eg Not Enough Customers, Not Enough Workers, etc. This lets you see why the building was abandoned.
 
 Hover the mouse over points on the charts for more details.
 
@@ -67,6 +68,7 @@ You can connect to the WebSocket server and call methods. New information is pus
 - Notify when a rocket is ready to launch.
 - Get localized strings from the game.
 - Notification when a new problem arises (maybe animate the icon for a second)
+- Show info about loaded mods/assets
 
 # Known issues
 
