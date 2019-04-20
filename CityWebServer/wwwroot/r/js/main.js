@@ -177,6 +177,10 @@ class App {
         if(name.startsWith('Commercial_High'))  return '#0040C0';
         if(name.startsWith('Industrial'))       return '#FF8000';
         if(name.startsWith('Office'))           return '#00C0C0';
+        if(name.startsWith('Water'))            return '#009DF3';
+        if(name.startsWith('Sewer'))            return '#802010';
+        if(name.startsWith('Electricity'))      return '#C0C000';
+        if(name.startsWith('Heat'))             return '#C000C0';
         let hue = 0, sat = 0, light = 0;
         for(let i=0; i<name.length; i++) {
             let c = name.charCodeAt(i);
