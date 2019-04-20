@@ -95,6 +95,7 @@ td.money:before { content: '' }
     background: rgba(0, 0, 0, 0.8);
     border: 1px #FFF solid;
     box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.8);
+    overflow: auto;
 }
 
 .popup button.close {

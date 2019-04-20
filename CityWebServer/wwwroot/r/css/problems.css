@@ -29,3 +29,12 @@
         -2px -2px 2px #000,
          2px -2px 2px #000;
 }
+
+.popup.problems {
+    left: 10%;
+    right: 10%;
+}
+
+.problems .flags img {
+    width: 1.5em;
+}
