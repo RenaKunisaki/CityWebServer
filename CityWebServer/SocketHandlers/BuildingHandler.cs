@@ -70,7 +70,7 @@ namespace CityWebServer.SocketHandlers {
 		public static readonly Building.Flags ProblemBuildingFlags =
 				Building.Flags.Abandoned |
 				Building.Flags.BurnedDown |
-				Building.Flags.CapacityFull |
+				//Building.Flags.CapacityFull |
 				Building.Flags.Collapsed |
 				Building.Flags.RateReduced;
 
@@ -78,7 +78,7 @@ namespace CityWebServer.SocketHandlers {
 			new Dictionary<string, Building.Flags> {
 				{ "Abandoned", Building.Flags.Abandoned },
 				{ "BurnedDown", Building.Flags.BurnedDown },
-				{ "CapacityFull", Building.Flags.CapacityFull },
+				//{ "CapacityFull", Building.Flags.CapacityFull },
 				{ "Collapsed", Building.Flags.Collapsed },
 				{ "RateReduced", Building.Flags.RateReduced },
 	};
@@ -87,6 +87,7 @@ namespace CityWebServer.SocketHandlers {
 		base(handler, "Building") {
 			//SendAll();
 			handler.RegisterMessageHandler("Building", OnClientMessage);
+
 		}
 
 		/// <summary>
@@ -450,7 +451,10 @@ namespace CityWebServer.SocketHandlers {
 					buildings.Add(GetBuilding(i));
 				}
 			}
-			SendJson(buildings, "FlagBuildings");
+			//Using ProblemBuildings here because this is really only used for
+			//the flags that indicate problems but aren't included in the
+			//Notification.Problem enum for some reason, like BurnedDown.
+			SendJson(buildings, "ProblemBuildings");
 		}
 
 		/// <summary>
@@ -461,7 +465,7 @@ namespace CityWebServer.SocketHandlers {
 		protected CityWebServer.Models.BuildingInfo GetBuilding(int id) {
 			Building building;
 			try {
-				building = Singleton<BuildingManager>.instance.m_buildings.m_buffer[id];
+				building = BuildingManager.instance.m_buildings.m_buffer[id];
 			}
 			catch(NullReferenceException) {
 				return null;
@@ -474,6 +478,7 @@ namespace CityWebServer.SocketHandlers {
 				name = BuildingManager.instance.GetBuildingName(
 					(ushort)id, building.Info.m_instanceID),
 				thumbnail = building.Info.m_Thumbnail,
+				district = (int)DistrictManager.instance.GetDistrict(building.m_position),
 				classLevel = (int)building.Info.GetClassLevel(),
 				maintenanceCost = building.Info.GetMaintenanceCost(),
 				service = (int)building.Info.GetService(),
