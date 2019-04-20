@@ -24,6 +24,8 @@ Only if you use it to cheat. It will let you break some rules (demolishing non-e
 
 The performance impact should be little to none, but running a web browser alongside the game might take up a bunch of extra RAM and CPU. (But, Steam's interface is already a web browser, so maybe not a big deal.) It uses very little memory, and is idle most of the time.
 
+You should be able to run this alongside the original version (it uses a different port) if you want to display its information on another computer. Otherwise, don't forget to remove/disable it.
+
 # Overview
 
 - Top bar: Shows city name and in-game date.
