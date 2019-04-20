@@ -17,7 +17,7 @@ namespace CityWebServer.SocketHandlers {
 		base(handler, "District") {
 			server.dailyCallbacks.Register(Update);
 			handler.RegisterMessageHandler("District", OnDistrictMessage);
-			SendDistrict(0);
+			SendAll();
 		}
 
 		/// <summary>
@@ -125,22 +125,14 @@ namespace CityWebServer.SocketHandlers {
 		/// Send a list of valid district IDs.
 		/// </summary>
 		protected void SendDistrictList() {
-			var districtManager = Singleton<DistrictManager>.instance;
+			var districtManager = DistrictManager.instance;
 			if(districtManager == null) {
 				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
 				return;
 			}
 
 			List<int> ids = new List<int>();
-			District[] districts;
-			try {
-				districts = districtManager.m_districts.m_buffer;
-			}
-			catch(Exception ex) {
-				Log($"Error getting districts buffer: {ex}");
-				throw;
-			}
-
+			District[] districts = districtManager.m_districts.m_buffer;
 			for(int i = 0; i < districts.Length; i++) {
 				var district = districts[i];
 				if(district.m_flags == District.Flags.None) continue;
@@ -156,6 +148,24 @@ namespace CityWebServer.SocketHandlers {
 		/// <param name="id">District ID.</param>
 		protected void SendDistrict(int id) {
 			SendJson(GetDistrict(id));
+		}
+
+		/// <summary>
+		/// Sends all district info to client.
+		/// </summary>
+		protected void SendAll() {
+			var districtManager = DistrictManager.instance;
+			if(districtManager == null) {
+				SendErrorResponse(HttpStatusCode.ServiceUnavailable);
+				return;
+			}
+
+			var districts = districtManager.m_districts.m_buffer;
+			for(int i = 0; i < districts.Length; i++) {
+				var district = districts[i];
+				if(district.m_flags == District.Flags.None) continue;
+				SendDistrict(i);
+			}
 		}
 	}
 }
