@@ -221,6 +221,15 @@
     <None Include="wwwroot\r\css\heightmap.css" />
     <None Include="wwwroot\r\js\heightmap.js" />
     <None Include="IntegratedWebServer.cs.old" />
+    <None Include="wwwroot\r\img\ToolbarIconBulldozer.png" />
+    <None Include="wwwroot\r\img\problems\BurnedDown.png" />
+    <None Include="wwwroot\r\img\problems\Collapsed.png" />
+    <None Include="wwwroot\r\img\problems\NoInputProducts.png" />
+    <None Include="wwwroot\r\img\problems\NoNaturalResources.png" />
+    <None Include="wwwroot\r\img\problems\RateReduced.png" />
+    <None Include="wwwroot\r\img\problems\StructureVisited.png" />
+    <None Include="wwwroot\r\img\problems\StructureVisitedService.png" />
+    <None Include="wwwroot\r\img\problems\TooFewServices.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SocketHandlers\" />
